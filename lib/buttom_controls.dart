@@ -111,54 +111,48 @@ class PlayPauseButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final player = Provider.of<AudioSchedule>(context).player;
     final song = Provider.of<AudioSchedule>(context).song;
-    return StreamBuilder<AudioPlayerState>(
-      stream: player.onPlayerStateChanged,
-      initialData: AudioPlayerState.STOPPED,
-      builder:
-          (BuildContext context, AsyncSnapshot<AudioPlayerState> snapshot) {
-        if (snapshot.hasError) return Text('Error: ${snapshot.error}');
-        IconData icon;
-        Function onPressed;
-        Color buttonColor = lightAccentColor;
-        switch (snapshot.data) {
-          case AudioPlayerState.PLAYING:
-            icon = Icons.pause;
-            onPressed = player.pause;
-            buttonColor = Colors.white;
-            break;
-          case AudioPlayerState.PAUSED:
-            icon = Icons.play_arrow;
-            onPressed = player.resume;
-            buttonColor = Colors.white;
-            break;
-          case AudioPlayerState.STOPPED:
-          case AudioPlayerState.COMPLETED:
-            icon = Icons.play_arrow;
-            onPressed = () => player.play(song.audioUrl);
-            buttonColor = Colors.white;
-            break;
-        }
-        return RawMaterialButton(
-          shape: CircleBorder(),
-          fillColor: buttonColor,
-          splashColor: lightAccentColor,
-          highlightColor: lightAccentColor.withOpacity(0.5),
-          elevation: 10.0,
-          highlightElevation: 5.0,
-          onPressed: () {},
-          child: Padding(
-            padding: EdgeInsets.all(8.0),
-            child: IconButton(
-              icon: Icon(
-                icon,
-                color: darkAccentColor,
-                size: 35.0,
-              ),
-              onPressed: onPressed,
-            ),
+    final state = Provider.of<AudioPlayerState>(context);
+
+    IconData icon;
+    Function onPressed;
+    Color buttonColor = lightAccentColor;
+    switch (state) {
+      case AudioPlayerState.PLAYING:
+        icon = Icons.pause;
+        onPressed = player.pause;
+        buttonColor = Colors.white;
+        break;
+      case AudioPlayerState.PAUSED:
+        icon = Icons.play_arrow;
+        onPressed = player.resume;
+        buttonColor = Colors.white;
+        break;
+      case AudioPlayerState.STOPPED:
+      case AudioPlayerState.COMPLETED:
+        icon = Icons.play_arrow;
+        onPressed = () => player.play(song.audioUrl);
+        buttonColor = Colors.white;
+        break;
+    }
+    return RawMaterialButton(
+      shape: CircleBorder(),
+      fillColor: buttonColor,
+      splashColor: lightAccentColor,
+      highlightColor: lightAccentColor.withOpacity(0.5),
+      elevation: 10.0,
+      highlightElevation: 5.0,
+      onPressed: () {},
+      child: Padding(
+        padding: EdgeInsets.all(8.0),
+        child: IconButton(
+          icon: Icon(
+            icon,
+            color: darkAccentColor,
+            size: 35.0,
           ),
-        );
-      },
+          onPressed: onPressed,
+        ),
+      ),
     );
   }
 }

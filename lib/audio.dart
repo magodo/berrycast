@@ -7,23 +7,16 @@ class AudioSchedule with ChangeNotifier {
   final AudioPlayer player;
   DemoPlaylist _playlist;
   int _playIdx;
-  Duration _progress;
 
   AudioSchedule()
       : player = AudioPlayer(),
         _playlist = demoPlaylist,
-        _playIdx = 0,
-        _progress = Duration();
+        _playIdx = 0;
 
   DemoPlaylist get playlist => _playlist;
   set playlist(DemoPlaylist playlist) {
     _playlist = playlist;
     notifyListeners();
-  }
-
-  Duration get progress => _progress;
-  set progress(Duration dur) {
-    _progress = dur;
   }
 
   DemoSong get song => _playlist.songs[_playIdx];
@@ -48,13 +41,20 @@ class AudioSchedule with ChangeNotifier {
     notifyListeners();
   }
 
-  void forward10() {
-    player.seek(_progress + Duration(seconds: 10));
+  void forward10() async {
+    var pos = await player.getCurrentPosition();
+    player.seek(Duration(milliseconds: pos + 10 * 1000));
     notifyListeners();
   }
 
-  void replay10() {
-    player.seek(_progress - Duration(seconds: 10));
+  void replay10() async {
+    var pos = await player.getCurrentPosition();
+    player.seek(Duration(milliseconds: pos - 10 * 1000));
+    notifyListeners();
+  }
+
+  void seek(double percent) {
+    player.seek(song.duration * percent);
     notifyListeners();
   }
 

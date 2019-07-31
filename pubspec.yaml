@@ -26,6 +26,7 @@ dependencies:
   audioplayers: ^0.13.1
   fluttery: ^0.0.8
   provider: ^3.0.0+1
+  rxdart: ^0.22.1
 
 dev_dependencies:
   flutter_test:
