@@ -5,6 +5,7 @@ import 'package:fluttery/gestures.dart';
 import 'package:provider/provider.dart';
 
 import 'audio.dart';
+import 'audioplayer_stream_wrapper.dart';
 import 'theme.dart';
 
 class RadialSeekBar extends StatefulWidget {
@@ -23,6 +24,7 @@ class _RadialSeekBarState extends State<RadialSeekBar> {
   double _seekPercent = 0.0;
   PolarCoord _startDragCoord;
   double _startDragPercent;
+  double _endDragPercent;
   double _currentDragPercent;
 
   @override
@@ -51,20 +53,31 @@ class _RadialSeekBarState extends State<RadialSeekBar> {
 
   RadialDragEnd _buildOnDragEnd(AudioSchedule schedule) {
     return () {
-      _seekPercent = _currentDragPercent;
       _startDragPercent = null;
       _startDragCoord = null;
-      schedule.seek(_currentDragPercent);
+      _endDragPercent = _currentDragPercent;
       _currentDragPercent = null;
+      schedule.seek(_endDragPercent);
     };
   }
 
   @override
   Widget build(BuildContext context) {
     final schedule = Provider.of<AudioSchedule>(context);
-    final position = Provider.of<Duration>(context);
-    _seekPercent =
-        (position.inSeconds / schedule.song.duration.inSeconds) % 1.0;
+    final position = Provider.of<AudioPosition>(context);
+
+    // The [_endDragPercent] here is because when we call [AudioPlayer.seek], it will always
+    // send a position via [onAudioPositionChanged] stream, and this position is the point before
+    // seeking. Hence, it will introduce ping-pong visual effect.
+    // To get rid of this first "non-sense" position, we will use the [_endDragPercent] if non-nil,
+    // and then set it as nil.
+    if (_endDragPercent != null) {
+      _seekPercent = _endDragPercent;
+      _endDragPercent = null;
+    } else {
+      _seekPercent =
+          (position.inSeconds / schedule.song.duration.inSeconds) % 1.0;
+    }
     return RadialDragGestureDetector(
       onRadialDragStart: _onDragStart,
       onRadialDragUpdate: _onDragUpdate,

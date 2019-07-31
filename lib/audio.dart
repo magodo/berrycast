@@ -55,6 +55,7 @@ class AudioSchedule with ChangeNotifier {
 
   void seek(double percent) {
     player.seek(song.duration * percent);
+    player.play(song.audioUrl);
     notifyListeners();
   }
 

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'audio.dart';
+import 'audioplayer_stream_wrapper.dart';
 import 'radial_seekbar.dart';
 
 void main() => runApp(MyApp());
@@ -34,10 +35,16 @@ class _HomePageState extends State<HomePage> {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider<AudioSchedule>.value(value: schedule),
-        StreamProvider<Duration>.value(
-          value: schedule.player.onAudioPositionChanged,
-          initialData: Duration(),
+        StreamProvider<AudioPosition>.value(
+          value: schedule.player.onAudioPositionChanged
+              .map((position) => AudioPosition(position)),
+          initialData: AudioPosition(Duration()),
         ),
+//        StreamProvider<AudioDuration>.value(
+//          value: schedule.player.onDurationChanged
+//              .map((dur) => AudioDuration(dur)),
+//          initialData: AudioDuration(Duration()),
+//        ),
         StreamProvider<AudioPlayerState>.value(
           value: schedule.player.onPlayerStateChanged,
           initialData: AudioPlayerState.STOPPED,

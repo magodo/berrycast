@@ -22,6 +22,14 @@ class DemoPlaylist {
 }
 
 final demoPlaylist = DemoPlaylist(songs: [
+//  DemoSong(
+//    audioUrl: "https://cdn.changelog.com/uploads/gotime/90/go-time-90.mp3",
+//    albumArtUrl:
+//        "https://cdn.changelog.com/uploads/covers/go-time-original.png",
+//    songTitle: "Go tooling",
+//    artist: "with Mat, Jaana & Johnny",
+//    duration: Duration(milliseconds: 95970193),
+//  ),
   DemoSong(
     audioUrl: "https://talkcdn.swift.gg/audio/1.mp3",
     albumArtUrl: "https://talkcdn.swift.gg/static/logo.jpg",
