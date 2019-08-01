@@ -9,10 +9,12 @@ import 'audioplayer_stream_wrapper.dart';
 import 'theme.dart';
 
 class RadialSeekBar extends StatefulWidget {
-  final double seekPercent;
+  final double thumbPercent;
+  final double progressPercent;
 
   const RadialSeekBar({
-    this.seekPercent = 0.0,
+    this.thumbPercent = 0.0,
+    this.progressPercent = 0.0,
     Key key,
   }) : super(key: key);
 
@@ -21,7 +23,8 @@ class RadialSeekBar extends StatefulWidget {
 }
 
 class _RadialSeekBarState extends State<RadialSeekBar> {
-  double _seekPercent = 0.0;
+  double _thumbPercent;
+  double _progressPercent;
   PolarCoord _startDragCoord;
   double _startDragPercent;
   double _endDragPercent;
@@ -30,18 +33,19 @@ class _RadialSeekBarState extends State<RadialSeekBar> {
   @override
   void initState() {
     super.initState();
-    _seekPercent = widget.seekPercent;
+    _thumbPercent = widget.thumbPercent;
+    _progressPercent = widget.progressPercent;
   }
 
   @override
   void didUpdateWidget(RadialSeekBar oldWidget) {
     super.didUpdateWidget(oldWidget);
-    _seekPercent = widget.seekPercent;
+    _thumbPercent = widget.thumbPercent;
   }
 
   void _onDragStart(PolarCoord coord) {
     _startDragCoord = coord;
-    _startDragPercent = _seekPercent;
+    _startDragPercent = _thumbPercent;
   }
 
   void _onDragUpdate(PolarCoord coord) {
@@ -66,17 +70,20 @@ class _RadialSeekBarState extends State<RadialSeekBar> {
     final schedule = Provider.of<AudioSchedule>(context);
     final position = Provider.of<AudioPosition>(context);
 
+    _progressPercent =
+        (position.inSeconds / schedule.song.duration.inSeconds) % 1.0;
+
     // The [_endDragPercent] here is because when we call [AudioPlayer.seek], it will always
     // send a position via [onAudioPositionChanged] stream, and this position is the point before
     // seeking. Hence, it will introduce ping-pong visual effect.
     // To get rid of this first "non-sense" position, we will use the [_endDragPercent] if non-nil,
     // and then set it as nil.
-    if (_endDragPercent != null) {
-      _seekPercent = _endDragPercent;
+    _thumbPercent = _progressPercent;
+    if (_currentDragPercent != null) {
+      _thumbPercent = _currentDragPercent;
+    } else if (_endDragPercent != null) {
+      _thumbPercent = _endDragPercent;
       _endDragPercent = null;
-    } else {
-      _seekPercent =
-          (position.inSeconds / schedule.song.duration.inSeconds) % 1.0;
     }
     return RadialDragGestureDetector(
       onRadialDragStart: _onDragStart,
@@ -92,9 +99,9 @@ class _RadialSeekBarState extends State<RadialSeekBar> {
             height: 180.0,
             child: RadialProgressBar(
               trackColor: Color(0xFFDDDDDD),
-              progressPercent: _currentDragPercent ?? _seekPercent,
+              progressPercent: _progressPercent,
               progressColor: accentColor,
-              thumbPosition: _currentDragPercent ?? _seekPercent,
+              thumbPosition: _thumbPercent,
               thumbColor: lightAccentColor,
               innerPadding: EdgeInsets.all(10.0),
               outerPadding: EdgeInsets.all(10.0),

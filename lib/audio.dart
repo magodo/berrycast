@@ -1,15 +1,16 @@
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 
+import 'audioplayer_stream_wrapper.dart';
 import 'songs.dart';
 
 class AudioSchedule with ChangeNotifier {
-  final AudioPlayer player;
+  final MyAudioPlayer player;
   DemoPlaylist _playlist;
   int _playIdx;
 
   AudioSchedule()
-      : player = AudioPlayer(),
+      : player = MyAudioPlayer(),
         _playlist = demoPlaylist,
         _playIdx = 0;
 
@@ -35,8 +36,9 @@ class AudioSchedule with ChangeNotifier {
     _changeSong();
   }
 
-  void _changeSong() {
+  void _changeSong() async {
     player.stop();
+    player.setPosition(Duration());
     player.play(_playlist.songs[_playIdx].audioUrl);
     notifyListeners();
   }

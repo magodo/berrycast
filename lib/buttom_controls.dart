@@ -69,6 +69,7 @@ class SongInfos extends StatelessWidget {
           )
         ],
       ),
+      textAlign: TextAlign.center,
     );
   }
 }
