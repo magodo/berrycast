@@ -7,4 +7,4 @@ The internal implementation is different, including
 - Use [audioplayers](https://pub.dev/packages/audioplayers) instead of [fluttery_audio](https://pub.dev/packages/fluttery_audio)
 - Use [Provider](https://pub.dev/packages/provider) for state management
 
-![screencast](https://github.com/magodo/screencast.jpg)
+![screencast](https://github.com/magodo/berrycast/blob/master/screencast.jpg)
