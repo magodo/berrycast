@@ -110,8 +110,7 @@ class PlayPauseButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final player = Provider.of<AudioSchedule>(context).player;
-    final song = Provider.of<AudioSchedule>(context).song;
+    final schedule = Provider.of<AudioSchedule>(context);
     final state = Provider.of<AudioPlayerState>(context);
 
     IconData icon;
@@ -120,18 +119,18 @@ class PlayPauseButton extends StatelessWidget {
     switch (state) {
       case AudioPlayerState.PLAYING:
         icon = Icons.pause;
-        onPressed = player.pause;
+        onPressed = schedule.pause;
         buttonColor = Colors.white;
         break;
       case AudioPlayerState.PAUSED:
         icon = Icons.play_arrow;
-        onPressed = player.resume;
+        onPressed = schedule.resume;
         buttonColor = Colors.white;
         break;
       case AudioPlayerState.STOPPED:
       case AudioPlayerState.COMPLETED:
         icon = Icons.play_arrow;
-        onPressed = () => player.play(song.audioUrl);
+        onPressed = schedule.play;
         buttonColor = Colors.white;
         break;
     }

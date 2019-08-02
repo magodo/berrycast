@@ -3,32 +3,16 @@ import 'package:berrycast/buttom_controls.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import 'album.dart';
+import 'album_page.dart';
 import 'audio.dart';
 import 'audioplayer_stream_wrapper.dart';
 import 'radial_seekbar.dart';
+import 'theme.dart';
 
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: '',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: HomePage(),
-    );
-  }
-}
-
-class HomePage extends StatefulWidget {
-  @override
-  _HomePageState createState() => _HomePageState();
-}
-
-class _HomePageState extends State<HomePage> {
   final AudioSchedule schedule = AudioSchedule();
   @override
   Widget build(BuildContext context) {
@@ -50,41 +34,65 @@ class _HomePageState extends State<HomePage> {
           initialData: AudioPlayerState.STOPPED,
         ),
       ],
-      child: Scaffold(
-        appBar: AppBar(
-          backgroundColor: Colors.transparent,
-          elevation: 0.0,
-          leading: IconButton(
-            icon: Icon(Icons.arrow_back),
-            color: Colors.grey,
-            onPressed: () {},
-          ),
-          actions: <Widget>[
-            IconButton(
-              icon: Icon(Icons.menu),
-              color: Colors.grey,
-              onPressed: () {},
-            ),
-          ],
+      child: MaterialApp(
+        title: '',
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData(
+          primarySwatch: Colors.blue,
         ),
-        body: Column(
-          children: <Widget>[
-            // seek bar
-            Expanded(
-              child: RadialSeekBar(),
-            ),
-
-            // visualizer
-            Container(
-              width: double.infinity,
-              height: 125.0,
-            ),
-
-            // song title, artist name and controls
-            ButtonControls(),
-          ],
+        home: ChangeNotifierProvider<DemoAlbumList>.value(
+          value: demoAlbumList,
+          child: HomePage(),
         ),
       ),
     );
   }
 }
+
+class HomePage extends StatelessWidget {
+  _openAlbumPage(BuildContext context, DemoAlbum album) {
+    Navigator.push(context, MaterialPageRoute(builder: (context) {
+      return AlbumPage(album: album);
+    }));
+  }
+
+  List<Widget> _buildAlbumThumb(BuildContext context) {
+    final albumList = Provider.of<DemoAlbumList>(context);
+    return List.generate(
+      albumList.albums.length,
+
+      (idx) => RawMaterialButton(
+        shape: CircleBorder(),
+        splashColor: lightAccentColor,
+        highlightColor: lightAccentColor.withOpacity(0.5),
+        elevation: 10.0,
+        highlightElevation: 5.0,
+        onPressed: () {},
+        child: GridTile(
+          child: InkResponse(
+            enableFeedback: true,
+            child: Image.network(
+              albumList.albums[idx].albumArtUrl,
+              fit: BoxFit.cover,
+            ),
+            onTap: () => _openAlbumPage(context, albumList.albums[idx]),
+          ),
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      child: GridView.count(
+          crossAxisCount: 2,
+          mainAxisSpacing: 4.0,
+          crossAxisSpacing: 4.0,
+          padding: const EdgeInsets.all(4.0),
+          childAspectRatio: 1.0,
+          children: _buildAlbumThumb(context)),
+    );
+  }
+}
+

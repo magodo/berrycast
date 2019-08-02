@@ -1,4 +1,3 @@
-import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 
 import 'audioplayer_stream_wrapper.dart';
@@ -17,7 +16,7 @@ class AudioSchedule with ChangeNotifier {
   DemoPlaylist get playlist => _playlist;
   set playlist(DemoPlaylist playlist) {
     _playlist = playlist;
-    notifyListeners();
+    _playIdx = 0;
   }
 
   DemoSong get song => _playlist.songs[_playIdx];
@@ -59,6 +58,18 @@ class AudioSchedule with ChangeNotifier {
     player.seek(song.duration * percent);
     player.play(song.audioUrl);
     notifyListeners();
+  }
+
+  void play() {
+    player.play(song.audioUrl);
+  }
+
+  void resume() {
+    player.resume();
+  }
+
+  void pause() {
+    player.pause();
   }
 
   @override
