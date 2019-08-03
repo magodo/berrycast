@@ -5,7 +5,7 @@ import 'album_page.dart';
 import 'songs.dart';
 import 'theme.dart';
 
-class HomePage extends StatelessWidget {
+class PodcastPage extends StatelessWidget {
   _openAlbumPage(BuildContext context, DemoAlbum album) {
     Navigator.push(context, MaterialPageRoute(builder: (context) {
       return AlbumPage(album: album);
@@ -16,8 +16,7 @@ class HomePage extends StatelessWidget {
     final albumList = Provider.of<DemoAlbumList>(context);
     return List.generate(
       albumList.albums.length,
-
-          (idx) => RawMaterialButton(
+      (idx) => RawMaterialButton(
         shape: CircleBorder(),
         splashColor: lightAccentColor,
         highlightColor: lightAccentColor.withOpacity(0.5),

@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 
 import 'audio.dart';
 import 'audioplayer_stream_wrapper.dart';
-import 'home_page.dart';
+import 'podcast_page.dart';
 import 'songs.dart';
 import 'theme.dart';
 
@@ -40,7 +40,41 @@ class MyApp extends StatelessWidget {
         ),
         home: ChangeNotifierProvider<DemoAlbumList>.value(
           value: demoAlbumList,
-          child: HomePage(),
+          child: DefaultTabController(
+            length: 3,
+            child: Scaffold(
+              appBar: AppBar(
+                title: Text(
+                  "Berrycast",
+                  style: TextStyle(color: Colors.white),
+                ),
+                leading: Builder(builder: (context) {
+                  return IconButton(
+                    icon: Icon(Icons.menu),
+                    color: Colors.white,
+                    onPressed: Scaffold.of(context).openDrawer,
+                  );
+                }),
+                bottom: TabBar(tabs: [
+                  Tab(icon: Icon(Icons.cast)),
+                  Tab(icon: Icon(Icons.library_music)),
+                  Tab(
+                    icon: Icon(Icons.find_replace),
+                  ),
+                ]),
+              ),
+              drawer: SafeArea(
+                child: Drawer(
+                  child: Container(),
+                ),
+              ),
+              body: TabBarView(children: [
+                PodcastPage(),
+                Container(),
+                Container(),
+              ]),
+            ),
+          ),
         ),
       ),
     );
