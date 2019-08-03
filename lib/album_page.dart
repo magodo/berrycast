@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import 'album.dart';
 import 'audio.dart';
 import 'play_page.dart';
 import 'songs.dart';
+import 'theme.dart';
 
 class AlbumPage extends StatelessWidget {
   final DemoAlbum album;
@@ -14,6 +14,14 @@ class AlbumPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      floatingActionButton: FloatingActionButton.extended(
+        backgroundColor: lightAccentColor,
+        icon: Icon(
+          Icons.play_circle_outline,
+        ),
+        label: Text("Play All"),
+        onPressed: () => _playNewAlbumm(context, album),
+      ),
       body: SafeArea(
         top: false,
         bottom: false,
@@ -21,9 +29,10 @@ class AlbumPage extends StatelessWidget {
           headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
             return <Widget>[
               SliverAppBar(
+                backgroundColor: Colors.transparent,
                 expandedHeight: 200.0,
-                floating: false,
-                pinned: true,
+                floating: true,
+                snap: false,
                 elevation: 0.0,
                 flexibleSpace: FlexibleSpaceBar(
                   background: Image.network(
@@ -36,7 +45,10 @@ class AlbumPage extends StatelessWidget {
           },
           body: ListView(
             children: album.songs
-                .map((DemoSong song) => _buildSongTile(context, song))
+                .asMap()
+                .map((idx, song) =>
+                    MapEntry(idx, _buildSongTile(context, idx, song)))
+                .values
                 .toList(),
           ),
         ),
@@ -44,23 +56,37 @@ class AlbumPage extends StatelessWidget {
     );
   }
 
-  ListTile _buildSongTile(BuildContext context, DemoSong song) {
+  ListTile _buildSongTile(BuildContext context, int index, DemoSong song) {
     return ListTile(
+      leading: Text("$index"),
       title: Text(song.songTitle,
           style: TextStyle(
             fontWeight: FontWeight.w500,
-            fontSize: 20,
+            fontSize: 15,
           )),
       subtitle: Text(song.artist),
-      onTap: () => _openPlayPage(context, song),
+      trailing: IconButton(
+        icon: Icon(Icons.more_vert),
+        onPressed: () {},
+      ),
+      onTap: () => _playNewSong(context, song),
     );
   }
 
-  _openPlayPage(BuildContext context, DemoSong song) {
+  _playNewSong(BuildContext context, DemoSong song) {
+    final schedule = Provider.of<AudioSchedule>(context);
+    schedule.playlist = <DemoSong>[song];
+    schedule.play();
     Navigator.push(context, MaterialPageRoute(builder: (context) {
-      final schedule = Provider.of<AudioSchedule>(context);
-      schedule.playlist = DemoPlaylist(songs: <DemoSong>[song]);
-      schedule.play();
+      return PlayPage();
+    }));
+  }
+
+  _playNewAlbumm(BuildContext context, DemoAlbum album) {
+    final schedule = Provider.of<AudioSchedule>(context);
+    schedule.playlist = List.from(album.songs);
+    schedule.play();
+    Navigator.push(context, MaterialPageRoute(builder: (context) {
       return PlayPage();
     }));
   }

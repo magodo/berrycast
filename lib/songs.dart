@@ -16,32 +16,87 @@ class DemoSong {
   });
 }
 
-class DemoPlaylist {
+class DemoAlbum {
+  final String title;
+  final String albumArtUrl;
+  final String description;
+  final String artist;
   final List<DemoSong> songs;
-  DemoPlaylist({@required this.songs});
+
+  DemoAlbum({
+    this.title,
+    this.albumArtUrl,
+    this.description,
+    this.artist,
+    this.songs,
+  });
 }
 
-final demoPlaylist = DemoPlaylist(songs: [
-//  DemoSong(
-//    audioUrl: "https://cdn.changelog.com/uploads/gotime/90/go-time-90.mp3",
-//    albumArtUrl:
-//        "https://cdn.changelog.com/uploads/covers/go-time-original.png",
-//    songTitle: "Go tooling",
-//    artist: "with Mat, Jaana & Johnny",
-//    duration: Duration(milliseconds: 95970193),
-//  ),
-  DemoSong(
-    audioUrl: "https://talkcdn.swift.gg/audio/1.mp3",
-    albumArtUrl: "https://talkcdn.swift.gg/static/logo.jpg",
-    songTitle: "聊聊程序员的升职加薪（上）",
-    artist: "梁杰",
-    duration: Duration(minutes: 57, seconds: 15),
-  ),
-  DemoSong(
-    audioUrl: "https://kernelpanic.fm/1/audio.mp3",
-    albumArtUrl: "https://kernelpanic.fm/assets/icon-kernelpanic-1800.png",
-    songTitle: "1. 内核恐慌开播！",
-    artist: "吴涛,Riog",
-    duration: Duration(seconds: 3464),
-  ),
-]);
+class DemoAlbumList with ChangeNotifier {
+  final List<DemoAlbum> _albums;
+
+  DemoAlbumList({albums}) : _albums = albums;
+
+  List<DemoAlbum> get albums => _albums;
+
+  void add(DemoAlbum album) {
+    if (!_albums.contains(album)) {
+      _albums.add(album);
+      notifyListeners();
+    }
+  }
+
+  void remove(DemoAlbum album) {
+    if (_albums.remove(album)) {
+      notifyListeners();
+    }
+  }
+}
+
+final demoAlbumList = DemoAlbumList(
+  albums: [
+    DemoAlbum(
+      title: "ggtalk",
+      albumArtUrl: "https://talkcdn.swift.gg/static/logo.jpg",
+      artist: "梁杰",
+      songs: [
+        DemoSong(
+          audioUrl: "https://talkcdn.swift.gg/audio/1.mp3",
+          albumArtUrl: "https://talkcdn.swift.gg/static/logo.jpg",
+          songTitle: "聊聊程序员的升职加薪（上）",
+          artist: "梁杰",
+          duration: Duration(minutes: 57, seconds: 15),
+        ),
+        DemoSong(
+          audioUrl: "https://talkcdn.swift.gg/audio/2.mp3",
+          albumArtUrl: "https://talkcdn.swift.gg/static/logo.jpg",
+          songTitle: "我都花时间搭博客了，为什么还要花时间写？",
+          artist: "梁杰",
+          duration: Duration(minutes: 47, seconds: 33),
+        ),
+        DemoSong(
+          audioUrl: "https://talkcdn.swift.gg/audio/3.mp3",
+          albumArtUrl: "https://talkcdn.swift.gg/static/logo.jpg",
+          songTitle: "和裕波聊聊如何办一场技术大会（上）",
+          artist: "梁杰",
+          duration: Duration(hours: 1, minutes: 4, seconds: 14),
+        ),
+      ],
+    ),
+    DemoAlbum(
+      title: "内核恐慌",
+      albumArtUrl: "https://kernelpanic.fm/assets/icon-kernelpanic-1800.png",
+      artist: "吴涛,Riog",
+      songs: [
+        DemoSong(
+          audioUrl: "https://kernelpanic.fm/1/audio.mp3",
+          albumArtUrl:
+              "https://kernelpanic.fm/assets/icon-kernelpanic-1800.png",
+          songTitle: "1. 内核恐慌开播！",
+          artist: "吴涛,Riog",
+          duration: Duration(seconds: 3464),
+        ),
+      ],
+    ),
+  ],
+);

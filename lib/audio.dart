@@ -5,40 +5,60 @@ import 'songs.dart';
 
 class AudioSchedule with ChangeNotifier {
   final MyAudioPlayer player;
-  DemoPlaylist _playlist;
+  List<DemoSong> _playlist;
   int _playIdx;
 
   AudioSchedule()
       : player = MyAudioPlayer(),
-        _playlist = demoPlaylist,
+        _playlist = null,
         _playIdx = 0;
 
-  DemoPlaylist get playlist => _playlist;
-  set playlist(DemoPlaylist playlist) {
+  List<DemoSong> get playlist => _playlist;
+  set playlist(List<DemoSong> playlist) {
     _playlist = playlist;
     _playIdx = 0;
   }
 
-  DemoSong get song => _playlist.songs[_playIdx];
+  DemoSong get song => _playlist[_playIdx];
   set setSong(int idx) {
     _playIdx = idx;
     notifyListeners();
   }
 
+  bool isSongIdxActive(int idx) {
+    return idx == _playIdx;
+  }
+
+  void reorderPlaylist(int oldIdx, int newIdx) {
+    // These two lines are workarounds for ReorderableListView problems
+    if (newIdx > _playlist.length) newIdx = _playlist.length;
+    if (oldIdx < newIdx) newIdx--;
+
+    print("oldIdx: $oldIdx, newIdx: $newIdx");
+    if (oldIdx < _playIdx && newIdx >= _playIdx) {
+      _playIdx--;
+    } else if (oldIdx > _playIdx && newIdx <= _playIdx) {
+      _playIdx++;
+    } else if (oldIdx == _playIdx) {
+      _playIdx = newIdx;
+    }
+    _playlist.insert(newIdx, _playlist.removeAt(oldIdx));
+    notifyListeners();
+  }
+
   void nextSong() {
-    _playIdx = (_playIdx + 1) % _playlist.songs.length;
+    _playIdx = (_playIdx + 1) % _playlist.length;
     _changeSong();
   }
 
   void prevSong() {
-    _playIdx = (_playIdx - 1) % _playlist.songs.length;
+    _playIdx = (_playIdx - 1) % _playlist.length;
     _changeSong();
   }
 
   void _changeSong() async {
-    player.stop();
     player.setPosition(Duration());
-    player.play(_playlist.songs[_playIdx].audioUrl);
+    player.play(_playlist[_playIdx].audioUrl);
     notifyListeners();
   }
 
@@ -62,6 +82,12 @@ class AudioSchedule with ChangeNotifier {
 
   void play() {
     player.play(song.audioUrl);
+  }
+
+  void playSong(int idx) {
+    _playIdx = idx;
+    play();
+    notifyListeners();
   }
 
   void resume() {
