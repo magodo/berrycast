@@ -26,10 +26,7 @@ class PodcastPage extends StatelessWidget {
         child: GridTile(
           child: InkResponse(
             enableFeedback: true,
-            child: Image.network(
-              albumList.albums[idx].albumArtUrl,
-              fit: BoxFit.cover,
-            ),
+            child: albumList.albums[idx].albumArt,
             onTap: () => _openAlbumPage(context, albumList.albums[idx]),
           ),
         ),

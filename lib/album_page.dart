@@ -35,10 +35,7 @@ class AlbumPage extends StatelessWidget {
                 snap: false,
                 elevation: 0.0,
                 flexibleSpace: FlexibleSpaceBar(
-                  background: Image.network(
-                    album.albumArtUrl,
-                    fit: BoxFit.cover,
-                  ),
+                  background: album.albumArt,
                 ),
               ),
             ];

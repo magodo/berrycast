@@ -28,6 +28,7 @@ dependencies:
   provider: ^3.0.0+1
   rxdart: ^0.22.1
   sticky_headers: ^0.1.8
+  flutter_advanced_networkimage: ^0.5.0
 
 dev_dependencies:
   flutter_test:

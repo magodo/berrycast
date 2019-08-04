@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 
 import 'audio.dart';
 import 'audioplayer_stream_wrapper.dart';
+import 'bottom_player.dart';
 import 'podcast_page.dart';
 import 'songs.dart';
 import 'theme.dart';
@@ -73,6 +74,7 @@ class MyApp extends StatelessWidget {
                 Container(),
                 Container(),
               ]),
+              bottomSheet: BottomPlayer(),
             ),
           ),
         ),

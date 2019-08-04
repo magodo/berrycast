@@ -2,34 +2,34 @@ import 'package:flutter/material.dart';
 
 class DemoSong {
   final String audioUrl;
-  final String albumArtUrl;
+  final Image albumArt;
   final String songTitle;
   final String artist;
   final Duration duration;
 
   DemoSong({
     @required this.audioUrl,
-    @required this.albumArtUrl,
+    @required String albumArtUrl,
     @required this.songTitle,
     @required this.artist,
     @required this.duration,
-  });
+  }) : albumArt = Image.network(albumArtUrl, fit: BoxFit.cover);
 }
 
 class DemoAlbum {
   final String title;
-  final String albumArtUrl;
+  final Image albumArt;
   final String description;
   final String artist;
   final List<DemoSong> songs;
 
   DemoAlbum({
     this.title,
-    this.albumArtUrl,
+    String albumArtUrl,
     this.description,
     this.artist,
     this.songs,
-  });
+  }) : albumArt = Image.network(albumArtUrl, fit: BoxFit.cover);
 }
 
 class DemoAlbumList with ChangeNotifier {

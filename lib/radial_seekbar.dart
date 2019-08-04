@@ -107,10 +107,7 @@ class _RadialSeekBarState extends State<RadialSeekBar> {
               outerPadding: EdgeInsets.all(10.0),
               child: ClipOval(
                 clipper: CircleClipper(),
-                child: Image.network(
-                  schedule.song.albumArtUrl,
-                  fit: BoxFit.cover,
-                ),
+                child: schedule.song.albumArt,
               ),
             ),
           ),

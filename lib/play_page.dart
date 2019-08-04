@@ -17,7 +17,7 @@ class PlayPage extends StatelessWidget {
               padding: const EdgeInsets.symmetric(vertical: 8.0),
               child: ListTile(
                 selected: schedule.isSongIdxActive(idx),
-                leading: Image.network(song.albumArtUrl),
+                leading: song.albumArt,
                 trailing: Icon(Icons.reorder),
                 title: Text(song.songTitle,
                     style: TextStyle(
