@@ -33,9 +33,9 @@ class PlayPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      endDrawer: SafeArea(
-        child: Drawer(
+    return SafeArea(
+      child: Scaffold(
+        endDrawer: Drawer(
           child: ReorderableListView(
             onReorder: (oldIdx, newIdx) {
               Provider.of<AudioSchedule>(context)
@@ -44,36 +44,36 @@ class PlayPage extends StatelessWidget {
             children: _buildPlaylist(context),
           ),
         ),
-      ),
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0.0,
-        actions: <Widget>[
-          Builder(builder: (context) {
-            return IconButton(
-              icon: Icon(Icons.playlist_play),
-              color: Colors.grey,
-              onPressed: () => Scaffold.of(context).openEndDrawer(),
-            );
-          }),
-        ],
-      ),
-      body: Column(
-        children: <Widget>[
-          // seek bar
-          Expanded(
-            child: RadialSeekBar(),
-          ),
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          elevation: 0.0,
+          actions: <Widget>[
+            Builder(builder: (context) {
+              return IconButton(
+                icon: Icon(Icons.playlist_play),
+                color: Colors.grey,
+                onPressed: () => Scaffold.of(context).openEndDrawer(),
+              );
+            }),
+          ],
+        ),
+        body: Column(
+          children: <Widget>[
+            // seek bar
+            Expanded(
+              child: RadialSeekBar(),
+            ),
 
-          // visualizer
-          Container(
-            width: double.infinity,
-            height: 125.0,
-          ),
+            // visualizer
+            Container(
+              width: double.infinity,
+              height: 125.0,
+            ),
 
-          // song title, artist name and controls
-          ButtonControls(),
-        ],
+            // song title, artist name and controls
+            ButtonControls(),
+          ],
+        ),
       ),
     );
   }

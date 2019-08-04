@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:sticky_headers/sticky_headers.dart';
 
 import 'audio.dart';
 import 'bottom_bar.dart';
 import 'play_page.dart';
+import 'sliver_appbar_delegate.dart';
 import 'songs.dart';
-import 'theme.dart';
 
 class AlbumPage extends StatelessWidget {
   final DemoAlbum album;
@@ -14,29 +15,43 @@ class AlbumPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-//      floatingActionButton: FloatingActionButton.extended(
-//        backgroundColor: lightAccentColor,
-//        icon: Icon(
-//          Icons.play_circle_outline,
-//        ),
-//        label: Text("Play All"),
-//        onPressed: () => _playNewAlbumm(context, album),
-//      ),
-      body: SafeArea(
-        top: false,
-        bottom: false,
-        child: NestedScrollView(
+    return SafeArea(
+      child: Scaffold(
+        body: NestedScrollView(
           headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
             return <Widget>[
               SliverAppBar(
-                backgroundColor: Colors.transparent,
                 expandedHeight: 200.0,
                 floating: true,
                 snap: false,
+                pinned: true,
                 elevation: 0.0,
                 flexibleSpace: FlexibleSpaceBar(
                   background: album.albumArt,
+                ),
+              ),
+              SliverPersistentHeader(
+                pinned: true,
+                delegate: SliverAppBarDelegate(
+                  minHeight: 50.0,
+                  maxHeight: 50.0,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                    ),
+                    child: FlatButton(
+                      child: Row(
+                        children: <Widget>[
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Icon(Icons.play_circle_outline),
+                          ),
+                          Text("PLAY ALL (${album.songs.length})"),
+                        ],
+                      ),
+                      onPressed: () => _playNewAlbumm(context, album),
+                    ),
+                  ),
                 ),
               ),
             ];
@@ -50,8 +65,8 @@ class AlbumPage extends StatelessWidget {
                 .toList(),
           ),
         ),
+        bottomSheet: BottomBar(),
       ),
-      bottomSheet: BottomBar(),
     );
   }
 

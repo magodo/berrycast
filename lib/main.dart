@@ -43,38 +43,38 @@ class MyApp extends StatelessWidget {
           value: demoAlbumList,
           child: DefaultTabController(
             length: 3,
-            child: Scaffold(
-              appBar: AppBar(
-                title: Text(
-                  "Berrycast",
-                  style: TextStyle(color: Colors.white),
-                ),
-                leading: Builder(builder: (context) {
-                  return IconButton(
-                    icon: Icon(Icons.menu),
-                    color: Colors.white,
-                    onPressed: Scaffold.of(context).openDrawer,
-                  );
-                }),
-                bottom: TabBar(tabs: [
-                  Tab(icon: Icon(Icons.cast)),
-                  Tab(icon: Icon(Icons.library_music)),
-                  Tab(
-                    icon: Icon(Icons.find_replace),
+            child: SafeArea(
+              child: Scaffold(
+                appBar: AppBar(
+                  title: Text(
+                    "Berrycast",
+                    style: TextStyle(color: Colors.white),
                   ),
-                ]),
-              ),
-              drawer: SafeArea(
-                child: Drawer(
+                  leading: Builder(builder: (context) {
+                    return IconButton(
+                      icon: Icon(Icons.menu),
+                      color: Colors.white,
+                      onPressed: Scaffold.of(context).openDrawer,
+                    );
+                  }),
+                  bottom: TabBar(tabs: [
+                    Tab(icon: Icon(Icons.cast)),
+                    Tab(icon: Icon(Icons.library_music)),
+                    Tab(
+                      icon: Icon(Icons.find_replace),
+                    ),
+                  ]),
+                ),
+                drawer: Drawer(
                   child: Container(),
                 ),
+                body: TabBarView(children: [
+                  PodcastPage(),
+                  Container(),
+                  Container(),
+                ]),
+                bottomSheet: BottomBar(),
               ),
-              body: TabBarView(children: [
-                PodcastPage(),
-                Container(),
-                Container(),
-              ]),
-              bottomSheet: BottomBar(),
             ),
           ),
         ),
