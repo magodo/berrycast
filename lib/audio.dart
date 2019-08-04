@@ -19,6 +19,8 @@ class AudioSchedule with ChangeNotifier {
     _playIdx = 0;
   }
 
+  bool get isEmpty => _playlist == null;
+
   DemoSong get song => _playlist[_playIdx];
   set setSong(int idx) {
     _playIdx = idx;

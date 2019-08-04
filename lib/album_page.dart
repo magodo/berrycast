@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'audio.dart';
+import 'bottom_bar.dart';
 import 'play_page.dart';
 import 'songs.dart';
 import 'theme.dart';
@@ -14,14 +15,14 @@ class AlbumPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButton: FloatingActionButton.extended(
-        backgroundColor: lightAccentColor,
-        icon: Icon(
-          Icons.play_circle_outline,
-        ),
-        label: Text("Play All"),
-        onPressed: () => _playNewAlbumm(context, album),
-      ),
+//      floatingActionButton: FloatingActionButton.extended(
+//        backgroundColor: lightAccentColor,
+//        icon: Icon(
+//          Icons.play_circle_outline,
+//        ),
+//        label: Text("Play All"),
+//        onPressed: () => _playNewAlbumm(context, album),
+//      ),
       body: SafeArea(
         top: false,
         bottom: false,
@@ -50,6 +51,7 @@ class AlbumPage extends StatelessWidget {
           ),
         ),
       ),
+      bottomSheet: BottomBar(),
     );
   }
 

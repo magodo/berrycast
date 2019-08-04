@@ -90,7 +90,10 @@ class ButtomControls extends StatelessWidget {
         buildAudioButton(Icons.skip_previous,
             (context) => Provider.of<AudioSchedule>(context).prevSong),
         Expanded(child: Container()),
-        PlayPauseButton(),
+        PlayPauseButton(
+          elevation: 10.0,
+          highlightElevation: 5.0,
+        ),
         Expanded(child: Container()),
         buildAudioButton(Icons.skip_next,
             (context) => Provider.of<AudioSchedule>(context).nextSong),
@@ -104,9 +107,19 @@ class ButtomControls extends StatelessWidget {
 }
 
 class PlayPauseButton extends StatelessWidget {
+  final double _elevation;
+  final double _highlightElevation;
+  final double _size;
+
   const PlayPauseButton({
     Key key,
-  }) : super(key: key);
+    elevation = 0.0,
+    highlightElevation = 0.0,
+    size = 35.0,
+  })  : _elevation = elevation,
+        _highlightElevation = highlightElevation,
+        _size = size,
+        super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -139,8 +152,8 @@ class PlayPauseButton extends StatelessWidget {
       fillColor: buttonColor,
       splashColor: lightAccentColor,
       highlightColor: lightAccentColor.withOpacity(0.5),
-      elevation: 10.0,
-      highlightElevation: 5.0,
+      elevation: _elevation,
+      highlightElevation: _highlightElevation,
       onPressed: () {},
       child: Padding(
         padding: EdgeInsets.all(8.0),
@@ -148,7 +161,7 @@ class PlayPauseButton extends StatelessWidget {
           icon: Icon(
             icon,
             color: darkAccentColor,
-            size: 35.0,
+            size: _size,
           ),
           onPressed: onPressed,
         ),
