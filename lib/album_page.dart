@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:sticky_headers/sticky_headers.dart';
 
 import 'audio.dart';
 import 'bottom_bar.dart';
@@ -90,7 +89,7 @@ class AlbumPage extends StatelessWidget {
   _playNewSong(BuildContext context, DemoSong song) {
     final schedule = Provider.of<AudioSchedule>(context);
     schedule.playlist = <DemoSong>[song];
-    schedule.play();
+    schedule.playNthSong(0);
     Navigator.push(context, MaterialPageRoute(builder: (context) {
       return PlayPage();
     }));
@@ -99,7 +98,7 @@ class AlbumPage extends StatelessWidget {
   _playNewAlbumm(BuildContext context, DemoAlbum album) {
     final schedule = Provider.of<AudioSchedule>(context);
     schedule.playlist = List.from(album.songs);
-    schedule.play();
+    schedule.playNthSong(0);
     Navigator.push(context, MaterialPageRoute(builder: (context) {
       return PlayPage();
     }));

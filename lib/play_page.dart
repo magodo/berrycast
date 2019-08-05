@@ -24,7 +24,7 @@ class PlayPage extends StatelessWidget {
                       fontWeight: FontWeight.w500,
                       fontSize: 10,
                     )),
-                onTap: () => schedule.playSong(idx),
+                onTap: () => schedule.playNthSong(idx),
               ),
             )))
         .values
@@ -58,22 +58,20 @@ class PlayPage extends StatelessWidget {
           ],
         ),
         body: Column(
-          children: <Widget>[
-            // seek bar
-            Expanded(
-              child: RadialSeekBar(),
-            ),
+            children: <Widget>[
+              // seek bar
+              Expanded(child: RadialSeekBar()),
 
-            // visualizer
-            Container(
-              width: double.infinity,
-              height: 125.0,
-            ),
+              // visualizer
+              Container(
+                width: double.infinity,
+                height: 125.0,
+              ),
 
-            // song title, artist name and controls
-            ButtonControls(),
-          ],
-        ),
+              // song title, artist name and controls
+              ButtonControls(),
+            ],
+          ),
       ),
     );
   }

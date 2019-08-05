@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'audio.dart';
+import 'audioplayer_stream_wrapper.dart';
 
 class ButtonControls extends StatelessWidget {
   const ButtonControls({
@@ -18,7 +19,7 @@ class ButtonControls extends StatelessWidget {
         color: accentColor,
         shadowColor: const Color(0x44000000),
         child: Padding(
-          padding: const EdgeInsets.only(top: 40.0, bottom: 50.0),
+          padding: const EdgeInsets.only(top: 20.0, bottom: 50.0),
           child: Column(
             children: <Widget>[
               // song/artist names
@@ -26,7 +27,7 @@ class ButtonControls extends StatelessWidget {
 
               // audio control
               Padding(
-                padding: const EdgeInsets.only(top: 40.0),
+                padding: const EdgeInsets.only(top: 10.0),
                 child: new ButtomControls(),
               ),
             ],
@@ -42,9 +43,24 @@ class SongInfos extends StatelessWidget {
     Key key,
   }) : super(key: key);
 
+  String _prettyDuration(Duration dur) {
+    String twoDigits(int n) {
+      if (n >= 10) return "$n";
+      return "0$n";
+    }
+
+    final String h = twoDigits(dur.inHours.remainder(24));
+    final String m = twoDigits(dur.inMinutes.remainder(60));
+    final String s = twoDigits(dur.inSeconds.remainder(60));
+    return "$h:$m:$s";
+  }
+
   @override
   Widget build(BuildContext context) {
-    final song = Provider.of<AudioSchedule>(context).song;
+    final schedule = Provider.of<AudioSchedule>(context);
+    final song = schedule.song;
+    final seekPosition = Provider.of<SeekPosition>(context);
+
     return RichText(
       text: TextSpan(
         children: [
@@ -59,14 +75,23 @@ class SongInfos extends StatelessWidget {
             ),
           ),
           TextSpan(
-            text: song.artist,
+            text: song.artist + "\n",
             style: TextStyle(
               color: Colors.white.withOpacity(0.75),
               fontSize: 12.0,
               letterSpacing: 3.0,
               height: 1.5,
             ),
-          )
+          ),
+          TextSpan(
+            text: _prettyDuration(seekPosition),
+            style: TextStyle(
+              color: Colors.white.withOpacity(0.75),
+              fontSize: 20.0,
+              letterSpacing: 1.0,
+              height: 1.5,
+            ),
+          ),
         ],
       ),
       textAlign: TextAlign.center,

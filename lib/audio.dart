@@ -7,6 +7,7 @@ class AudioSchedule with ChangeNotifier {
   final MyAudioPlayer player;
   List<DemoSong> _playlist;
   int _playIdx;
+  DemoSong _song;
 
   AudioSchedule()
       : player = MyAudioPlayer(),
@@ -21,9 +22,9 @@ class AudioSchedule with ChangeNotifier {
 
   bool get isEmpty => _playlist == null;
 
-  DemoSong get song => _playlist[_playIdx];
-  set setSong(int idx) {
-    _playIdx = idx;
+  DemoSong get song => _song;
+  set song (DemoSong song) {
+    _song = song;
     notifyListeners();
   }
 
@@ -59,8 +60,7 @@ class AudioSchedule with ChangeNotifier {
   }
 
   void _changeSong() async {
-    player.setPosition(Duration());
-    player.play(_playlist[_playIdx].audioUrl);
+    playNthSong(_playIdx);
     notifyListeners();
   }
 
@@ -79,16 +79,27 @@ class AudioSchedule with ChangeNotifier {
   void seek(double percent) {
     player.seek(song.duration * percent);
     player.play(song.audioUrl);
-    notifyListeners();
   }
 
   void play() {
     player.play(song.audioUrl);
   }
 
-  void playSong(int idx) {
+  void _playFromHead() {
+    player.setPosition(AudioPosition(Duration()));
+    player.setSeekPosition(null);
+    player.play(song.audioUrl);
+  }
+
+  void playNthSong(int idx) {
     _playIdx = idx;
-    play();
+    final targetSong = _playlist[idx];
+    if (targetSong == song) {
+      play();
+    }
+
+    song = targetSong;
+    _playFromHead();
     notifyListeners();
   }
 

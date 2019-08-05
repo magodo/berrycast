@@ -19,9 +19,12 @@ class MyApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider<AudioSchedule>.value(value: schedule),
         StreamProvider<AudioPosition>.value(
-          value: schedule.player.onAudioPositionChanged
-              .map((position) => AudioPosition(position)),
+          value: schedule.player.onAudioPositionChanged,
           initialData: AudioPosition(Duration()),
+        ),
+        StreamProvider<SeekPosition>.value(
+          value: schedule.player.onSeekPositionChanged,
+          initialData: SeekPosition(Duration()),
         ),
 //        StreamProvider<AudioDuration>.value(
 //          value: schedule.player.onDurationChanged

@@ -9,12 +9,7 @@ import 'audioplayer_stream_wrapper.dart';
 import 'theme.dart';
 
 class RadialSeekBar extends StatefulWidget {
-  final double thumbPercent;
-  final double progressPercent;
-
   const RadialSeekBar({
-    this.thumbPercent = 0.0,
-    this.progressPercent = 0.0,
     Key key,
   }) : super(key: key);
 
@@ -23,72 +18,54 @@ class RadialSeekBar extends StatefulWidget {
 }
 
 class _RadialSeekBarState extends State<RadialSeekBar> {
-  double _thumbPercent;
   double _progressPercent;
   PolarCoord _startDragCoord;
   double _startDragPercent;
-  double _endDragPercent;
   double _currentDragPercent;
 
   @override
   void initState() {
     super.initState();
-    _thumbPercent = widget.thumbPercent;
-    _progressPercent = widget.progressPercent;
   }
 
-  @override
-  void didUpdateWidget(RadialSeekBar oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    _thumbPercent = widget.thumbPercent;
-  }
-
-  void _onDragStart(PolarCoord coord) {
+  void _onDragStart(BuildContext context, PolarCoord coord) {
     _startDragCoord = coord;
-    _startDragPercent = _thumbPercent;
+    _startDragPercent = _progressPercent;
   }
 
-  void _onDragUpdate(PolarCoord coord) {
+  void _onDragUpdate(BuildContext context, PolarCoord coord) {
     final dragAngle = coord.angle - _startDragCoord.angle;
     final dragPercent = dragAngle / (2 * pi);
-    setState(
-        () => _currentDragPercent = (_startDragPercent + dragPercent) % 1.0);
+    final schedule = Provider.of<AudioSchedule>(context);
+    _currentDragPercent = (_startDragPercent + dragPercent) % 1.0;
+    schedule.player.setSeekPosition(
+        SeekPosition(schedule.song.duration * _currentDragPercent));
   }
 
-  RadialDragEnd _buildOnDragEnd(AudioSchedule schedule) {
-    return () {
-      _startDragPercent = null;
-      _startDragCoord = null;
-      _endDragPercent = _currentDragPercent;
-      _currentDragPercent = null;
-      schedule.seek(_endDragPercent);
-    };
+  void _onDragEnd(BuildContext context) {
+    final schedule = Provider.of<AudioSchedule>(context);
+    _startDragPercent = null;
+    _startDragCoord = null;
+    schedule.seek(_currentDragPercent);
+    schedule.player.setSeekPosition(SeekPosition(schedule.song.duration * _currentDragPercent, isEnd: true));
+    _currentDragPercent = null;
   }
 
   @override
   Widget build(BuildContext context) {
     final schedule = Provider.of<AudioSchedule>(context);
-    final position = Provider.of<AudioPosition>(context);
+    final audioPosition = Provider.of<AudioPosition>(context);
+    final seekPosition = Provider.of<SeekPosition>(context);
 
     _progressPercent =
-        (position.inSeconds / schedule.song.duration.inSeconds) % 1.0;
+        (audioPosition.inSeconds / schedule.song.duration.inSeconds) % 1.0;
 
-    // The [_endDragPercent] here is because when we call [AudioPlayer.seek], it will always
-    // send a position via [onAudioPositionChanged] stream, and this position is the point before
-    // seeking. Hence, it will introduce ping-pong visual effect.
-    // To get rid of this first "non-sense" position, we will use the [_endDragPercent] if non-nil,
-    // and then set it as nil.
-    _thumbPercent = _progressPercent;
-    if (_currentDragPercent != null) {
-      _thumbPercent = _currentDragPercent;
-    } else if (_endDragPercent != null) {
-      _thumbPercent = _endDragPercent;
-      _endDragPercent = null;
-    }
+    print("seek: $seekPosition, audio: $audioPosition");
+
     return RadialDragGestureDetector(
-      onRadialDragStart: _onDragStart,
-      onRadialDragUpdate: _onDragUpdate,
-      onRadialDragEnd: _buildOnDragEnd(schedule),
+      onRadialDragStart: (coord) => _onDragStart(context, coord),
+      onRadialDragUpdate: (coord) => _onDragUpdate(context, coord),
+      onRadialDragEnd: () => _onDragEnd(context),
       child: Container(
         width: double.infinity,
         height: double.infinity,
@@ -101,7 +78,8 @@ class _RadialSeekBarState extends State<RadialSeekBar> {
               trackColor: Color(0xFFDDDDDD),
               progressPercent: _progressPercent,
               progressColor: accentColor,
-              thumbPosition: _thumbPercent,
+              thumbPosition:
+                  seekPosition.inSeconds / schedule.song.duration.inSeconds,
               thumbColor: lightAccentColor,
               innerPadding: EdgeInsets.all(10.0),
               outerPadding: EdgeInsets.all(10.0),
