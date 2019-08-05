@@ -39,16 +39,19 @@ class MyAudioPlayer extends AudioPlayer {
         onAudioPositionChanged.map((pos) => SeekPosition(pos)),
         Observable(_seekPositionController.stream).startWith(null),
         (SeekPosition audiopos,SeekPosition seekpos) {
-          //print("audio: $audiopos, seek: $seekpos");
           if (seekpos == null) {
             return audiopos;
           }
           if (!seekpos.isEnd) {
             return seekpos;
           }
-          // return end seek position, until audio pos is near enough against seek position
+          // Return end seek position, until audio pos is near enough against seek position, in which case we will also send
+          // a null SeekPosition so that we have no need to consider [seekpos] any more, until a new seek event occurs.
+          // This is a workaround in fact that audioplayers will notify original position even after calling `seek()`, and the
+          // amount of original position events is un-predicable.
           final drift = seekpos.inSeconds - audiopos.inSeconds;
           if (drift.abs() <= 1)  {
+            _seekPositionController.add(null);
             return audiopos;
           }
           return seekpos;

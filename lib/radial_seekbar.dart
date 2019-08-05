@@ -60,8 +60,6 @@ class _RadialSeekBarState extends State<RadialSeekBar> {
     _progressPercent =
         (audioPosition.inSeconds / schedule.song.duration.inSeconds) % 1.0;
 
-    print("seek: $seekPosition, audio: $audioPosition");
-
     return RadialDragGestureDetector(
       onRadialDragStart: (coord) => _onDragStart(context, coord),
       onRadialDragUpdate: (coord) => _onDragUpdate(context, coord),
