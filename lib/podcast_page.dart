@@ -1,21 +1,33 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 import 'album_page.dart';
 import 'songs.dart';
 import 'theme.dart';
 
 class PodcastPage extends StatelessWidget {
-  _openAlbumPage(BuildContext context, DemoAlbum album) {
+  _openAlbumPage(BuildContext context, PodcastAlbum album) {
     Navigator.push(context, MaterialPageRoute(builder: (context) {
       return AlbumPage(album: album);
     }));
   }
 
+  _openSnackBar(BuildContext context) {
+    Scaffold.of(context).showSnackBar(
+      SnackBar(
+        content: Text("Loading..."),
+      ),
+    );
+  }
+
   List<Widget> _buildAlbumThumb(BuildContext context) {
-    final albumList = Provider.of<DemoAlbumList>(context);
+    Map<String, AlbumInfo> albumMaps = {
+      ...podcastStorage?.map((k, v) => MapEntry(k, v.albumInfo)),
+      ...globalPodcastMap?.podcasts?.map((k, v) => MapEntry(k, v.info)),
+    };
+    List<AlbumInfo> albums = albumMaps.values.toList();
+
     return List.generate(
-      albumList.albums.length,
+      albums.length,
       (idx) => RawMaterialButton(
         shape: CircleBorder(),
         splashColor: lightAccentColor,
@@ -26,8 +38,31 @@ class PodcastPage extends StatelessWidget {
         child: GridTile(
           child: InkResponse(
             enableFeedback: true,
-            child: albumList.albums[idx].albumArt,
-            onTap: () => _openAlbumPage(context, albumList.albums[idx]),
+            child: FutureBuilder<PodcastAlbum>(
+              future: getPodcast(albums[idx].title),
+              builder:
+                  (BuildContext context, AsyncSnapshot<PodcastAlbum> snapshot) {
+                switch (snapshot.connectionState) {
+                  case ConnectionState.none:
+                  case ConnectionState.active:
+                  case ConnectionState.waiting:
+                    return CircularProgressIndicator();
+                  case ConnectionState.done:
+                    if (snapshot.hasError)
+                      return Text('Error: ${snapshot.error}');
+                }
+                return snapshot.data.info.coverArt;
+              },
+            ),
+            //albumList.albums[idx].albumArt,
+            onTap: () {
+              if (globalPodcastMap?.podcasts[albums[idx].title] == null) {
+                _openSnackBar(context);
+                return;
+              }
+              _openAlbumPage(
+                  context, globalPodcastMap.podcasts[albums[idx].title]);
+            },
           ),
         ),
       ),

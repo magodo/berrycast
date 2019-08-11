@@ -5,25 +5,25 @@ import 'songs.dart';
 
 class AudioSchedule with ChangeNotifier {
   final MyAudioPlayer player;
-  List<DemoSong> _playlist;
+  List<Song> _playlist;
   int _playIdx;
-  DemoSong _song;
+  Song _song;
 
   AudioSchedule()
       : player = MyAudioPlayer(),
         _playlist = null,
         _playIdx = 0;
 
-  List<DemoSong> get playlist => _playlist;
-  set playlist(List<DemoSong> playlist) {
+  List<Song> get playlist => _playlist;
+  set playlist(List<Song> playlist) {
     _playlist = playlist;
     _playIdx = 0;
   }
 
   bool get isEmpty => _playlist == null;
 
-  DemoSong get song => _song;
-  set song (DemoSong song) {
+  Song get song => _song;
+  set song (Song song) {
     _song = song;
     notifyListeners();
   }
@@ -76,8 +76,8 @@ class AudioSchedule with ChangeNotifier {
     notifyListeners();
   }
 
-  void seek(double percent) {
-    player.seek(song.duration * percent);
+  void seek(double percentage) {
+    player.seek(song.audioDuration * percentage);
     player.play(song.audioUrl);
   }
 
@@ -86,6 +86,7 @@ class AudioSchedule with ChangeNotifier {
   }
 
   void _playFromHead() {
+    player.stop();
     player.setPosition(AudioPosition(Duration()));
     player.setSeekPosition(null);
     player.play(song.audioUrl);

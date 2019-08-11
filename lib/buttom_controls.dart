@@ -84,7 +84,7 @@ class SongInfos extends StatelessWidget {
             ),
           ),
           TextSpan(
-            text: _prettyDuration(seekPosition),
+            text: "${_prettyDuration(seekPosition)}/${_prettyDuration(song.audioDuration)}",
             style: TextStyle(
               color: Colors.white.withOpacity(0.75),
               fontSize: 20.0,

@@ -39,7 +39,7 @@ class _RadialSeekBarState extends State<RadialSeekBar> {
     final schedule = Provider.of<AudioSchedule>(context);
     _currentDragPercent = (_startDragPercent + dragPercent) % 1.0;
     schedule.player.setSeekPosition(
-        SeekPosition(schedule.song.duration * _currentDragPercent));
+        SeekPosition(schedule.song.audioDuration * _currentDragPercent));
   }
 
   void _onDragEnd(BuildContext context) {
@@ -47,7 +47,7 @@ class _RadialSeekBarState extends State<RadialSeekBar> {
     _startDragPercent = null;
     _startDragCoord = null;
     schedule.seek(_currentDragPercent);
-    schedule.player.setSeekPosition(SeekPosition(schedule.song.duration * _currentDragPercent, isEnd: true));
+    schedule.player.setSeekPosition(SeekPosition(schedule.song.audioDuration * _currentDragPercent, isEnd: true));
     _currentDragPercent = null;
   }
 
@@ -58,7 +58,7 @@ class _RadialSeekBarState extends State<RadialSeekBar> {
     final seekPosition = Provider.of<SeekPosition>(context);
 
     _progressPercent =
-        (audioPosition.inSeconds / schedule.song.duration.inSeconds) % 1.0;
+        (audioPosition.inSeconds / schedule.song.audioDuration.inSeconds) % 1.0;
 
     return RadialDragGestureDetector(
       onRadialDragStart: (coord) => _onDragStart(context, coord),
@@ -77,7 +77,7 @@ class _RadialSeekBarState extends State<RadialSeekBar> {
               progressPercent: _progressPercent,
               progressColor: accentColor,
               thumbPosition:
-                  seekPosition.inSeconds / schedule.song.duration.inSeconds,
+                  seekPosition.inSeconds / schedule.song.audioDuration.inSeconds,
               thumbColor: lightAccentColor,
               innerPadding: EdgeInsets.all(10.0),
               outerPadding: EdgeInsets.all(10.0),

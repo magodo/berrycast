@@ -14,7 +14,7 @@ description: A new Flutter project.
 version: 1.0.0+1
 
 environment:
-  sdk: ">=2.1.0 <3.0.0"
+  sdk: ">=2.3.0 <3.0.0"
 
 dependencies:
   flutter:
@@ -29,6 +29,12 @@ dependencies:
   rxdart: ^0.22.1
   sticky_headers: ^0.1.8
   flutter_advanced_networkimage: ^0.5.0
+  # webfeed: ^0.4.2
+  webfeed:
+    path: /home/magodo/github/webfeed
+  http: ^0.12.0+2
+  intl: ^0.15.8
+  cached_network_image: ^1.1.1
 
 dev_dependencies:
   flutter_test:

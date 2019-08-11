@@ -8,7 +8,7 @@ import 'sliver_appbar_delegate.dart';
 import 'songs.dart';
 
 class AlbumPage extends StatelessWidget {
-  final DemoAlbum album;
+  final Album album;
 
   const AlbumPage({Key key, this.album}) : super(key: key);
 
@@ -69,7 +69,7 @@ class AlbumPage extends StatelessWidget {
     );
   }
 
-  ListTile _buildSongTile(BuildContext context, int index, DemoSong song) {
+  ListTile _buildSongTile(BuildContext context, int index, Episode song) {
     return ListTile(
       leading: Text("$index"),
       title: Text(song.songTitle,
@@ -86,16 +86,16 @@ class AlbumPage extends StatelessWidget {
     );
   }
 
-  _playNewSong(BuildContext context, DemoSong song) {
+  _playNewSong(BuildContext context, Episode song) {
     final schedule = Provider.of<AudioSchedule>(context);
-    schedule.playlist = <DemoSong>[song];
+    schedule.playlist = <Episode>[song];
     schedule.playNthSong(0);
     Navigator.push(context, MaterialPageRoute(builder: (context) {
       return PlayPage();
     }));
   }
 
-  _playNewAlbumm(BuildContext context, DemoAlbum album) {
+  _playNewAlbumm(BuildContext context, PodcastAlbum album) {
     final schedule = Provider.of<AudioSchedule>(context);
     schedule.playlist = List.from(album.songs);
     schedule.playNthSong(0);

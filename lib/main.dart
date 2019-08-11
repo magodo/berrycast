@@ -6,7 +6,6 @@ import 'audio.dart';
 import 'audioplayer_stream_wrapper.dart';
 import 'bottom_bar.dart';
 import 'podcast_page.dart';
-import 'songs.dart';
 import 'theme.dart';
 
 void main() => runApp(MyApp());
@@ -42,42 +41,42 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           primaryColor: accentColor,
         ),
-        home: ChangeNotifierProvider<DemoAlbumList>.value(
-          value: demoAlbumList,
-          child: DefaultTabController(
-            length: 3,
-            child: SafeArea(
-              child: Scaffold(
-                appBar: AppBar(
-                  title: Text(
-                    "Berrycast",
-                    style: TextStyle(color: Colors.white),
+        home: DefaultTabController(
+          initialIndex: 0,
+          length: 3,
+          child: SafeArea(
+            child: Scaffold(
+              appBar: AppBar(
+                title: Text(
+                  "Berrycast",
+                  style: TextStyle(color: Colors.white),
+                ),
+                leading: Builder(builder: (context) {
+                  return IconButton(
+                    icon: Icon(Icons.menu),
+                    color: Colors.white,
+                    onPressed: Scaffold.of(context).openDrawer,
+                  );
+                }),
+                bottom: TabBar(tabs: [
+                  Tab(icon: Icon(Icons.cast)),
+                  Tab(icon: Icon(Icons.library_music)),
+                  Tab(
+                    icon: Icon(Icons.find_replace),
                   ),
-                  leading: Builder(builder: (context) {
-                    return IconButton(
-                      icon: Icon(Icons.menu),
-                      color: Colors.white,
-                      onPressed: Scaffold.of(context).openDrawer,
-                    );
-                  }),
-                  bottom: TabBar(tabs: [
-                    Tab(icon: Icon(Icons.cast)),
-                    Tab(icon: Icon(Icons.library_music)),
-                    Tab(
-                      icon: Icon(Icons.find_replace),
-                    ),
-                  ]),
-                ),
-                drawer: Drawer(
-                  child: Container(),
-                ),
-                body: TabBarView(children: [
+                ]),
+              ),
+              drawer: Drawer(
+                child: Container(),
+              ),
+              body: TabBarView(
+                children: [
                   PodcastPage(),
                   Container(),
                   Container(),
-                ]),
-                bottomSheet: BottomBar(),
+                ],
               ),
+              bottomSheet: BottomBar(),
             ),
           ),
         ),
