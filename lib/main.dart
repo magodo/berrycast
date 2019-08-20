@@ -4,8 +4,11 @@ import 'package:provider/provider.dart';
 
 import 'audio.dart';
 import 'audioplayer_stream_wrapper.dart';
+import 'bloc/podcast.dart';
 import 'bottom_bar.dart';
+import 'model/podcast.dart';
 import 'podcast_page.dart';
+import 'search_page.dart';
 import 'theme.dart';
 
 void main() => runApp(MyApp());
@@ -34,12 +37,16 @@ class MyApp extends StatelessWidget {
           value: schedule.player.onPlayerStateChanged,
           initialData: AudioPlayerState.STOPPED,
         ),
+        StreamProvider<List<Podcast>>.value(
+          value: podcastBloc.podcasts,
+        ),
       ],
       child: MaterialApp(
         title: '',
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
           primaryColor: accentColor,
+          accentColor: accentColor,
         ),
         home: DefaultTabController(
           initialIndex: 0,
@@ -61,9 +68,7 @@ class MyApp extends StatelessWidget {
                 bottom: TabBar(tabs: [
                   Tab(icon: Icon(Icons.cast)),
                   Tab(icon: Icon(Icons.library_music)),
-                  Tab(
-                    icon: Icon(Icons.find_replace),
-                  ),
+                  Tab(icon: Icon(Icons.search)),
                 ]),
               ),
               drawer: Drawer(
@@ -73,7 +78,7 @@ class MyApp extends StatelessWidget {
                 children: [
                   PodcastPage(),
                   Container(),
-                  Container(),
+                  SearchPage(),
                 ],
               ),
               bottomSheet: BottomBar(),

@@ -35,6 +35,9 @@ dependencies:
   http: ^0.12.0+2
   intl: ^0.15.8
   cached_network_image: ^1.1.1
+  sqflite: ^1.1.6
+  path: ^1.6.2
+  path_provider: ^1.2.0
 
 dev_dependencies:
   flutter_test:
