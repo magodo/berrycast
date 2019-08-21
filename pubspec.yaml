@@ -38,6 +38,8 @@ dependencies:
   sqflite: ^1.1.6
   path: ^1.6.2
   path_provider: ^1.2.0
+  flushbar: ^1.8.2
+
 
 dev_dependencies:
   flutter_test:

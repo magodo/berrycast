@@ -1,3 +1,5 @@
+import 'package:flushbar/flushbar.dart';
+import 'package:flushbar/flushbar_helper.dart';
 import 'package:flutter/material.dart';
 
 import 'bloc/podcast.dart';
@@ -93,31 +95,43 @@ class _SearchPageState extends State<SearchPage> {
         podcast = await Podcast.newPodcastByUrl(url);
         await podcastBloc.add(podcast);
       } on PodcastAlreadyExistException catch (e) {
-        Scaffold.of(context).showSnackBar(SnackBar(
-            backgroundColor: Colors.yellow[700],
-            content: Text(
-              "${e.toString()}",
-              textAlign: TextAlign.center,
-            )));
+        Flushbar(
+          messageText: Text(
+            "${e.toString()}",
+            style: TextStyle(color: Colors.white),
+          ),
+          icon: Icon(
+            Icons.warning,
+            size: 28,
+            color: Colors.yellow.shade300,
+          ),
+          leftBarIndicatorColor: Colors.yellow.shade300,
+          duration: Duration(seconds: 3),
+        )..show(context);
         return;
       } catch (e) {
-        Scaffold.of(context).showSnackBar(SnackBar(
-            backgroundColor: Colors.red,
-            content: Text(
-              "${e.toString()}",
-              textAlign: TextAlign.center,
-            )));
+        Flushbar(
+          messageText: Text(
+            "${e.toString()}",
+            style: TextStyle(color: Colors.white),
+          ),
+          icon: Icon(
+            Icons.error_outline,
+            size: 28,
+            color: Colors.red.shade300,
+          ),
+          leftBarIndicatorColor: Colors.red.shade300,
+          duration: Duration(seconds: 3),
+        )..show(context);
         return;
       }
-      Scaffold.of(context).showSnackBar(SnackBar(
-          backgroundColor: accentColor,
-          content: Text("OK!", textAlign: TextAlign.center)));
+      FlushbarHelper.createInformation(message: "Subscribe successfully!")
+          .show(context);
     }();
 
     _ectrl.clear();
 
     setState(() {
-      print("4");
       _tfSuffix = IconButton(
         icon: Icon(Icons.done_outline),
         onPressed: () => _submitUrl(context, _ectrl.text),
