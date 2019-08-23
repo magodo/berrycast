@@ -1,9 +1,6 @@
-import 'package:flushbar/flushbar.dart';
-import 'package:flushbar/flushbar_helper.dart';
 import 'package:flutter/material.dart';
-
-import 'bloc/podcast.dart';
-import 'model/podcast.dart';
+import 'bloc/itunes_bloc.dart';
+import 'search_result_page.dart';
 import 'theme.dart';
 
 class SearchPage extends StatefulWidget {
@@ -42,7 +39,7 @@ class _SearchPageState extends State<SearchPage> {
             child: Column(children: [
               Padding(padding: EdgeInsets.only(top: 40.0)),
               Text(
-                'Subscribe Podcast',
+                'Search Podcast',
                 style: TextStyle(color: accentColor, fontSize: 25.0),
               ),
               Padding(padding: EdgeInsets.only(top: 50.0)),
@@ -50,7 +47,7 @@ class _SearchPageState extends State<SearchPage> {
                 controller: _ectrl,
                 decoration: InputDecoration(
                   suffixIcon: _tfSuffix,
-                  labelText: "Enter RSS feed URL",
+                  labelText: "Please enter a search term",
                   fillColor: Colors.white,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(25.0),
@@ -60,14 +57,14 @@ class _SearchPageState extends State<SearchPage> {
                 ),
                 validator: (val) {
                   if (val.length == 0) {
-                    return "URL cannot be empty";
+                    return "Term cannot be empty";
                   } else {
                     return null;
                   }
                 },
-                onFieldSubmitted: (String url) =>
+                onFieldSubmitted: (String term) =>
                     _submitUrl(context, _ectrl.text),
-                keyboardType: TextInputType.url,
+                keyboardType: TextInputType.text,
                 style: TextStyle(
                   fontFamily: "Poppins",
                 ),
@@ -77,7 +74,7 @@ class _SearchPageState extends State<SearchPage> {
     );
   }
 
-  void _submitUrl(BuildContext context, String url) async {
+  void _submitUrl(BuildContext context, String term) {
     setState(() {
       _tfSuffix = Padding(
         padding: const EdgeInsets.all(8.0),
@@ -85,51 +82,18 @@ class _SearchPageState extends State<SearchPage> {
       );
     });
 
-    await () async {
-      if (!_formKey.currentState.validate()) {
-        return;
-      }
-      FocusScope.of(context).requestFocus(FocusNode());
-      Podcast podcast;
-      try {
-        podcast = await Podcast.newPodcastByUrl(url);
-        await podcastBloc.add(podcast);
-      } on PodcastAlreadyExistException catch (e) {
-        Flushbar(
-          messageText: Text(
-            "${e.toString()}",
-            style: TextStyle(color: Colors.white),
-          ),
-          icon: Icon(
-            Icons.warning,
-            size: 28,
-            color: Colors.yellow.shade300,
-          ),
-          leftBarIndicatorColor: Colors.yellow.shade300,
-          duration: Duration(seconds: 3),
-        )..show(context);
-        return;
-      } catch (e) {
-        Flushbar(
-          messageText: Text(
-            "${e.toString()}",
-            style: TextStyle(color: Colors.white),
-          ),
-          icon: Icon(
-            Icons.error_outline,
-            size: 28,
-            color: Colors.red.shade300,
-          ),
-          leftBarIndicatorColor: Colors.red.shade300,
-          duration: Duration(seconds: 3),
-        )..show(context);
-        return;
-      }
-      FlushbarHelper.createInformation(message: "Subscribe successfully!")
-          .show(context);
-    }();
+    if (!_formKey.currentState.validate()) {
+      return;
+    }
 
-    _ectrl.clear();
+    itunesBloc.searchPodcasts(term);
+
+    // clear text field
+    // TODO: There is bug in flutter 1.7.8, see [this](https://github.com/flutter/flutter/pull/38722)
+//    _ectrl.clear();
+
+    // release focus from text field
+    FocusScope.of(context).unfocus();
 
     setState(() {
       _tfSuffix = IconButton(
@@ -137,5 +101,9 @@ class _SearchPageState extends State<SearchPage> {
         onPressed: () => _submitUrl(context, _ectrl.text),
       );
     });
+
+    Navigator.push(context, MaterialPageRoute(builder: (context) {
+      return SearchResultPage();
+    }));
   }
 }

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'bloc/podcast.dart';
+import 'bloc/db_podcast.dart';
 import 'model/podcast.dart';
 import 'theme.dart';
 
@@ -111,7 +111,7 @@ class _FancyFabState extends State<FancyFab>
       _ectrl.clear();
       return;
     }
-    podcastBloc.add(podcast);
+    dbPodcastBloc.add(podcast);
     _ectrl.clear();
   }
 

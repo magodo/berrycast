@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import '../model/podcast.dart';
-import '../repository/db.dart';
+import '../resources/db.dart';
 
 class PodcastAlreadyExistException implements Exception{
   @override
@@ -10,22 +10,35 @@ class PodcastAlreadyExistException implements Exception{
   }
 }
 
-class PodcastBloc {
+class DBPodcastBloc {
   final _podcastsController = StreamController<List<Podcast>>.broadcast();
+  final _podcastController = StreamController<Podcast>.broadcast();
 
-  PodcastBloc() {
+  DBPodcastBloc() {
     getPodcasts();
   }
 
   dispose() {
     _podcastsController.close();
+    _podcastController.close();
   }
 
   getPodcasts() async {
     _podcastsController.add(await DBProvider.db.getAllPodcasts());
   }
 
+  loadPodcast(String feedUrl) async {
+    var podcast = await Podcast.newPodcastByUrl(feedUrl);
+    _podcastController.add(podcast);
+  }
+
   get podcasts => _podcastsController.stream;
+  get podcast => _podcastController.stream;
+
+  addByUrl(String url) async {
+    var podcast = await Podcast.newPodcastByUrl(url);
+    add(podcast);
+  }
 
   add(Podcast podcast) async {
     final podcasts = await DBProvider.db.getAllPodcasts();
@@ -47,4 +60,4 @@ class PodcastBloc {
   }
 }
 
-final PodcastBloc podcastBloc =PodcastBloc();
+final DBPodcastBloc dbPodcastBloc =DBPodcastBloc();

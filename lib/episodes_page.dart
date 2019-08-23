@@ -1,74 +1,163 @@
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flushbar/flushbar_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'audio.dart';
-import 'bloc/podcast.dart';
+import 'bloc/db_podcast.dart';
 import 'bottom_bar.dart';
 import 'model/podcast.dart';
 import 'play_page.dart';
 import 'sliver_appbar_delegate.dart';
 import 'theme.dart';
 
+// If [podcast] is passed in, then we will directly build from it.
+// Otherwise, we will use stream builder on [dbPodcastBloc.podcast] stream, and optionally use [image] if also passed in.
 class EpisodesPage extends StatefulWidget {
-  final Podcast podcast;
+  final CachedNetworkImage _coverImage;
+  final Podcast _podcast;
 
-  const EpisodesPage({Key key, this.podcast}) : super(key: key);
+  EpisodesPage({Podcast podcast, CachedNetworkImage image})
+      : _podcast = podcast,
+        _coverImage = image;
 
   @override
   _EpisodesPageState createState() => _EpisodesPageState();
 }
 
 class _EpisodesPageState extends State<EpisodesPage> {
+  // TODO: optimize following redundent code...
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        body: NestedScrollView(
-          headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
-            return <Widget>[
-              SliverAppBar(
-                expandedHeight: 200.0,
-                floating: true,
-                snap: false,
-                pinned: true,
-                elevation: 0.0,
-                flexibleSpace: FlexibleSpaceBar(
-                  background: widget.podcast.image,
+    if (widget._podcast != null)
+      return SafeArea(
+        child: Scaffold(
+          body: NestedScrollView(
+            headerSliverBuilder:
+                (BuildContext context, bool innerBoxIsScrolled) {
+              return <Widget>[
+                SliverAppBar(
+                  expandedHeight: 200.0,
+                  floating: true,
+                  snap: false,
+                  pinned: true,
+                  elevation: 0.0,
+                  flexibleSpace: FlexibleSpaceBar(
+                    background: widget._podcast.image,
+                  ),
                 ),
-              ),
-              SliverPersistentHeader(
-                pinned: true,
-                delegate: SliverAppBarDelegate(
-                  minHeight: 50.0,
-                  maxHeight: 50.0,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: <Widget>[
-                        buildPlayallButton(),
-                        bubildSubscribeButton(),
-                      ],
+                SliverPersistentHeader(
+                  pinned: true,
+                  delegate: SliverAppBarDelegate(
+                    minHeight: 50.0,
+                    maxHeight: 50.0,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          buildPlayallButton(context, widget._podcast),
+                          bubildSubscribeButton(context, widget._podcast),
+                        ],
+                      ),
                     ),
                   ),
                 ),
+              ];
+            },
+            body: buildEpisodeListView(context, widget._podcast),
+          ),
+          bottomSheet: BottomBar(),
+        ),
+      );
+    else
+      return StreamBuilder(
+        stream: dbPodcastBloc.podcast,
+        builder: (BuildContext context, AsyncSnapshot<Podcast> snapshot) {
+          if (snapshot.hasError) {
+            return FlushbarHelper.createError(
+                message: "${snapshot.error}", duration: Duration(seconds: 3));
+          }
+          return SafeArea(
+            child: Scaffold(
+              body: NestedScrollView(
+                headerSliverBuilder:
+                    (BuildContext context, bool innerBoxIsScrolled) {
+                  return <Widget>[
+                    SliverAppBar(
+                      expandedHeight: 200.0,
+                      floating: true,
+                      snap: false,
+                      pinned: true,
+                      elevation: 0.0,
+                      flexibleSpace: FlexibleSpaceBar(
+                        background: widget._coverImage == null
+                            ? (snapshot.hasData
+                                ? snapshot.data.image
+                                : Center(child: CircularProgressIndicator()))
+                            : widget._coverImage,
+                      ),
+                    ),
+                    SliverPersistentHeader(
+                      pinned: true,
+                      delegate: SliverAppBarDelegate(
+                        minHeight: 50.0,
+                        maxHeight: 50.0,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: snapshot.hasData
+                                ? <Widget>[
+                                    buildPlayallButton(context, snapshot.data),
+                                    bubildSubscribeButton(
+                                        context, snapshot.data),
+                                  ]
+                                : [],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ];
+                },
+                body: asyncBuildEpisodeListView(context, snapshot),
               ),
-            ];
-          },
-          body: ListView(
-            children: widget.podcast.episodes
+              bottomSheet: BottomBar(),
+            ),
+          );
+        },
+      );
+  }
+
+  Widget buildEpisodeListView(BuildContext context, Podcast podcast) {
+    return ListView(
+      children: podcast.episodes
+          .asMap()
+          .map((idx, episode) =>
+              MapEntry(idx, _buildSongTile(context, idx, episode)))
+          .values
+          .toList(),
+    );
+  }
+
+  Widget asyncBuildEpisodeListView(
+      BuildContext context, AsyncSnapshot<Podcast> snapshot) {
+    return snapshot.hasData
+        ? ListView(
+            children: snapshot.data.episodes
                 .asMap()
                 .map((idx, episode) =>
                     MapEntry(idx, _buildSongTile(context, idx, episode)))
                 .values
                 .toList(),
-          ),
-        ),
-        bottomSheet: BottomBar(),
-      ),
-    );
+          )
+        : Center(
+            child: CircularProgressIndicator(),
+          );
   }
 
   ListTile _buildSongTile(BuildContext context, int index, Episode episode) {
@@ -106,8 +195,8 @@ class _EpisodesPageState extends State<EpisodesPage> {
     }));
   }
 
-  Widget bubildSubscribeButton() {
-    if (widget.podcast.isSubscribed) {
+  Widget bubildSubscribeButton(BuildContext context, Podcast podcast) {
+    if (podcast.isSubscribed) {
       return FlatButton(
         child: Row(
           children: <Widget>[
@@ -119,8 +208,8 @@ class _EpisodesPageState extends State<EpisodesPage> {
           ],
         ),
         onPressed: () => setState(() {
-          widget.podcast.isSubscribed = false;
-          podcastBloc.delete(widget.podcast.id);
+          podcast.isSubscribed = false;
+          dbPodcastBloc.delete(podcast.id);
         }),
       );
     }
@@ -138,13 +227,13 @@ class _EpisodesPageState extends State<EpisodesPage> {
         ],
       ),
       onPressed: () => setState(() {
-        podcastBloc.add(widget.podcast);
-        widget.podcast.isSubscribed = true;
+        dbPodcastBloc.add(podcast);
+        podcast.isSubscribed = true;
       }),
     );
   }
 
-  buildPlayallButton() {
+  buildPlayallButton(BuildContext context, Podcast podcast) {
     return FlatButton(
       child: Row(
         children: <Widget>[
@@ -156,12 +245,12 @@ class _EpisodesPageState extends State<EpisodesPage> {
             ),
           ),
           Text(
-            "PLAY ALL (${widget.podcast.episodes.length})",
+            "PLAY ALL (${podcast.episodes.length})",
             style: TextStyle(color: accentColor),
           ),
         ],
       ),
-      onPressed: () => _playNewPodcast(context, widget.podcast),
+      onPressed: () => _playNewPodcast(context, podcast),
     );
   }
 }

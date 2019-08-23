@@ -3,9 +3,12 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
+import 'package:logger/logger.dart';
 
 import 'package:webfeed/webfeed.dart';
 
+import '../logger.dart';
+import '../resources/db.dart';
 import '../songs.dart';
 
 class Podcast {
@@ -70,6 +73,8 @@ class Podcast {
       );
 
   static Future<Podcast> newPodcastByUrl(String url) async {
+    var podcast = await DBProvider.db.getPodcastByUrl(url);
+    if (podcast != null) return podcast;
     var resp = await http.get(url);
     var feedContent = utf8.decode(resp.bodyBytes);
     var feed = RssFeed.parse(feedContent);

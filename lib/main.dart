@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 
 import 'audio.dart';
 import 'audioplayer_stream_wrapper.dart';
-import 'bloc/podcast.dart';
+import 'bloc/db_podcast.dart';
 import 'bottom_bar.dart';
 import 'model/podcast.dart';
 import 'podcast_page.dart';
@@ -38,7 +38,7 @@ class MyApp extends StatelessWidget {
           initialData: AudioPlayerState.STOPPED,
         ),
         StreamProvider<List<Podcast>>.value(
-          value: podcastBloc.podcasts,
+          value: dbPodcastBloc.podcasts,
         ),
       ],
       child: MaterialApp(

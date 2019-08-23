@@ -68,6 +68,12 @@ class DBProvider {
     return res.isNotEmpty ? Podcast.fromMap(res.first) : null;
   }
 
+  getPodcastByUrl(String url) async {
+    final db = await database;
+    var res = await db.query("Podcasts", where: "feed_url = ?", whereArgs: [url]);
+    return res.isNotEmpty ? Podcast.fromMap(res.first): null;
+  }
+
   Future<List<Podcast>> getAllPodcasts() async {
     final db = await database;
     var res = await db.query("Podcasts");
