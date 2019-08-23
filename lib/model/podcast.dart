@@ -12,7 +12,7 @@ import '../songs.dart';
 class Podcast {
   final String feedUrl;
   final String imageUrl;
-  final String _feedContent;
+  final String feedContent;
   final RssFeed _rssFeed;
   List<Episode> _episodes;
   List<Episode> get episodes => _episodes;
@@ -21,10 +21,9 @@ class Podcast {
   Podcast({
     this.feedUrl,
     this.imageUrl,
-    feedContent,
+    this.feedContent,
     this.isSubscribed,
-  })  : _feedContent = feedContent,
-        _rssFeed = RssFeed.parse(feedContent) {
+  }) : _rssFeed = RssFeed.parse(feedContent) {
     _episodes = [
       for (var item in _rssFeed.items)
         Episode(
@@ -53,7 +52,7 @@ class Podcast {
   Map<String, dynamic> toMap() => {
         "feed_url": feedUrl,
         "image_url": imageUrl,
-        "feed_content": _feedContent,
+        "feed_content": feedContent,
       };
 
   String get author => _rssFeed.itunes?.author;
@@ -62,17 +61,19 @@ class Podcast {
   CachedNetworkImage get image => CachedNetworkImage(
         imageUrl: imageUrl,
         placeholder: (context, url) => CircularProgressIndicator(),
-    fit: BoxFit.cover,
+        fit: BoxFit.cover,
       );
 
   static Future<Podcast> newPodcastByUrl(String url, {String imageUrl}) async {
-    var podcast = await DBProvider.db.getPodcast(url);
-    if (podcast != null) return podcast;
     var resp = await http.get(url);
     var feedContent = utf8.decode(resp.bodyBytes);
     var feed = RssFeed.parse(feedContent);
+    var isSubscribed = await DBProvider.db.getPodcast(url) != null;
     return Podcast(
-        feedUrl: url, imageUrl: imageUrl?? feed.itunes.image.href, feedContent: feedContent, isSubscribed: false);
+        feedUrl: url,
+        imageUrl: imageUrl ?? feed.itunes.image.href,
+        feedContent: feedContent,
+        isSubscribed: isSubscribed);
   }
 }
 

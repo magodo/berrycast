@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 import 'bloc/db_podcast.dart';
 import 'episodes_page.dart';
@@ -7,6 +8,14 @@ import 'model/podcast.dart';
 import 'theme.dart';
 
 class PodcastPage extends StatelessWidget {
+  RefreshController _refreshController =
+      RefreshController(initialRefresh: false);
+
+  void _onRefresh() async {
+    await dbPodcastBloc.refreshPodcasts();
+    _refreshController.refreshCompleted();
+  }
+
   _openAlbumPage(BuildContext context, Podcast podcast) async {
     dbPodcastBloc.feedPodcast(podcast);
     Navigator.push(context, MaterialPageRoute(builder: (context) {
@@ -49,12 +58,18 @@ class PodcastPage extends StatelessWidget {
 //          tooltip: "",
 //          icon: Icons.add,
 //        ),
-    return GridView.count(
-        crossAxisCount: 2,
-        mainAxisSpacing: 4.0,
-        crossAxisSpacing: 4.0,
-        padding: const EdgeInsets.all(4.0),
-        childAspectRatio: 1.0,
-        children: _buildAlbumThumb(context));
+    return SmartRefresher(
+      enablePullDown: true,
+      header: MaterialClassicHeader(),
+      controller: _refreshController,
+      onRefresh: _onRefresh,
+      child: GridView.count(
+          crossAxisCount: 2,
+          mainAxisSpacing: 4.0,
+          crossAxisSpacing: 4.0,
+          padding: const EdgeInsets.all(4.0),
+          childAspectRatio: 1.0,
+          children: _buildAlbumThumb(context)),
+    );
   }
 }

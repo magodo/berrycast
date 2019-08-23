@@ -1,6 +1,7 @@
 
 import 'package:rxdart/rxdart.dart';
 
+import '../logger.dart';
 import '../model/podcast.dart';
 import '../resources/db.dart';
 
@@ -26,6 +27,26 @@ class DBPodcastBloc {
 
   getPodcasts() async {
     _podcastsSubscribe.add(await DBProvider.db.getAllPodcasts());
+  }
+
+  refreshPodcasts() async {
+    var podcasts = await DBProvider.db.getAllPodcasts();
+    //TODO: parallelize the refresh process below
+    var futures = <Future>[];
+    for (var p in podcasts) {
+      futures.add(() async {
+        print("start to refresh ${p.feedUrl}");
+        var podcast =  await Podcast.newPodcastByUrl(p.feedUrl, imageUrl: p.imageUrl);
+        if (podcast.feedContent == p.feedContent)  {
+          print("${p.feedUrl} is same");
+          return;
+        }
+        print("${p.feedUrl} is different, update...");
+        await upgrade(podcast);
+      }());
+    }
+    await Future.wait(futures);
+    return;
   }
 
   feedPodcastByUrl(String feedUrl, {String imageUrl}) async {

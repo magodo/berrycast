@@ -53,12 +53,11 @@ class DBProvider {
   }
 
   newPodcast(Podcast podcast) async {
-    final db = await database;
-    var pm = podcast.toMap();
-    if (pm["feed_content"].length >= sqliteRowSize) {
+    if (podcast.feedContent.length >= sqliteRowSize) {
       throw Exception("podcast feed_content exceeds sql row size limit");
     }
-    var res = await db.insert("Podcasts", pm);
+    final db = await database;
+    var res = await db.insert("Podcasts", podcast.toMap());
     return res;
   }
 
