@@ -1,21 +1,23 @@
 import 'dart:async';
 
+import 'package:rxdart/rxdart.dart';
+
 import '../model/itunes.dart';
 import '../resources/itunes_api_provider.dart';
 
 class ItunesBloc {
-  final _itunesPodcastController = StreamController<List<ItunesPodcast>>.broadcast();
+  final _itunesPodcastSubscribe = BehaviorSubject<List<ItunesPodcast>>();
 
   void dispose() {
-    _itunesPodcastController.close();
+    _itunesPodcastSubscribe.close();
   }
 
-  get podcasts => _itunesPodcastController.stream;
+  get podcasts => _itunesPodcastSubscribe.stream;
 
   searchPodcasts(String term) async {
     List<ItunesPodcast> itunesPodcasts =
         await ItunesApiProvider.api.searchPdocasts(term);
-    _itunesPodcastController.add(itunesPodcasts);
+    _itunesPodcastSubscribe.add(itunesPodcasts);
   }
 }
 

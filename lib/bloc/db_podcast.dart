@@ -1,9 +1,11 @@
 import 'dart:async';
 
+import 'package:rxdart/rxdart.dart';
+
 import '../model/podcast.dart';
 import '../resources/db.dart';
 
-class PodcastAlreadyExistException implements Exception{
+class PodcastAlreadyExistException implements Exception {
   @override
   String toString() {
     return "Podcast already exists!";
@@ -11,29 +13,39 @@ class PodcastAlreadyExistException implements Exception{
 }
 
 class DBPodcastBloc {
-  final _podcastsController = StreamController<List<Podcast>>.broadcast();
-  final _podcastController = StreamController<Podcast>.broadcast();
+  final _podcastsSubscribe = BehaviorSubject<List<Podcast>>();
+  final _podcastSubject = BehaviorSubject<Podcast>();
 
   DBPodcastBloc() {
     getPodcasts();
   }
 
   dispose() {
-    _podcastsController.close();
-    _podcastController.close();
+    _podcastsSubscribe.close();
+    _podcastSubject.close();
   }
 
   getPodcasts() async {
-    _podcastsController.add(await DBProvider.db.getAllPodcasts());
+    _podcastsSubscribe.add(await DBProvider.db.getAllPodcasts());
   }
 
-  loadPodcast(String feedUrl) async {
+  feedPodcastByUrl(String feedUrl) async {
+    // Since we are using BehaviorSubscribe, if the `add()` takes time, and the page
+    // which subscribe it is built first. Then it will show the last emitted event.
+    // This is not what we want, which causes confusion.
+    // So we will pass in a null, which will notify the page a new event will come soon,
+    // and page should be in an waiting state, showing indicator or something similar.
+    _podcastSubject.add(null);
     var podcast = await Podcast.newPodcastByUrl(feedUrl);
-    _podcastController.add(podcast);
+    _podcastSubject.add(podcast);
   }
 
-  get podcasts => _podcastsController.stream;
-  get podcast => _podcastController.stream;
+  feedPodcast(Podcast podcast) async {
+      _podcastSubject.add(podcast);
+  }
+
+  get podcasts => _podcastsSubscribe.stream;
+  get podcast => _podcastSubject.stream;
 
   addByUrl(String url) async {
     var podcast = await Podcast.newPodcastByUrl(url);
@@ -60,4 +72,5 @@ class DBPodcastBloc {
   }
 }
 
-final DBPodcastBloc dbPodcastBloc =DBPodcastBloc();
+final DBPodcastBloc dbPodcastBloc = DBPodcastBloc();
+

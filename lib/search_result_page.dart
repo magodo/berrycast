@@ -72,11 +72,9 @@ class SearchResultPage extends StatelessWidget {
   }
 
   _openAlbumPage(BuildContext context, ItunesPodcast ipodcast) {
-    dbPodcastBloc.loadPodcast(ipodcast.feedUrl);
+    dbPodcastBloc.feedPodcastByUrl(ipodcast.feedUrl);
     Navigator.push(context, MaterialPageRoute(builder: (context) {
-      return EpisodesPage(
-        image: ipodcast.image,
-      );
+      return EpisodesPage(ipodcast.image      );
     }));
   }
 }

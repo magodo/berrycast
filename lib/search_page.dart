@@ -1,3 +1,4 @@
+import 'package:flushbar/flushbar_helper.dart';
 import 'package:flutter/material.dart';
 import 'bloc/itunes_bloc.dart';
 import 'search_result_page.dart';
@@ -74,7 +75,7 @@ class _SearchPageState extends State<SearchPage> {
     );
   }
 
-  void _submitUrl(BuildContext context, String term) {
+  void _submitUrl(BuildContext context, String term) async {
     setState(() {
       _tfSuffix = Padding(
         padding: const EdgeInsets.all(8.0),
@@ -82,11 +83,21 @@ class _SearchPageState extends State<SearchPage> {
       );
     });
 
-    if (!_formKey.currentState.validate()) {
-      return;
-    }
+    await () async {
+      if (!_formKey.currentState.validate()) {
+        return;
+      }
 
-    itunesBloc.searchPodcasts(term);
+      try {
+        await itunesBloc.searchPodcasts(term);
+      } on Exception catch (e) {
+        FlushbarHelper.createError(message: e.toString(), duration: Duration(seconds: 3)).show(context);
+        return;
+      }
+      Navigator.push(context, MaterialPageRoute(builder: (context) {
+        return SearchResultPage();
+      }));
+    }();
 
     // clear text field
     // TODO: There is bug in flutter 1.7.8, see [this](https://github.com/flutter/flutter/pull/38722)
@@ -101,9 +112,5 @@ class _SearchPageState extends State<SearchPage> {
         onPressed: () => _submitUrl(context, _ectrl.text),
       );
     });
-
-    Navigator.push(context, MaterialPageRoute(builder: (context) {
-      return SearchResultPage();
-    }));
   }
 }

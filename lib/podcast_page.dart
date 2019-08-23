@@ -7,9 +7,10 @@ import 'model/podcast.dart';
 import 'theme.dart';
 
 class PodcastPage extends StatelessWidget {
-  _openAlbumPage(BuildContext context, Podcast podcast) {
+  _openAlbumPage(BuildContext context, Podcast podcast) async {
+    dbPodcastBloc.feedPodcast(podcast);
     Navigator.push(context, MaterialPageRoute(builder: (context) {
-      return EpisodesPage(podcast: podcast);
+      return EpisodesPage(podcast.image);
     }));
   }
 

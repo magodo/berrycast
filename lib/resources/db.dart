@@ -19,7 +19,7 @@ class DBProvider {
   }
 
   _migrateDB(Database db, int oldVersion, int newVersion) async {
-    print("migrating db...");
+    print("migrating db... ($oldVersion -> $newVersion)");
     await db.execute("DROP TABLE Podcasts");
     await db.execute("""
     CREATE TABLE Podcasts(
@@ -29,9 +29,6 @@ class DBProvider {
       feed_content TEXT NOT NULL
     );
     """);
-    var ggtalk =
-        await Podcast.newPodcastByUrl("https://talk.swift.gg/static/rss.xml");
-    await db.insert("Podcasts", ggtalk.toMap());
   }
 
   initDB() async {
