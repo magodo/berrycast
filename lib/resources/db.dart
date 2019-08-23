@@ -7,6 +7,7 @@ import 'package:sqflite/sqflite.dart';
 import '../model/podcast.dart';
 
 class DBProvider {
+  static final  sqliteRowSize = 1024*1024;
   static Database _database;
   DBProvider._();
   static final DBProvider db = DBProvider._();
@@ -23,9 +24,8 @@ class DBProvider {
     await db.execute("DROP TABLE Podcasts");
     await db.execute("""
     CREATE TABLE Podcasts(
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      feed_url TEXT NOT NULL,
-      image_base64 TEXT NOT NULL,
+      feed_url TEXT NOT NULL PRIMARY KEY,
+      image_url TEXT NOT NULL,
       feed_content TEXT NOT NULL
     );
     """);
@@ -36,14 +36,13 @@ class DBProvider {
     String path = join(documentsDirectory.path, "Podcast.db");
     return await openDatabase(
       path,
-      version: 1,
+      version: 3,
       onOpen: (db) {},
       onCreate: (Database db, int version) async {
         await db.execute("""
     CREATE TABLE Podcasts(
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      feed_url TEXT NOT NULL,
-      image_base64 TEXT NOT NULL,
+      feed_url TEXT NOT NULL PRIMARY KEY,
+      image_url TEXT NOT NULL,
       feed_content TEXT NOT NULL
     );
     """);
@@ -55,20 +54,18 @@ class DBProvider {
 
   newPodcast(Podcast podcast) async {
     final db = await database;
-    var res = await db.insert("Podcasts", podcast.toMap());
+    var pm = podcast.toMap();
+    if (pm["feed_content"].length >= sqliteRowSize) {
+      throw Exception("podcast feed_content exceeds sql row size limit");
+    }
+    var res = await db.insert("Podcasts", pm);
     return res;
   }
 
-  getPodcast(int id) async {
-    final db = await database;
-    var res = await db.query("Podcasts", where: "id = ?", whereArgs: [id]);
-    return res.isNotEmpty ? Podcast.fromMap(res.first) : null;
-  }
-
-  getPodcastByUrl(String url) async {
+  getPodcast(String url) async {
     final db = await database;
     var res = await db.query("Podcasts", where: "feed_url = ?", whereArgs: [url]);
-    return res.isNotEmpty ? Podcast.fromMap(res.first): null;
+    return res.isNotEmpty ? Podcast.fromMap(res.first) : null;
   }
 
   Future<List<Podcast>> getAllPodcasts() async {
@@ -82,15 +79,15 @@ class DBProvider {
     var res = await db.update(
       "Podcasts",
       podcast.toMap(),
-      where: "id = ?",
-      whereArgs: [podcast.id],
+      where: "feed_url = ?",
+      whereArgs: [podcast.feedUrl],
     );
     return res;
   }
 
-  deletePodcast(int id) async {
+  deletePodcast(String url) async {
     final db = await database;
-    var res = await db.delete("Podcasts", where: "id = ?", whereArgs: [id]);
+    var res = await db.delete("Podcasts", where: "feed_url = ?", whereArgs: [url]);
     return res;
   }
 }

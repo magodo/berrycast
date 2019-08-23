@@ -3,18 +3,15 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
-import 'package:logger/logger.dart';
 
 import 'package:webfeed/webfeed.dart';
 
-import '../logger.dart';
 import '../resources/db.dart';
 import '../songs.dart';
 
 class Podcast {
-  final int id;
   final String feedUrl;
-  final String imageBase64;
+  final String imageUrl;
   final String _feedContent;
   final RssFeed _rssFeed;
   List<Episode> _episodes;
@@ -22,9 +19,8 @@ class Podcast {
   bool isSubscribed;
 
   Podcast({
-    this.id,
     this.feedUrl,
-    this.imageBase64,
+    this.imageUrl,
     feedContent,
     this.isSubscribed,
   })  : _feedContent = feedContent,
@@ -48,17 +44,15 @@ class Podcast {
   String toJson() => json.encode(toMap());
 
   factory Podcast.fromMap(Map<String, dynamic> json) => new Podcast(
-        id: json["id"],
         feedUrl: json["feed_url"],
-        imageBase64: json['image_base64'],
+        imageUrl: json['image_url'],
         feedContent: json["feed_content"],
         isSubscribed: true,
       );
 
   Map<String, dynamic> toMap() => {
-        "id": id,
         "feed_url": feedUrl,
-        "image_base64": imageBase64,
+        "image_url": imageUrl,
         "feed_content": _feedContent,
       };
 
@@ -66,22 +60,19 @@ class Podcast {
   String get title => _rssFeed.itunes?.title ?? _rssFeed.title;
   String get description => _rssFeed.description;
   CachedNetworkImage get image => CachedNetworkImage(
-        imageUrl: _rssFeed.itunes.image.href,
+        imageUrl: imageUrl,
         placeholder: (context, url) => CircularProgressIndicator(),
-        errorWidget: (context, url, err) => Image.memory(base64.decode(imageBase64), fit: BoxFit.cover),
     fit: BoxFit.cover,
       );
 
-  static Future<Podcast> newPodcastByUrl(String url) async {
-    var podcast = await DBProvider.db.getPodcastByUrl(url);
+  static Future<Podcast> newPodcastByUrl(String url, {String imageUrl}) async {
+    var podcast = await DBProvider.db.getPodcast(url);
     if (podcast != null) return podcast;
     var resp = await http.get(url);
     var feedContent = utf8.decode(resp.bodyBytes);
     var feed = RssFeed.parse(feedContent);
-    var imageResp = await http.get(feed.itunes.image.href);
-    var imageBase64 = base64.encode(imageResp.bodyBytes);
     return Podcast(
-        feedUrl: url, imageBase64: imageBase64, feedContent: feedContent, isSubscribed: false);
+        feedUrl: url, imageUrl: imageUrl?? feed.itunes.image.href, feedContent: feedContent, isSubscribed: false);
   }
 }
 

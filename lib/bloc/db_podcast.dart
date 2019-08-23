@@ -1,4 +1,3 @@
-import 'dart:async';
 
 import 'package:rxdart/rxdart.dart';
 
@@ -29,14 +28,14 @@ class DBPodcastBloc {
     _podcastsSubscribe.add(await DBProvider.db.getAllPodcasts());
   }
 
-  feedPodcastByUrl(String feedUrl) async {
+  feedPodcastByUrl(String feedUrl, {String imageUrl}) async {
     // Since we are using BehaviorSubscribe, if the `add()` takes time, and the page
     // which subscribe it is built first. Then it will show the last emitted event.
     // This is not what we want, which causes confusion.
     // So we will pass in a null, which will notify the page a new event will come soon,
     // and page should be in an waiting state, showing indicator or something similar.
     _podcastSubject.add(null);
-    var podcast = await Podcast.newPodcastByUrl(feedUrl);
+    var podcast = await Podcast.newPodcastByUrl(feedUrl, imageUrl: imageUrl);
     _podcastSubject.add(podcast);
   }
 
@@ -47,10 +46,10 @@ class DBPodcastBloc {
   get podcasts => _podcastsSubscribe.stream;
   get podcast => _podcastSubject.stream;
 
-  addByUrl(String url) async {
-    var podcast = await Podcast.newPodcastByUrl(url);
-    add(podcast);
-  }
+//  addByUrl(String url) async {
+//    var podcast = await Podcast.newPodcastByUrl(url);
+//    add(podcast);
+//  }
 
   add(Podcast podcast) async {
     final podcasts = await DBProvider.db.getAllPodcasts();
@@ -61,8 +60,8 @@ class DBPodcastBloc {
     getPodcasts();
   }
 
-  delete(int id) async {
-    await DBProvider.db.deletePodcast(id);
+  delete(String url) async {
+    await DBProvider.db.deletePodcast(url);
     getPodcasts();
   }
 

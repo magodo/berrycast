@@ -141,10 +141,12 @@ class _EpisodesPageState extends State<EpisodesPage> {
             ),
           ],
         ),
-        onPressed: () => setState(() {
-          podcast.isSubscribed = false;
-          dbPodcastBloc.delete(podcast.id);
-        }),
+        onPressed: () async {
+          await dbPodcastBloc.delete(podcast.feedUrl);
+          setState(() {
+            podcast.isSubscribed = false;
+          });
+        },
       );
     }
     return FlatButton(
@@ -160,10 +162,17 @@ class _EpisodesPageState extends State<EpisodesPage> {
           ),
         ],
       ),
-      onPressed: () => setState(() {
-        dbPodcastBloc.add(podcast);
-        podcast.isSubscribed = true;
-      }),
+      onPressed: () async {
+        try {
+          await dbPodcastBloc.add(podcast);
+        } on Exception catch (e) {
+          FlushbarHelper.createError(message: e.toString()).show(context);
+          return;
+        }
+        setState(() {
+          podcast.isSubscribed = true;
+        });
+      },
     );
   }
 

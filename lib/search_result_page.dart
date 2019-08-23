@@ -1,13 +1,10 @@
 import 'package:flushbar/flushbar_helper.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 import 'bloc/db_podcast.dart';
 import 'bloc/itunes_bloc.dart';
 import 'episodes_page.dart';
 import 'model/itunes.dart';
-import 'model/podcast.dart';
-import 'theme.dart';
 
 class SearchResultPage extends StatelessWidget {
   @override
@@ -72,9 +69,10 @@ class SearchResultPage extends StatelessWidget {
   }
 
   _openAlbumPage(BuildContext context, ItunesPodcast ipodcast) {
-    dbPodcastBloc.feedPodcastByUrl(ipodcast.feedUrl);
+    dbPodcastBloc.feedPodcastByUrl(ipodcast.feedUrl,
+        imageUrl: ipodcast.artworkUrl600);
     Navigator.push(context, MaterialPageRoute(builder: (context) {
-      return EpisodesPage(ipodcast.image      );
+      return EpisodesPage(ipodcast.image);
     }));
   }
 }
