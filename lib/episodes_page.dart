@@ -113,7 +113,12 @@ class _EpisodesPageState extends State<EpisodesPage> {
 
   _playNewEpisode(BuildContext context, Episode song) {
     final schedule = Provider.of<AudioSchedule>(context);
-    schedule.playlist = <Episode>[song];
+    if (schedule.playlist == null) {
+      schedule.playlist = <Episode>[song];
+    } else {
+      schedule.playlist.remove(song);
+      schedule.playlist.insert(0, song);
+    }
     schedule.playNthSong(0);
     Navigator.push(context, MaterialPageRoute(builder: (context) {
       return PlayPage();

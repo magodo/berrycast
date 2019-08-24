@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'audioplayer_stream_wrapper.dart';
+import 'resources/db.dart';
 import 'songs.dart';
 
 class AudioSchedule with ChangeNotifier {
@@ -12,12 +13,12 @@ class AudioSchedule with ChangeNotifier {
   AudioSchedule()
       : player = MyAudioPlayer(),
         _playlist = null,
-        _playIdx = 0;
+        _playIdx = null;
 
   List<Song> get playlist => _playlist;
   set playlist(List<Song> playlist) {
     _playlist = playlist;
-    _playIdx = 0;
+    _playIdx = null;
   }
 
   bool get isEmpty => _playlist == null;
@@ -50,18 +51,11 @@ class AudioSchedule with ChangeNotifier {
   }
 
   void nextSong() {
-    _playIdx = (_playIdx + 1) % _playlist.length;
-    _changeSong();
+    playNthSong((_playIdx + 1) % _playlist.length);
   }
 
   void prevSong() {
-    _playIdx = (_playIdx - 1) % _playlist.length;
-    _changeSong();
-  }
-
-  void _changeSong() async {
-    playNthSong(_playIdx);
-    notifyListeners();
+    playNthSong((_playIdx - 1) % _playlist.length);
   }
 
   void forward10() async {
@@ -81,26 +75,20 @@ class AudioSchedule with ChangeNotifier {
     player.play(song.audioUrl);
   }
 
-  void play() {
-    player.play(song.audioUrl);
-  }
-
-  void _playFromHead() {
-    player.stop();
-    player.setPosition(AudioPosition(Duration()));
-    player.setSeekPosition(null);
-    player.play(song.audioUrl);
+  void play() async {
+    var duration = await DBProvider.db.getPlayHistory(song.audioUrl);
+    player.play(song.audioUrl, position: duration);
   }
 
   void playNthSong(int idx) {
-    _playIdx = idx;
-    final targetSong = _playlist[idx];
-    if (targetSong == song) {
-      play();
+    if (_playlist[idx]  == song) {
+      return;
     }
 
-    song = targetSong;
-    _playFromHead();
+    pause();
+    _playIdx = idx;
+    song = _playlist[idx];
+    play();
     notifyListeners();
   }
 
@@ -108,8 +96,12 @@ class AudioSchedule with ChangeNotifier {
     player.resume();
   }
 
-  void pause() {
-    player.pause();
+  void pause() async {
+    if (song != null) {
+      player.pause();
+      DBProvider.db.addPlayHistory(song.audioUrl,
+          Duration(milliseconds: await player.getCurrentPosition()));
+    }
   }
 
   @override

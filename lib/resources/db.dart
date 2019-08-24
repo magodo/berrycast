@@ -21,13 +21,25 @@ class DBProvider {
 
   _migrateDB(Database db, int oldVersion, int newVersion) async {
     print("migrating db... ($oldVersion -> $newVersion)");
-    await db.execute("DROP TABLE Podcasts");
+    try {
+      await db.execute("DROP TABLE Podcasts");
+    } on Exception {}
     await db.execute("""
     CREATE TABLE Podcasts(
       feed_url TEXT NOT NULL PRIMARY KEY,
       image_url TEXT NOT NULL,
       feed_content TEXT NOT NULL
     );
+    """);
+    try {
+      await db.execute("DROP TABLE PlayHistory");
+    } on Exception {}
+    await db.execute("""
+    CREATE TABLE PlayHistory(
+      song TEXT NOT NULL PRIMARY KEY,
+      duration INTEGER,
+      updated_at INTEGER
+    ); 
     """);
   }
 
@@ -36,7 +48,7 @@ class DBProvider {
     String path = join(documentsDirectory.path, "Podcast.db");
     return await openDatabase(
       path,
-      version: 3,
+      version: 2,
       onOpen: (db) {},
       onCreate: (Database db, int version) async {
         await db.execute("""
@@ -45,6 +57,16 @@ class DBProvider {
       image_url TEXT NOT NULL,
       feed_content TEXT NOT NULL
     );
+    """);
+        // song: episode url for podcast episode
+        // duration: seconds played last time
+        // updated_at: update timestamp of this record, this is for keeping this table in certain amount of rows
+        await db.execute("""
+    CREATE TABLE PlayHistory(
+      song TEXT NOT NULL PRIMARY KEY,
+      duration INTEGER,
+      updated_at INTEGER
+    ); 
     """);
       },
       onUpgrade: _migrateDB,
@@ -88,5 +110,25 @@ class DBProvider {
     final db = await database;
     var res = await db.delete("Podcasts", where: "feed_url = ?", whereArgs: [url]);
     return res;
+  }
+
+  addPlayHistory(String song, Duration duration) async {
+    final db = await database;
+    await db.execute("insert or replace into PlayHistory(song, duration, updated_at) values (?,?,?)" , [song, duration.inSeconds, DateTime.now().millisecondsSinceEpoch/1000]);
+    print("set duration: ${duration.inSeconds} seconds");
+    // keep certain amount of history
+    final keep = 30;
+    await db.execute("delete from PlayHistory where song not in (select song from PlayHistory order by updated_at desc limit ?)", [keep]);
+    return;
+  }
+
+  getPlayHistory(String song) async {
+    final db = await database;
+    var res = await db.query("PlayHistory", where: "song = ?", whereArgs: [song]);
+    if (res.isNotEmpty) {
+      print("get duration: ${res.first["duration"]} seconds");
+      return Duration(seconds: res.first["duration"]);
+    }
+    return null;
   }
 }

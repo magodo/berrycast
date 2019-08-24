@@ -83,6 +83,7 @@ class Episode implements Song {
   final String songTitle;
   final Podcast podcast;
   final DateTime pubDate;
+  Duration lastPlayPosition;
   CachedNetworkImage get albumArt => podcast.image;
 
   String get artist => podcast.author;
@@ -92,7 +93,7 @@ class Episode implements Song {
     @required this.audioUrl,
     @required this.audioDuration,
     @required this.songTitle,
-    @required this.pubDate,
     @required this.podcast,
+  @required this.pubDate,
   });
 }
