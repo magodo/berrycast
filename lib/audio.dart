@@ -13,7 +13,16 @@ class AudioSchedule with ChangeNotifier {
   AudioSchedule()
       : player = MyAudioPlayer(),
         _playlist = null,
-        _playIdx = null;
+        _playIdx = null {
+    // Remember play history whenever audio focus is disabled.
+    // Explicitly use the deprecated [focusHanlder] here because it's more fit then using stream.
+    player.focusHandler = (focused) async {
+      if (song != null) {
+        DBProvider.db.addPlayHistory(song.audioUrl,
+            Duration(milliseconds: await player.getCurrentPosition()));
+      }
+    };
+  }
 
   List<Song> get playlist => _playlist;
   set playlist(List<Song> playlist) {
@@ -72,12 +81,12 @@ class AudioSchedule with ChangeNotifier {
 
   void seek(double percentage) {
     player.seek(song.audioDuration * percentage);
-    player.play(song.audioUrl);
+    player.play(song.audioUrl, respectAudioFocus: true);
   }
 
   void play() async {
     var duration = await DBProvider.db.getPlayHistory(song.audioUrl);
-    player.play(song.audioUrl, position: duration);
+    player.play(song.audioUrl, position: duration, respectAudioFocus: true);
   }
 
   void playNthSong(int idx) {

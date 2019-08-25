@@ -154,6 +154,7 @@ class PlayPauseButton extends StatelessWidget {
     IconData icon;
     Function onPressed;
     Color buttonColor = lightAccentColor;
+    print("audio state changed to: $state");
     switch (state) {
       case AudioPlayerState.PLAYING:
         icon = Icons.pause;

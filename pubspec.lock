@@ -11,9 +11,9 @@ packages:
   audioplayers:
     dependency: "direct main"
     description:
-      name: audioplayers
-      url: "https://pub.dartlang.org"
-    source: hosted
+      path: "/home/magodo/github/audioplayers"
+      relative: false
+    source: path
     version: "0.13.1"
   boolean_selector:
     dependency: transitive

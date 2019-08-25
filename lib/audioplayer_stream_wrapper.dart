@@ -15,7 +15,8 @@ class AudioDuration extends Duration {
 
 class SeekPosition extends Duration {
   bool isEnd;
-  SeekPosition(Duration dur, {this.isEnd = false}) : super(milliseconds: dur.inMilliseconds);
+  SeekPosition(Duration dur, {this.isEnd = false})
+      : super(milliseconds: dur.inMilliseconds);
 }
 
 class MyAudioPlayer extends AudioPlayer {
@@ -38,24 +39,24 @@ class MyAudioPlayer extends AudioPlayer {
     Observable<SeekPosition> seekPositionObservable = Observable.combineLatest2(
         onAudioPositionChanged.map((pos) => SeekPosition(pos)),
         Observable(_seekPositionController.stream).startWith(null),
-        (SeekPosition audiopos,SeekPosition seekpos) {
-          if (seekpos == null) {
-            return audiopos;
-          }
-          if (!seekpos.isEnd) {
-            return seekpos;
-          }
-          // Return end seek position, until audio pos is near enough against seek position, in which case we will also send
-          // a null SeekPosition so that we have no need to consider [seekpos] any more, until a new seek event occurs.
-          // This is a workaround in fact that audioplayers will notify original position even after calling `seek()`, and the
-          // amount of original position events is un-predicable.
-          final drift = seekpos.inSeconds - audiopos.inSeconds;
-          if (drift.abs() <= 1)  {
-            _seekPositionController.add(null);
-            return audiopos;
-          }
-          return seekpos;
-        });
+        (SeekPosition audiopos, SeekPosition seekpos) {
+      if (seekpos == null) {
+        return audiopos;
+      }
+      if (!seekpos.isEnd) {
+        return seekpos;
+      }
+      // Return end seek position, until audio pos is near enough against seek position, in which case we will also send
+      // a null SeekPosition so that we have no need to consider [seekpos] any more, until a new seek event occurs.
+      // This is a workaround in fact that audioplayers will notify original position even after calling `seek()`, and the
+      // amount of original position events is un-predicable.
+      final drift = seekpos.inSeconds - audiopos.inSeconds;
+      if (drift.abs() <= 1) {
+        _seekPositionController.add(null);
+        return audiopos;
+      }
+      return seekpos;
+    });
     return seekPositionObservable;
   }
 
