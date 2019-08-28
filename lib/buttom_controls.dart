@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 
 import 'audio.dart';
 import 'audioplayer_stream_wrapper.dart';
+import 'utils.dart';
 
 class ButtonControls extends StatelessWidget {
   const ButtonControls({
@@ -43,18 +44,6 @@ class SongInfos extends StatelessWidget {
     Key key,
   }) : super(key: key);
 
-  String _prettyDuration(Duration dur) {
-    String twoDigits(int n) {
-      if (n >= 10) return "$n";
-      return "0$n";
-    }
-
-    final String h = twoDigits(dur.inHours.remainder(24));
-    final String m = twoDigits(dur.inMinutes.remainder(60));
-    final String s = twoDigits(dur.inSeconds.remainder(60));
-    return "$h:$m:$s";
-  }
-
   @override
   Widget build(BuildContext context) {
     final schedule = Provider.of<AudioSchedule>(context);
@@ -84,7 +73,7 @@ class SongInfos extends StatelessWidget {
             ),
           ),
           TextSpan(
-            text: "${_prettyDuration(seekPosition)}/${_prettyDuration(song.audioDuration)}",
+            text: "${prettyDuration(seekPosition)}/${prettyDuration(song.audioDuration)}",
             style: TextStyle(
               color: Colors.white.withOpacity(0.75),
               fontSize: 20.0,

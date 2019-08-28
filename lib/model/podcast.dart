@@ -31,7 +31,9 @@ class Podcast {
           audioDuration: item.itunes.duration,
           songTitle: item.title,
           pubDate: DateFormat("EEE, dd MMM yyyy hh:mm").parse(item.pubDate),
+          summary: item.itunes.summary ?? item.description,
           podcast: this,
+          size: item.enclosure.length,
         )
     ];
     _episodes
@@ -83,6 +85,8 @@ class Episode implements Song {
   final String songTitle;
   final Podcast podcast;
   final DateTime pubDate;
+  final String summary;
+  final int size;
   Duration lastPlayPosition;
   CachedNetworkImage get albumArt => podcast.image;
 
@@ -94,6 +98,8 @@ class Episode implements Song {
     @required this.audioDuration,
     @required this.songTitle,
     @required this.podcast,
-  @required this.pubDate,
+    @required this.pubDate,
+    @required this.summary,
+    @required this.size,
   });
 }

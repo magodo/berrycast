@@ -10,6 +10,7 @@ import 'model/podcast.dart';
 import 'play_page.dart';
 import 'sliver_appbar_delegate.dart';
 import 'theme.dart';
+import 'utils.dart';
 
 class EpisodesPage extends StatefulWidget {
   final CachedNetworkImage _coverImage;
@@ -21,6 +22,7 @@ class EpisodesPage extends StatefulWidget {
 }
 
 class _EpisodesPageState extends State<EpisodesPage> {
+
   @override
   Widget build(BuildContext context) {
     return StreamBuilder(
@@ -30,6 +32,7 @@ class _EpisodesPageState extends State<EpisodesPage> {
           return FlushbarHelper.createError(
               message: "${snapshot.error}", duration: Duration(seconds: 3));
         }
+
         return SafeArea(
           child: Scaffold(
             body: NestedScrollView(
@@ -85,44 +88,13 @@ class _EpisodesPageState extends State<EpisodesPage> {
             children: snapshot.data.episodes
                 .asMap()
                 .map((idx, episode) =>
-                    MapEntry(idx, _buildSongTile(context, idx, episode)))
+                    MapEntry(idx, EpisodeItem(index: idx, episode: episode)))
                 .values
                 .toList(),
           )
         : Center(
             child: CircularProgressIndicator(),
           );
-  }
-
-  ListTile _buildSongTile(BuildContext context, int index, Episode episode) {
-    return ListTile(
-      leading: Text("$index"),
-      title: Text(episode.songTitle,
-          style: TextStyle(
-            fontWeight: FontWeight.w500,
-            fontSize: 15,
-          )),
-      subtitle: Text(episode.artist),
-      trailing: IconButton(
-        icon: Icon(Icons.more_vert),
-        onPressed: () {},
-      ),
-      onTap: () => _playNewEpisode(context, episode),
-    );
-  }
-
-  _playNewEpisode(BuildContext context, Episode song) {
-    final schedule = Provider.of<AudioSchedule>(context);
-    if (schedule.playlist == null) {
-      schedule.playlist = <Episode>[song];
-    } else {
-      schedule.playlist.remove(song);
-      schedule.playlist.insert(0, song);
-    }
-    schedule.playNthSong(0);
-    Navigator.push(context, MaterialPageRoute(builder: (context) {
-      return PlayPage();
-    }));
   }
 
   _playNewPodcast(BuildContext context, Podcast podcast) {
@@ -200,5 +172,108 @@ class _EpisodesPageState extends State<EpisodesPage> {
       ),
       onPressed: () => _playNewPodcast(context, podcast),
     );
+  }
+}
+
+class EpisodeItem extends StatelessWidget {
+  final int index;
+  final Episode episode;
+
+  const EpisodeItem({Key key, this.index, this.episode}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      leading: Text("$index"),
+      title: Text(episode.songTitle,
+          style: TextStyle(
+            fontWeight: FontWeight.w500,
+            fontSize: 15,
+          )),
+      subtitle: Text(episode.artist),
+      trailing: IconButton(
+        icon: Icon(Icons.more_vert),
+        onPressed: () {
+          _buildBottomSheet(context, episode);
+        },
+      ),
+      onTap: () => _playNewEpisode(context, episode),
+    );
+  }
+
+  void _buildBottomSheet(BuildContext context, Episode episode) {
+    showModalBottomSheet(
+      shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(10))),
+      elevation: 5,
+      isScrollControlled: true,
+      context: context,
+      builder: (BuildContext context) {
+        return ConstrainedBox(
+          constraints: BoxConstraints(maxHeight: 500),
+          child: ListView(
+            shrinkWrap: true,
+            children: <Widget>[
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: ListTile(
+                  contentPadding: EdgeInsets.all(0),
+                  leading: episode.albumArt,
+                  title: Text(
+                    episode.songTitle,
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(8.0, 0, 8.0, 0),
+                child: ListTile(
+                  contentPadding: EdgeInsets.all(0),
+                  leading: Icon(Icons.file_download),
+                  title: Text("Download Episode (${prettySize(episode.size)})"),
+                  onTap: (){},
+                ),
+              ),
+              Divider(),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(8.0, 0, 8.0, 0),
+                child: ListTile(
+                  contentPadding: EdgeInsets.all(0),
+                  leading: Icon(Icons.date_range),
+                  title: Text("${episode.pubDate}"),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(8.0, 0, 8.0, 0),
+                child: ListTile(
+                  contentPadding: EdgeInsets.all(0),
+                  leading: Icon(Icons.timelapse),
+                  title: Text(prettyDuration(episode.audioDuration)),
+                ),
+              ),
+              Divider(),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(episode.summary),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  _playNewEpisode(BuildContext context, Episode song) {
+    final schedule = Provider.of<AudioSchedule>(context);
+    if (schedule.playlist == null) {
+      schedule.playlist = <Episode>[song];
+    } else {
+      schedule.playlist.remove(song);
+      schedule.playlist.insert(0, song);
+    }
+    schedule.playNthSong(0);
+    Navigator.push(context, MaterialPageRoute(builder: (context) {
+      return PlayPage();
+    }));
   }
 }
