@@ -91,7 +91,9 @@ class _SearchPageState extends State<SearchPage> {
       try {
         await itunesBloc.searchPodcasts(term);
       } on Exception catch (e) {
-        FlushbarHelper.createError(message: e.toString(), duration: Duration(seconds: 3)).show(context);
+        FlushbarHelper.createError(
+                message: e.toString(), duration: Duration(seconds: 3))
+            .show(context);
         return;
       }
       Navigator.push(context, MaterialPageRoute(builder: (context) {
