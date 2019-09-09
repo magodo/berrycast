@@ -5,10 +5,8 @@ import 'package:provider/provider.dart';
 import 'audio.dart';
 import 'audioplayer_stream_wrapper.dart';
 import 'bloc/db_podcast.dart';
-import 'bottom_bar.dart';
+import 'home.dart';
 import 'model/podcast.dart';
-import 'podcast_page.dart';
-import 'search_page.dart';
 import 'theme.dart';
 
 void main() => runApp(MyApp());
@@ -48,44 +46,9 @@ class MyApp extends StatelessWidget {
           primaryColor: accentColor,
           accentColor: accentColor,
         ),
-        home: DefaultTabController(
-          initialIndex: 0,
-          length: 3,
-          child: SafeArea(
-            child: Scaffold(
-              appBar: AppBar(
-                title: Text(
-                  "Berrycast",
-                  style: TextStyle(color: Colors.white),
-                ),
-                leading: Builder(builder: (context) {
-                  return IconButton(
-                    icon: Icon(Icons.menu),
-                    color: Colors.white,
-                    onPressed: Scaffold.of(context).openDrawer,
-                  );
-                }),
-                bottom: TabBar(tabs: [
-                  Tab(icon: Icon(Icons.cast)),
-                  Tab(icon: Icon(Icons.library_music)),
-                  Tab(icon: Icon(Icons.search)),
-                ]),
-              ),
-              drawer: Drawer(
-                child: Container(),
-              ),
-              body: TabBarView(
-                children: [
-                  PodcastPage(),
-                  Container(),
-                  SearchPage(),
-                ],
-              ),
-              bottomSheet: BottomBar(),
-            ),
-          ),
-        ),
+        home: Home(),
       ),
     );
   }
 }
+

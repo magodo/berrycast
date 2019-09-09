@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:path/path.dart' as path;
 import 'package:flushbar/flushbar_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -231,7 +232,13 @@ class EpisodeItem extends StatelessWidget {
                   contentPadding: EdgeInsets.all(0),
                   leading: Icon(Icons.file_download),
                   title: Text("Download Episode (${prettySize(episode.size)})"),
-                  onTap: (){},
+                  onTap: () async {
+                    if (await ensureStoragePermission()) {
+                      final episodePath = path.join(await ensurePodcastFolder(), episode.songTitle);
+                      // TODO download stuff....
+                      print(episodePath);
+                    }
+                  },
                 ),
               ),
               Divider(),

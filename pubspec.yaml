@@ -43,6 +43,7 @@ dependencies:
   flushbar: ^1.8.2
   logger: ^0.6.0
   pull_to_refresh: ^1.5.4
+  permission_handler: ^3.2.2
 
 
 dev_dependencies:

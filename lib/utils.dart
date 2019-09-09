@@ -1,3 +1,9 @@
+import 'dart:io';
+import 'package:path/path.dart' as p;
+
+import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
+
 String prettyDuration(Duration dur) {
   String twoDigits(int n) {
     if (n >= 10) return "$n";
@@ -21,4 +27,35 @@ String prettySize(int byte) {
     return "${(byte/(1<<20)).toStringAsFixed(2)} MB";
   }
   return "${(byte/(1<<30)).toStringAsFixed(2)} GB";
+}
+
+Future<bool> ensureStoragePermission() async {
+  if (Platform.isAndroid) {
+    PermissionStatus permission = await PermissionHandler()
+        .checkPermissionStatus(PermissionGroup.storage);
+    if (permission != PermissionStatus.granted) {
+      Map<PermissionGroup, PermissionStatus> permissions =
+      await PermissionHandler()
+          .requestPermissions([PermissionGroup.storage]);
+      return permissions[PermissionGroup.storage] == PermissionStatus.granted;
+      }
+    return true;
+  }
+  return true;
+}
+
+Future<String> _findLocalPath() async {
+  final directory = Platform.isAndroid
+      ? await getExternalStorageDirectory()
+      : await getApplicationDocumentsDirectory();
+  return directory.path;
+}
+
+Future<String> ensurePodcastFolder() async {
+  final baseDirPath = p.join(await _findLocalPath(), 'Download');
+  final podcastDirPath = p.join(baseDirPath, 'Podcasts');
+
+  if (! await Directory(baseDirPath).exists()) await Directory(baseDirPath).create();
+  if (! await Directory(podcastDirPath).exists()) await Directory(podcastDirPath).create();
+  return podcastDirPath;
 }
