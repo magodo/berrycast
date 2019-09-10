@@ -5,10 +5,14 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'audio.dart';
+import 'bloc/db_offline_episode.dart';
 import 'bloc/db_podcast.dart';
 import 'bottom_bar.dart';
+import 'model/episode.dart';
+import 'model/offline_episode.dart';
 import 'model/podcast.dart';
 import 'play_page.dart';
+import 'resources/db.dart';
 import 'sliver_appbar_delegate.dart';
 import 'theme.dart';
 import 'utils.dart';
@@ -23,7 +27,6 @@ class EpisodesPage extends StatefulWidget {
 }
 
 class _EpisodesPageState extends State<EpisodesPage> {
-
   @override
   Widget build(BuildContext context) {
     return StreamBuilder(
@@ -64,7 +67,7 @@ class _EpisodesPageState extends State<EpisodesPage> {
                           children: snapshot.hasData && snapshot.data != null
                               ? <Widget>[
                                   buildPlayallButton(context, snapshot.data),
-                                  bubildSubscribeButton(context, snapshot.data),
+                                  SubscribeButton(podcast: snapshot.data),
                                 ]
                               : [],
                         ),
@@ -105,53 +108,6 @@ class _EpisodesPageState extends State<EpisodesPage> {
     Navigator.push(context, MaterialPageRoute(builder: (context) {
       return PlayPage();
     }));
-  }
-
-  Widget bubildSubscribeButton(BuildContext context, Podcast podcast) {
-    if (podcast.isSubscribed) {
-      return FlatButton(
-        child: Row(
-          children: <Widget>[
-            Icon(Icons.done_outline, color: accentColor),
-            Text(
-              "SUBSCRIBED",
-              style: TextStyle(color: accentColor),
-            ),
-          ],
-        ),
-        onPressed: () async {
-          await dbPodcastBloc.delete(podcast.feedUrl);
-          setState(() {
-            podcast.isSubscribed = false;
-          });
-        },
-      );
-    }
-    return FlatButton(
-      child: Row(
-        children: <Widget>[
-          Icon(
-            Icons.add,
-            color: lightAccentColor,
-          ),
-          Text(
-            "SUBSCRIBE",
-            style: TextStyle(color: lightAccentColor),
-          ),
-        ],
-      ),
-      onPressed: () async {
-        try {
-          await dbPodcastBloc.add(podcast);
-        } on Exception catch (e) {
-          FlushbarHelper.createError(message: e.toString()).show(context);
-          return;
-        }
-        setState(() {
-          podcast.isSubscribed = true;
-        });
-      },
-    );
   }
 
   buildPlayallButton(BuildContext context, Podcast podcast) {
@@ -228,17 +184,8 @@ class EpisodeItem extends StatelessWidget {
               ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(8.0, 0, 8.0, 0),
-                child: ListTile(
-                  contentPadding: EdgeInsets.all(0),
-                  leading: Icon(Icons.file_download),
-                  title: Text("Download Episode (${prettySize(episode.size)})"),
-                  onTap: () async {
-                    if (await ensureStoragePermission()) {
-                      final episodePath = path.join(await ensurePodcastFolder(), episode.songTitle);
-                      // TODO download stuff....
-                      print(episodePath);
-                    }
-                  },
+                child: DownloadButtom(
+                  episode: episode,
                 ),
               ),
               Divider(),
@@ -282,5 +229,141 @@ class EpisodeItem extends StatelessWidget {
     Navigator.push(context, MaterialPageRoute(builder: (context) {
       return PlayPage();
     }));
+  }
+}
+
+class DownloadButtom extends StatefulWidget {
+  final Episode episode;
+  const DownloadButtom({
+    Key key,
+    @required this.episode,
+  }) : super(key: key);
+
+  @override
+  _DownloadButtomState createState() => _DownloadButtomState();
+}
+
+class _DownloadButtomState extends State<DownloadButtom> {
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder(
+      future: DBProvider.db.getOfflineEpisode(widget.episode.audioUrl),
+      builder: (BuildContext context, AsyncSnapshot<OfflineEpisode> snapshot) {
+        print("${snapshot.hasData}, ${snapshot.connectionState}");
+        return snapshot.connectionState != ConnectionState.done
+            ? Container()
+            : snapshot.hasData
+                ? ListTile(
+                    contentPadding: EdgeInsets.all(0),
+                    leading: Icon(Icons.file_download),
+                    title: Text("Downloading..."),
+                  )
+                : ListTile(
+                    contentPadding: EdgeInsets.all(0),
+                    leading: Icon(Icons.file_download),
+                    title: Text(
+                        "Download Episode (${prettySize(widget.episode.size)})"),
+                    onTap: () async {
+                      if (await ensureStoragePermission()) {
+                        final episodePath = path.join(
+                            await ensurePodcastFolder(),
+                            widget.episode.songTitle);
+                        // TODO download stuff....
+                        await dbOfflineEpisodeBloc.add(OfflineEpisode(
+                          songUrl: widget.episode.audioUrl,
+                          title: widget.episode.songTitle,
+                          podcastUrl: widget.episode.podcast.feedUrl,
+                          path: episodePath,
+                          progress: 0.5,
+                        ));
+                        setState(() {});
+                      }
+                    },
+                  );
+      },
+    );
+  }
+}
+
+class SubscribeButton extends StatefulWidget {
+  final Podcast podcast;
+
+  const SubscribeButton({Key key, this.podcast}) : super(key: key);
+
+  @override
+  _SubscribeButtonState createState() => _SubscribeButtonState();
+}
+
+enum _SubscribeState { unsubscribed, subscribing, subscribed }
+
+class _SubscribeButtonState extends State<SubscribeButton> {
+  Podcast podcast;
+  _SubscribeState _subscribeState;
+
+  @override
+  void initState() {
+    super.initState();
+    podcast = widget.podcast;
+    _subscribeState = podcast.isSubscribed
+        ? _SubscribeState.subscribed
+        : _SubscribeState.unsubscribed;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    VoidCallback callback;
+    Widget child;
+    Color color;
+    switch (_subscribeState) {
+      case _SubscribeState.unsubscribed:
+        callback = () async {
+          setState(() {
+            _subscribeState = _SubscribeState.subscribing;
+          });
+          // explicitly delay
+          await Future.delayed(const Duration(seconds: 1), () {});
+          try {
+            await dbPodcastBloc.add(podcast);
+          } on Exception catch (e) {
+            FlushbarHelper.createError(message: e.toString()).show(context);
+            return;
+          }
+          setState(() {
+            _subscribeState = _SubscribeState.subscribed;
+          });
+        };
+        child = Text(
+          "SUBSCRIBE",
+          style: TextStyle(color: Colors.white),
+        );
+        color = accentColor;
+        break;
+      case _SubscribeState.subscribed:
+        callback = () async {
+          await dbPodcastBloc.delete(podcast.feedUrl);
+          setState(() {
+            _subscribeState = _SubscribeState.unsubscribed;
+          });
+        };
+        child = Text(
+          "UNSUBSCRIBE",
+          style: TextStyle(color: accentColor),
+        );
+        color = Colors.white;
+        break;
+      case _SubscribeState.subscribing:
+        callback = null;
+        child = Text(
+          "SUBSCRIBING...",
+          style: TextStyle(color: Colors.white),
+        );
+        color = lightAccentColor;
+        break;
+    }
+    return AnimatedContainer(
+      duration: Duration(milliseconds: 500),
+      color: color,
+      child: FlatButton(onPressed: callback, child: child),
+    );
   }
 }

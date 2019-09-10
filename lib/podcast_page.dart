@@ -8,7 +8,7 @@ import 'model/podcast.dart';
 import 'theme.dart';
 
 class PodcastPage extends StatelessWidget {
-  RefreshController _refreshController =
+  final RefreshController _refreshController =
       RefreshController(initialRefresh: false);
 
   void _onRefresh() async {

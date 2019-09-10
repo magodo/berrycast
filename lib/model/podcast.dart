@@ -7,7 +7,7 @@ import 'package:intl/intl.dart';
 import 'package:webfeed/webfeed.dart';
 
 import '../resources/db.dart';
-import '../songs.dart';
+import 'episode.dart';
 
 class Podcast {
   final String feedUrl;
@@ -19,10 +19,10 @@ class Podcast {
   bool isSubscribed;
 
   Podcast({
-    this.feedUrl,
-    this.imageUrl,
-    this.feedContent,
-    this.isSubscribed,
+    @required this.feedUrl,
+    @required this.imageUrl,
+    @required this.feedContent,
+    @required this.isSubscribed,
   }) : _rssFeed = RssFeed.parse(feedContent) {
     _episodes = [
       for (var item in _rssFeed.items)
@@ -48,13 +48,14 @@ class Podcast {
         feedUrl: json["feed_url"],
         imageUrl: json['image_url'],
         feedContent: json["feed_content"],
-        isSubscribed: true,
+        isSubscribed: json["is_subscribed"] == 1,
       );
 
   Map<String, dynamic> toMap() => {
         "feed_url": feedUrl,
         "image_url": imageUrl,
         "feed_content": feedContent,
+        "is_subscribed": isSubscribed? 1:0,
       };
 
   String get author => _rssFeed.itunes?.author;
@@ -77,29 +78,4 @@ class Podcast {
         feedContent: feedContent,
         isSubscribed: isSubscribed);
   }
-}
-
-class Episode implements Song {
-  final String audioUrl;
-  final Duration audioDuration;
-  final String songTitle;
-  final Podcast podcast;
-  final DateTime pubDate;
-  final String summary;
-  final int size;
-  Duration lastPlayPosition;
-  CachedNetworkImage get albumArt => podcast.image;
-
-  String get artist => podcast.author;
-  String get albumTitle => podcast.title;
-
-  Episode({
-    @required this.audioUrl,
-    @required this.audioDuration,
-    @required this.songTitle,
-    @required this.podcast,
-    @required this.pubDate,
-    @required this.summary,
-    @required this.size,
-  });
 }

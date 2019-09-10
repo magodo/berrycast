@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
 import 'audioplayer_stream_wrapper.dart';
+import 'model/songs.dart';
 import 'resources/db.dart';
-import 'songs.dart';
 
 class AudioSchedule with ChangeNotifier {
   final MyAudioPlayer player;

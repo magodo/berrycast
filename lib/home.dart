@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 
 import 'bottom_bar.dart';
+import 'offline_episode_page.dart';
 import 'podcast_page.dart';
 import 'search_page.dart';
+import 'theme.dart';
 import 'utils.dart';
 
 class Home extends StatefulWidget {
@@ -51,8 +53,25 @@ class _HomeState extends State<Home> {
             ]),
           ),
           drawer: Drawer(
-            child: Container(),
-          ),
+              child: ListView(
+            padding: EdgeInsets.all(0),
+            children: <Widget>[
+              DrawerHeader(
+                child: Text("Header"),
+                decoration: BoxDecoration(color: accentColor),
+              ),
+              ListTile(
+                leading: Icon(Icons.file_download),
+                title: Text("Offline Download"),
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.push(context, MaterialPageRoute(builder: (context) {
+                    return OfflineEpisodePage();
+                  }));
+                },
+              ),
+            ],
+          )),
           body: _isLoading
               ? Center(
                   child: CircularProgressIndicator(),

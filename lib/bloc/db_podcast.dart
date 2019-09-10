@@ -1,7 +1,6 @@
 
 import 'package:rxdart/rxdart.dart';
 
-import '../logger.dart';
 import '../model/podcast.dart';
 import '../resources/db.dart';
 
@@ -13,7 +12,7 @@ class PodcastAlreadyExistException implements Exception {
 }
 
 class DBPodcastBloc {
-  final _podcastsSubscribe = BehaviorSubject<List<Podcast>>();
+  final _podcastsSubject = BehaviorSubject<List<Podcast>>();
   final _podcastSubject = BehaviorSubject<Podcast>();
 
   DBPodcastBloc() {
@@ -21,12 +20,12 @@ class DBPodcastBloc {
   }
 
   dispose() {
-    _podcastsSubscribe.close();
+    _podcastsSubject.close();
     _podcastSubject.close();
   }
 
   getPodcasts() async {
-    _podcastsSubscribe.add(await DBProvider.db.getAllPodcasts());
+    _podcastsSubject.add(await DBProvider.db.getAllPodcasts());
   }
 
   refreshPodcasts() async {
@@ -64,7 +63,7 @@ class DBPodcastBloc {
       _podcastSubject.add(podcast);
   }
 
-  get podcasts => _podcastsSubscribe.stream;
+  get podcasts => _podcastsSubject.stream;
   get podcast => _podcastSubject.stream;
 
 //  addByUrl(String url) async {
@@ -73,11 +72,12 @@ class DBPodcastBloc {
 //  }
 
   add(Podcast podcast) async {
-    final podcasts = await DBProvider.db.getAllPodcasts();
-    for (var p in podcasts) {
-      if (p.title == podcast.title) throw PodcastAlreadyExistException();
+    podcast.isSubscribed = true;
+    try {
+      await DBProvider.db.addPodcast(podcast);
+    } on Exception {
+      await DBProvider.db.updatePodcast(podcast);
     }
-    await DBProvider.db.newPodcast(podcast);
     getPodcasts();
   }
 
