@@ -22,21 +22,6 @@ class DBProvider {
 
   _upgradeDBSchema(Database db, int oldVersion, int newVersion) async {
     print("upgrade db schema... ($oldVersion -> $newVersion)");
-    try {
-      await db.execute('drop table OfflineEpisodes');
-    } on Exception {}
-    await db.execute("""
-    CREATE TABLE OfflineEpisodes(
-      song TEXT NOT NULL PRIMARY KEY,
-      title TEXT NOT NULL,
-      podcast_url TEXT NOT NULL,
-      path TEXT NOT NULL,
-      progress REAL
-    );
-    """);
-    await db.execute(
-        'alter table Podcasts add column is_subscribed INTEGER NOT NULL DEFAULT 1');
-    await db.execute('update Podcasts set is_subscribed = 1');
   }
 
   initDB() async {
@@ -44,7 +29,7 @@ class DBProvider {
     String path = join(documentsDirectory.path, "Podcast.db");
     return await openDatabase(
       path,
-      version: 7,
+      version: 1,
       onOpen: (db) {},
       onCreate: (Database db, int version) async {
         await db.execute("""
@@ -73,9 +58,9 @@ class DBProvider {
     CREATE TABLE OfflineEpisodes(
       song TEXT NOT NULL PRIMARY KEY,
       title TEXT NOT NULL,
-      podcast_url TEXT NOT NULL,
+      image_url TEXT NOT NULL,
       path TEXT NOT NULL,
-      progress REAL,
+      progress REAL
     );
     """);
       },
@@ -154,16 +139,7 @@ class DBProvider {
 
   addOfflineEpisode(OfflineEpisode episode) async {
     final db = await database;
-    await db.execute(
-        "insert into OfflineEpisodes(song, title, path, podcast_url, progress) values (?,?,?,?,?)",
-        [
-          episode.songUrl,
-          episode.title,
-          episode.path,
-          episode.podcastUrl,
-          episode.progress
-        ]);
-    return;
+    await db.insert("OfflineEpisodes", episode.toMap());
   }
 
   updateOfflineEpisode(OfflineEpisode episode) async {

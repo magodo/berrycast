@@ -1,17 +1,24 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
 class OfflineEpisode {
   final String songUrl;
   final String title;
   final String path;
-  final String podcastUrl;
+  final String imageUrl;
   final double progress;
+
+  CachedNetworkImage get image => CachedNetworkImage(
+    imageUrl: imageUrl,
+    placeholder: (context, url) => CircularProgressIndicator(),
+    fit: BoxFit.cover,
+  );
 
   OfflineEpisode({
     @required this.songUrl,
     @required this.title,
     @required this.path,
-    @required this.podcastUrl,
+    @required this.imageUrl,
     @required this.progress,
   });
 
@@ -19,7 +26,7 @@ class OfflineEpisode {
     songUrl: json["song"],
     title: json['title'],
     path: json['path'],
-    podcastUrl: json['podcast_url'],
+    imageUrl: json['image_url'],
     progress: json["progress"],
   );
 
@@ -27,7 +34,7 @@ class OfflineEpisode {
     "song": songUrl,
     "title": title,
     "path": path,
-    "podcast_url": podcastUrl,
+    "image_url": imageUrl,
     "progress": progress,
   };
 }

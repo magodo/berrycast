@@ -272,7 +272,7 @@ class _DownloadButtomState extends State<DownloadButtom> {
                         await dbOfflineEpisodeBloc.add(OfflineEpisode(
                           songUrl: widget.episode.audioUrl,
                           title: widget.episode.songTitle,
-                          podcastUrl: widget.episode.podcast.feedUrl,
+                          imageUrl: widget.episode.podcast.imageUrl,
                           path: episodePath,
                           progress: 0.5,
                         ));
@@ -294,7 +294,12 @@ class SubscribeButton extends StatefulWidget {
   _SubscribeButtonState createState() => _SubscribeButtonState();
 }
 
-enum _SubscribeState { unsubscribed, subscribing, subscribed }
+enum _SubscribeState {
+  unsubscribed,
+  subscribing,
+  subscribed,
+  unsubscribing,
+}
 
 class _SubscribeButtonState extends State<SubscribeButton> {
   Podcast podcast;
@@ -340,13 +345,16 @@ class _SubscribeButtonState extends State<SubscribeButton> {
         break;
       case _SubscribeState.subscribed:
         callback = () async {
+          setState(() {
+            _subscribeState = _SubscribeState.unsubscribing;
+          });
           await dbPodcastBloc.delete(podcast.feedUrl);
           setState(() {
             _subscribeState = _SubscribeState.unsubscribed;
           });
         };
         child = Text(
-          "UNSUBSCRIBE",
+          "SUBSCRIBED",
           style: TextStyle(color: accentColor),
         );
         color = Colors.white;
@@ -359,10 +367,23 @@ class _SubscribeButtonState extends State<SubscribeButton> {
         );
         color = lightAccentColor;
         break;
+      case _SubscribeState.unsubscribing:
+        callback = null;
+        child = Text(
+          "UBSUBSCRIBING...",
+          style: TextStyle(color: Colors.white),
+        );
+        color = lightAccentColor;
+        break;
     }
     return AnimatedContainer(
-      duration: Duration(milliseconds: 500),
-      color: color,
+      margin: EdgeInsets.fromLTRB(0, 8, 0, 8),
+      decoration: BoxDecoration(
+        color: color,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      duration: Duration(seconds: 1),
+      //color: color,
       child: FlatButton(onPressed: callback, child: child),
     );
   }

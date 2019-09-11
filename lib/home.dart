@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 
+import 'bloc/db_offline_episode.dart';
 import 'bottom_bar.dart';
 import 'offline_episode_page.dart';
 import 'podcast_page.dart';
+import 'resources/db.dart';
 import 'search_page.dart';
 import 'theme.dart';
 import 'utils.dart';
@@ -63,10 +65,12 @@ class _HomeState extends State<Home> {
               ListTile(
                 leading: Icon(Icons.file_download),
                 title: Text("Offline Download"),
-                onTap: () {
+                onTap: () async {
                   Navigator.pop(context);
+                  final offlineEpisodes =
+                      await DBProvider.db.getAllOfflineEpisodes();
                   Navigator.push(context, MaterialPageRoute(builder: (context) {
-                    return OfflineEpisodePage();
+                    return OfflineEpisodePage(offlineEpisodes: offlineEpisodes);
                   }));
                 },
               ),
