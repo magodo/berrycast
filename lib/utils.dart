@@ -52,10 +52,12 @@ Future<String> _findLocalPath() async {
 }
 
 Future<String> ensurePodcastFolder() async {
-  final baseDirPath = p.join(await _findLocalPath(), 'Download');
-  final podcastDirPath = p.join(baseDirPath, 'Podcasts');
+  final podcastDirPath = await getPodcastFolder();
 
-  if (! await Directory(baseDirPath).exists()) await Directory(baseDirPath).create();
   if (! await Directory(podcastDirPath).exists()) await Directory(podcastDirPath).create();
   return podcastDirPath;
+}
+
+Future<String> getPodcastFolder() async {
+  return p.join(await _findLocalPath(), 'Podcasts');
 }

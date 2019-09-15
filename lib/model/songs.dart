@@ -7,5 +7,6 @@ abstract class Song {
   CachedNetworkImage get albumArt;
   String get artist;
   String get albumTitle;
+  bool get isLocal;
 }
 

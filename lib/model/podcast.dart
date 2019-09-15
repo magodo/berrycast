@@ -34,6 +34,7 @@ class Podcast {
           summary: item.itunes.summary ?? item.description,
           podcast: this,
           size: item.enclosure.length,
+          isLocal: false,
         )
     ];
     _episodes

@@ -1,7 +1,9 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:path/path.dart' as path;
+import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:flushbar/flushbar_helper.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_downloader/flutter_downloader.dart';
+import 'package:path/path.dart' as path;
 import 'package:provider/provider.dart';
 
 import 'audio.dart';
@@ -154,7 +156,7 @@ class EpisodeItem extends StatelessWidget {
           _buildBottomSheet(context, episode);
         },
       ),
-      onTap: () => _playNewEpisode(context, episode),
+      onTap: () async => await playNewEpisode(context, episode),
     );
   }
 
@@ -217,23 +219,11 @@ class EpisodeItem extends StatelessWidget {
     );
   }
 
-  _playNewEpisode(BuildContext context, Episode song) {
-    final schedule = Provider.of<AudioSchedule>(context);
-    if (schedule.playlist == null) {
-      schedule.playlist = <Episode>[song];
-    } else {
-      schedule.playlist.remove(song);
-      schedule.playlist.insert(0, song);
-    }
-    schedule.playNthSong(0);
-    Navigator.push(context, MaterialPageRoute(builder: (context) {
-      return PlayPage();
-    }));
-  }
 }
 
 class DownloadButtom extends StatefulWidget {
   final Episode episode;
+
   const DownloadButtom({
     Key key,
     @required this.episode,
@@ -265,16 +255,27 @@ class _DownloadButtomState extends State<DownloadButtom> {
                         "Download Episode (${prettySize(widget.episode.size)})"),
                     onTap: () async {
                       if (await ensureStoragePermission()) {
-                        final episodePath = path.join(
-                            await ensurePodcastFolder(),
-                            widget.episode.songTitle);
-                        // TODO download stuff....
+                        var podcastDir = await ensurePodcastFolder();
+
+                        final taskId = await FlutterDownloader.enqueue(
+                          url: widget.episode.audioUrl,
+                          savedDir: podcastDir,
+                          fileName: widget.episode.songTitle,
+                          showNotification: true,
+                          openFileFromNotification: true,
+                        );
+
+                        FlutterDownloader.registerCallback((String id, DownloadTaskStatus status, int progress) async {
+                          //print("status: $status, progress: $progress");
+                          dbOfflineEpisodeBloc.upgradeTask();
+                        });
+
                         await dbOfflineEpisodeBloc.add(OfflineEpisode(
                           songUrl: widget.episode.audioUrl,
                           title: widget.episode.songTitle,
+                          podcastUrl: widget.episode.podcast.feedUrl,
                           imageUrl: widget.episode.podcast.imageUrl,
-                          path: episodePath,
-                          progress: 0.5,
+                          taskID: taskId,
                         ));
                         setState(() {});
                       }
@@ -387,4 +388,40 @@ class _SubscribeButtonState extends State<SubscribeButton> {
       child: FlatButton(onPressed: callback, child: child),
     );
   }
+}
+
+playNewEpisode(BuildContext context, Episode episode) async {
+  
+  // if specified episode has offline version, use it
+  final offlineEp = await DBProvider.db.getOfflineEpisode(episode.audioUrl);
+  if (offlineEp != null) {
+    final tasks = await FlutterDownloader.loadTasks();
+    final taskMap = {for (var task in tasks) task.taskId: task};
+    offlineEp.taskInfo = taskMap[offlineEp.taskID];
+    if (offlineEp.taskInfo?.status == DownloadTaskStatus.complete) {
+      final localPath =  path.join(await getPodcastFolder(), episode.songTitle);
+      episode = Episode(
+        audioUrl: localPath,
+        audioDuration: episode.audioDuration,
+        songTitle: episode.songTitle,
+        podcast: episode.podcast,
+        pubDate: episode.pubDate,
+        summary: episode.summary,
+        size: episode.size,
+        isLocal: true,
+      );
+    }
+  }
+  
+  final schedule = Provider.of<AudioSchedule>(context);
+  if (schedule.playlist == null) {
+  schedule.playlist = <Episode>[episode];
+  } else {
+    schedule.playlist.remove(episode);
+    schedule.playlist.insert(0, episode);
+  }
+  schedule.playNthSong(0);
+  Navigator.push(context, MaterialPageRoute(builder: (context) {
+    return PlayPage();
+  }));
 }

@@ -12,6 +12,7 @@ class Episode implements Song {
   final DateTime pubDate;
   final String summary;
   final int size;
+  final bool isLocal;
   Duration lastPlayPosition;
   CachedNetworkImage get albumArt => podcast.image;
 
@@ -26,5 +27,6 @@ class Episode implements Song {
     @required this.pubDate,
     @required this.summary,
     @required this.size,
+    @required this.isLocal,
   });
 }

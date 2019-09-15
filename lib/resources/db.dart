@@ -10,7 +10,9 @@ import '../model/podcast.dart';
 class DBProvider {
   static final sqliteRowSize = 1024 * 1024;
   static Database _database;
+
   DBProvider._();
+
   static final DBProvider db = DBProvider._();
 
   Future<Database> get database async {
@@ -22,6 +24,43 @@ class DBProvider {
 
   _upgradeDBSchema(Database db, int oldVersion, int newVersion) async {
     print("upgrade db schema... ($oldVersion -> $newVersion)");
+    try {
+      await db.execute("drop table Podcasts");
+    } on Exception {}
+    await db.execute("""
+    CREATE TABLE Podcasts(
+      feed_url TEXT NOT NULL PRIMARY KEY,
+      image_url TEXT NOT NULL,
+      feed_content TEXT NOT NULL,
+      is_subscribed INTEGER NOT NULL
+    );
+    """);
+
+    try {
+      await db.execute("drop table PlayHistory");
+    } on Exception {}
+
+    await db.execute("""
+    CREATE TABLE PlayHistory(
+      song TEXT NOT NULL PRIMARY KEY,
+      duration INTEGER,
+      updated_at INTEGER
+    ); 
+    """);
+
+    try {
+      await db.execute("drop table OfflineEpisodes");
+    } on Exception {}
+
+    await db.execute("""
+    CREATE TABLE OfflineEpisodes(
+      song TEXT NOT NULL PRIMARY KEY,
+      title TEXT NOT NULL,
+      podcast_url TEXT NOT NULL,
+      image_url TEXT NOT NULL,
+      task_id TEXT NOT NULL
+    );
+    """);
   }
 
   initDB() async {
@@ -52,15 +91,13 @@ class DBProvider {
     """);
 
         // song: episode url for podcast episode
-        // path: offline path where this episode is stored
-        // progress: download progress percentage [0-1]
         await db.execute("""
     CREATE TABLE OfflineEpisodes(
       song TEXT NOT NULL PRIMARY KEY,
       title TEXT NOT NULL,
+      podcast_url TEXT NOT NULL,
       image_url TEXT NOT NULL,
-      path TEXT NOT NULL,
-      progress REAL
+      task_id TEXT NOT NULL
     );
     """);
       },
@@ -80,7 +117,7 @@ class DBProvider {
   Future<Podcast> getPodcast(String url) async {
     final db = await database;
     var res = await db.query("Podcasts",
-        where: "feed_url = ? and is_subscribed = 1", whereArgs: [url]);
+        where: "feed_url = ?", whereArgs: [url]);
     return res.isNotEmpty ? Podcast.fromMap(res.first) : null;
   }
 

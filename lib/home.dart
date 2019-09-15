@@ -67,10 +67,8 @@ class _HomeState extends State<Home> {
                 title: Text("Offline Download"),
                 onTap: () async {
                   Navigator.pop(context);
-                  final offlineEpisodes =
-                      await DBProvider.db.getAllOfflineEpisodes();
                   Navigator.push(context, MaterialPageRoute(builder: (context) {
-                    return OfflineEpisodePage(offlineEpisodes: offlineEpisodes);
+                    return OfflineEpisodePage();
                   }));
                 },
               ),

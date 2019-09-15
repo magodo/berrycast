@@ -1,12 +1,14 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_downloader/flutter_downloader.dart';
 
 class OfflineEpisode {
   final String songUrl;
   final String title;
-  final String path;
+  final String podcastUrl;
   final String imageUrl;
-  final double progress;
+  String taskID;
+  DownloadTask taskInfo;
 
   CachedNetworkImage get image => CachedNetworkImage(
     imageUrl: imageUrl,
@@ -17,24 +19,24 @@ class OfflineEpisode {
   OfflineEpisode({
     @required this.songUrl,
     @required this.title,
-    @required this.path,
+    @required this.podcastUrl,
     @required this.imageUrl,
-    @required this.progress,
+    @required this.taskID,
   });
 
   factory OfflineEpisode.fromMap(Map<String, dynamic> json) => new OfflineEpisode(
     songUrl: json["song"],
     title: json['title'],
-    path: json['path'],
-    imageUrl: json['image_url'],
-    progress: json["progress"],
+    podcastUrl: json['podcast_url'],
+    imageUrl: json["image_url"],
+    taskID: json["task_id"],
   );
 
   Map<String, dynamic> toMap() => {
     "song": songUrl,
     "title": title,
-    "path": path,
+    "podcast_url": podcastUrl,
     "image_url": imageUrl,
-    "progress": progress,
+    "task_id": taskID,
   };
 }
