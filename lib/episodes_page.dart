@@ -88,7 +88,7 @@ class _EpisodesPageState extends State<EpisodesPage> {
 
   Widget buildEpisodeListView(
       BuildContext context, AsyncSnapshot<Podcast> snapshot) {
-    return snapshot.hasData && snapshot.data != null
+    return snapshot.hasData
         ? ListView(
             children: snapshot.data.episodes
                 .asMap()

@@ -12,14 +12,16 @@ class OfflineEpisodePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          "Berrycast",
-          style: TextStyle(color: Colors.white),
+    return SafeArea(
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(
+            "Berrycast",
+            style: TextStyle(color: Colors.white),
+          ),
         ),
+        body: new _body(),
       ),
-      body: new _body(),
     );
   }
 }
