@@ -77,7 +77,7 @@ Future<String> getPodcastFolder() async {
 List<Widget> buildDownloadControls(BuildContext context, OfflineEpisode p) {
   Widget progressWidget, controlWidget;
   if (p.taskInfo == null) {
-    progressWidget = progressBar(
+    progressWidget = ProgressBar(
       context: context,
       progress: 0,
       color: Colors.grey,
@@ -89,7 +89,7 @@ List<Widget> buildDownloadControls(BuildContext context, OfflineEpisode p) {
   final progress = (p.taskInfo.progress / 100);
   final status = p.taskInfo.status;
   if (status == DownloadTaskStatus.running) {
-    progressWidget = progressBar(context: context, progress: progress);
+    progressWidget = ProgressBar(context: context, progress: progress);
     controlWidget = IconButton(
       icon: Icon(
         Icons.pause,
@@ -100,7 +100,7 @@ List<Widget> buildDownloadControls(BuildContext context, OfflineEpisode p) {
     return [progressWidget, controlWidget];
   }
   if (status == DownloadTaskStatus.paused) {
-    progressWidget = progressBar(context: context, progress: progress);
+    progressWidget = ProgressBar(context: context, progress: progress);
     controlWidget = IconButton(
         icon: Icon(
           Icons.file_download,
@@ -115,7 +115,7 @@ List<Widget> buildDownloadControls(BuildContext context, OfflineEpisode p) {
     return [progressWidget, controlWidget];
   }
   if (status == DownloadTaskStatus.failed) {
-    progressWidget = progressBar(
+    progressWidget = ProgressBar(
       context: context,
       progress: progress,
       color: Colors.red,

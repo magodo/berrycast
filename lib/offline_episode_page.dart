@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 
 import 'bloc/db_offline_episode.dart';
@@ -20,22 +19,22 @@ class OfflineEpisodePage extends StatelessWidget {
             style: TextStyle(color: Colors.white),
           ),
         ),
-        body: new _body(),
+        body: new _Body(),
       ),
     );
   }
 }
 
-class _body extends StatefulWidget {
-  const _body({
+class _Body extends StatefulWidget {
+  const _Body({
     Key key,
   }) : super(key: key);
 
   @override
-  __bodyState createState() => __bodyState();
+  _BodyState createState() => _BodyState();
 }
 
-class __bodyState extends State<_body> {
+class _BodyState extends State<_Body> {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder(
@@ -71,8 +70,8 @@ class __bodyState extends State<_body> {
   }
 }
 
-class progressBar extends StatelessWidget {
-  const progressBar({
+class ProgressBar extends StatelessWidget {
+  const ProgressBar({
     Key key,
     @required this.context,
     @required this.progress,

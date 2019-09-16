@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 
-import 'bloc/db_offline_episode.dart';
 import 'bottom_bar.dart';
 import 'offline_episode_page.dart';
 import 'podcast_page.dart';
-import 'resources/db.dart';
 import 'search_page.dart';
 import 'theme.dart';
 import 'utils.dart';
