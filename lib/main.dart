@@ -26,7 +26,14 @@ class _MyAppState extends State<MyApp> {
     super.initState();
     dbOfflineEpisodeBloc.init();
     FlutterDownloader.registerCallback(
-            (String id, DownloadTaskStatus status, int progress) async => dbOfflineEpisodeBloc.upgradeTaskStatus(id, status, progress));
+            (String id, DownloadTaskStatus status, int progress) async {
+              // workaround when a task is just started but no byte is downloaded, then this task is paused.
+              // The flutter_downloader will return progress as -1 in this case.
+              if (progress < 0) {
+                progress = 0;
+              }
+              dbOfflineEpisodeBloc.upgradeTaskStatus(id, status, progress);
+            });
   }
 
   @override

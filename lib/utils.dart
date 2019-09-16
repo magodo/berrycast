@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flushbar/flushbar_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
+import 'package:marquee/marquee.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -196,5 +197,20 @@ Dismissible buildCancelDownloadDismissable(
           });
     },
     child: child,
+  );
+}
+
+Widget buildMarqueeText(BuildContext context, Text text, double height) {
+  final parentWidth = MediaQuery.of(context).size.width;
+  return SizedBox(
+    height: height,
+    child: Marquee(
+      text: text.data,
+      style: text.style,
+      scrollAxis: Axis.horizontal,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      blankSpace: parentWidth/2,
+      velocity: 100.0,
+    ),
   );
 }

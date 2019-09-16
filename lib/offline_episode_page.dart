@@ -71,12 +71,14 @@ class _BodyState extends State<_Body> {
 }
 
 class ProgressBar extends StatelessWidget {
-  const ProgressBar({
+  ProgressBar({
     Key key,
     @required this.context,
     @required this.progress,
     this.color = accentColor,
-  }) : super(key: key);
+  }) : super(key: key) {
+    assert(progress != null);
+  }
 
   final BuildContext context;
   final double progress;

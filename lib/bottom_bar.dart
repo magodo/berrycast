@@ -6,6 +6,7 @@ import 'buttom_controls.dart';
 import 'play_page.dart';
 import 'radial_seekbar.dart';
 import 'theme.dart';
+import 'utils.dart';
 
 class BottomBar extends StatelessWidget {
   @override
@@ -41,31 +42,38 @@ class BottomBar extends StatelessWidget {
               fit: FlexFit.tight,
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: RichText(
-                  text: TextSpan(
-                    children: [
-                      TextSpan(
-                        text: schedule.song.songTitle + "\n",
-                        style: TextStyle(
-                          color: accentColor,
-                          fontSize: 14.0,
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: 4.0,
-                          height: 1.5,
+                child: Column(
+                  children: <Widget>[
+                    buildMarqueeText(
+                        context,
+                        Text(
+                          schedule.song.songTitle,
+                          style: TextStyle(
+                            color: accentColor,
+                            fontSize: 14.0,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 4.0,
+                            height: 1.5,
+                          ),
                         ),
+                        30),
+                    RichText(
+                      text: TextSpan(
+                        children: [
+                          TextSpan(
+                            text: schedule.song.artist,
+                            style: TextStyle(
+                              color: lightAccentColor,
+                              fontSize: 12.0,
+                              letterSpacing: 3.0,
+                              height: 1.5,
+                            ),
+                          )
+                        ],
                       ),
-                      TextSpan(
-                        text: schedule.song.artist,
-                        style: TextStyle(
-                          color: lightAccentColor,
-                          fontSize: 12.0,
-                          letterSpacing: 3.0,
-                          height: 1.5,
-                        ),
-                      )
-                    ],
-                  ),
-                  textAlign: TextAlign.center,
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
                 ),
               ),
             ),

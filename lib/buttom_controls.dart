@@ -1,6 +1,7 @@
-import 'package:berrycast/theme.dart';
 import 'package:audioplayers/audioplayers.dart';
+import 'package:berrycast/theme.dart';
 import 'package:flutter/material.dart';
+import 'package:marquee/marquee.dart';
 import 'package:provider/provider.dart';
 
 import 'audio.dart';
@@ -14,6 +15,21 @@ class ButtonControls extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var songTitleText = Text(
+      Provider
+          .of<AudioSchedule>(context)
+          .song
+          .songTitle,
+      style: TextStyle(
+        color: Colors.white,
+        fontSize: 14.0,
+        fontWeight: FontWeight.bold,
+        letterSpacing: 4.0,
+        height: 1.5,
+      ),
+    );
+    final songTitle =  buildMarqueeText(context, songTitleText, 50);
+
     return Container(
       width: double.infinity,
       child: Material(
@@ -24,8 +40,8 @@ class ButtonControls extends StatelessWidget {
           child: Column(
             children: <Widget>[
               // song/artist names
+              songTitle,
               new SongInfos(),
-
               // audio control
               Padding(
                 padding: const EdgeInsets.only(top: 10.0),
@@ -54,16 +70,6 @@ class SongInfos extends StatelessWidget {
       text: TextSpan(
         children: [
           TextSpan(
-            text: song.songTitle + "\n",
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 14.0,
-              fontWeight: FontWeight.bold,
-              letterSpacing: 4.0,
-              height: 1.5,
-            ),
-          ),
-          TextSpan(
             text: song.artist + "\n",
             style: TextStyle(
               color: Colors.white.withOpacity(0.75),
@@ -73,7 +79,9 @@ class SongInfos extends StatelessWidget {
             ),
           ),
           TextSpan(
-            text: "${prettyDuration(seekPosition)}/${prettyDuration(song.audioDuration)}",
+            text:
+            "${prettyDuration(seekPosition)}/${prettyDuration(
+                song.audioDuration)}",
             style: TextStyle(
               color: Colors.white.withOpacity(0.75),
               fontSize: 20.0,
@@ -99,10 +107,16 @@ class ButtomControls extends StatelessWidget {
       children: <Widget>[
         Expanded(child: Container()),
         buildAudioButton(Icons.replay_10,
-            (context) => Provider.of<AudioSchedule>(context).replay10),
+                (context) =>
+            Provider
+                .of<AudioSchedule>(context)
+                .replay10),
         Expanded(child: Container()),
         buildAudioButton(Icons.skip_previous,
-            (context) => Provider.of<AudioSchedule>(context).prevSong),
+                (context) =>
+            Provider
+                .of<AudioSchedule>(context)
+                .prevSong),
         Expanded(child: Container()),
         PlayPauseButton(
           elevation: 10.0,
@@ -110,10 +124,16 @@ class ButtomControls extends StatelessWidget {
         ),
         Expanded(child: Container()),
         buildAudioButton(Icons.skip_next,
-            (context) => Provider.of<AudioSchedule>(context).nextSong),
+                (context) =>
+            Provider
+                .of<AudioSchedule>(context)
+                .nextSong),
         Expanded(child: Container()),
         buildAudioButton(Icons.forward_10,
-            (context) => Provider.of<AudioSchedule>(context).forward10),
+                (context) =>
+            Provider
+                .of<AudioSchedule>(context)
+                .forward10),
         Expanded(child: Container()),
       ],
     );
@@ -130,7 +150,8 @@ class PlayPauseButton extends StatelessWidget {
     elevation = 0.0,
     highlightElevation = 0.0,
     size = 35.0,
-  })  : _elevation = elevation,
+  })
+      : _elevation = elevation,
         _highlightElevation = highlightElevation,
         _size = size,
         super(key: key);
