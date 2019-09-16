@@ -1,9 +1,11 @@
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:provider/provider.dart';
 
 import 'audio.dart';
 import 'audioplayer_stream_wrapper.dart';
+import 'bloc/db_offline_episode.dart';
 import 'bloc/db_podcast.dart';
 import 'home.dart';
 import 'model/podcast.dart';
@@ -11,8 +13,28 @@ import 'theme.dart';
 
 void main() => runApp(MyApp());
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
+  @override
+  _MyAppState createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
   final AudioSchedule schedule = AudioSchedule();
+
+  @override
+  void initState() {
+    super.initState();
+    dbOfflineEpisodeBloc.init();
+    FlutterDownloader.registerCallback(
+            (String id, DownloadTaskStatus status, int progress) async => dbOfflineEpisodeBloc.upgradeTaskStatus(id, status, progress));
+  }
+
+  @override
+  void dispose() {
+    FlutterDownloader.registerCallback(null);
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return MultiProvider(

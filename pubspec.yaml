@@ -44,9 +44,9 @@ dependencies:
   logger: ^0.6.0
   pull_to_refresh: ^1.5.4
   permission_handler: ^3.2.2
-  # flutter_downloader: ^1.2.1
-  flutter_downloader:
-    path: /media/storage/github/flutter_downloader
+  flutter_downloader: ^1.2.1
+  #flutter_downloader:
+  #  path: /media/storage/github/flutter_downloader
   percent_indicator: "^2.1.1"
 
 dev_dependencies:
