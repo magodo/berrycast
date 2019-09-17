@@ -3,9 +3,9 @@ import 'package:provider/provider.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 import 'bloc/db_podcast.dart';
-import 'episodes_page.dart';
 import 'model/podcast.dart';
 import 'theme.dart';
+import 'utils.dart';
 
 class PodcastPage extends StatelessWidget {
   final RefreshController _refreshController =
@@ -14,13 +14,6 @@ class PodcastPage extends StatelessWidget {
   void _onRefresh() async {
     await dbPodcastBloc.refreshPodcasts();
     _refreshController.refreshCompleted();
-  }
-
-  _openAlbumPage(BuildContext context, Podcast podcast) async {
-    dbPodcastBloc.feedPodcast(podcast);
-    Navigator.push(context, MaterialPageRoute(builder: (context) {
-      return EpisodesPage(podcast.image);
-    }));
   }
 
   List<Widget> _buildAlbumThumb(BuildContext context) {
@@ -41,7 +34,7 @@ class PodcastPage extends StatelessWidget {
             enableFeedback: true,
             child: podcasts[idx].image,
             onTap: () {
-              _openAlbumPage(context, podcasts[idx]);
+              openAlbumPage(context, podcasts[idx]);
             },
           ),
         ),

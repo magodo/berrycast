@@ -3,7 +3,9 @@ import 'package:provider/provider.dart';
 
 import 'audio.dart';
 import 'buttom_controls.dart';
+import 'model/episode.dart';
 import 'radial_seekbar.dart';
+import 'utils.dart';
 
 class PlayPage extends StatelessWidget {
   List<Widget> _buildPlaylist(context) {
@@ -49,6 +51,18 @@ class PlayPage extends StatelessWidget {
           elevation: 0.0,
           actions: <Widget>[
             Builder(builder: (context) {
+              final schedule = Provider.of<AudioSchedule>(context);
+              final song = schedule.song;
+              if (song is Episode) {
+                return IconButton(
+                  icon: Icon(Icons.cast),
+                  color: Colors.grey,
+                  onPressed: () => openAlbumPage(context, song.podcast),
+                );
+              }
+              return Container();
+            }),
+            Builder(builder: (context) {
               return IconButton(
                 icon: Icon(Icons.playlist_play),
                 color: Colors.grey,
@@ -58,20 +72,20 @@ class PlayPage extends StatelessWidget {
           ],
         ),
         body: Column(
-            children: <Widget>[
-              // seek bar
-              Expanded(child: RadialSeekBar()),
+          children: <Widget>[
+            // seek bar
+            Expanded(child: RadialSeekBar()),
 
-              // visualizer
-              Container(
-                width: double.infinity,
-                height: 125.0,
-              ),
+            // visualizer
+            Container(
+              width: double.infinity,
+              height: 125.0,
+            ),
 
-              // song title, artist name and controls
-              ButtonControls(),
-            ],
-          ),
+            // song title, artist name and controls
+            ButtonControls(),
+          ],
+        ),
       ),
     );
   }

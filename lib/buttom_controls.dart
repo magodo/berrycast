@@ -1,7 +1,6 @@
 import 'package:audioplayers/audioplayers.dart';
 import 'package:berrycast/theme.dart';
 import 'package:flutter/material.dart';
-import 'package:marquee/marquee.dart';
 import 'package:provider/provider.dart';
 
 import 'audio.dart';
@@ -16,10 +15,7 @@ class ButtonControls extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var songTitleText = Text(
-      Provider
-          .of<AudioSchedule>(context)
-          .song
-          .songTitle,
+      Provider.of<AudioSchedule>(context).song.songTitle,
       style: TextStyle(
         color: Colors.white,
         fontSize: 14.0,
@@ -28,7 +24,7 @@ class ButtonControls extends StatelessWidget {
         height: 1.5,
       ),
     );
-    final songTitle =  buildMarqueeText(context, songTitleText, 50);
+    final songTitle = buildMarqueeText(context, songTitleText, 50);
 
     return Container(
       width: double.infinity,
@@ -80,8 +76,7 @@ class SongInfos extends StatelessWidget {
           ),
           TextSpan(
             text:
-            "${prettyDuration(seekPosition)}/${prettyDuration(
-                song.audioDuration)}",
+                "${prettyDuration(seekPosition)}/${prettyDuration(song.audioDuration)}",
             style: TextStyle(
               color: Colors.white.withOpacity(0.75),
               fontSize: 20.0,
@@ -107,16 +102,10 @@ class ButtomControls extends StatelessWidget {
       children: <Widget>[
         Expanded(child: Container()),
         buildAudioButton(Icons.replay_10,
-                (context) =>
-            Provider
-                .of<AudioSchedule>(context)
-                .replay10),
+            (context) => Provider.of<AudioSchedule>(context).replay10),
         Expanded(child: Container()),
         buildAudioButton(Icons.skip_previous,
-                (context) =>
-            Provider
-                .of<AudioSchedule>(context)
-                .prevSong),
+            (context) => Provider.of<AudioSchedule>(context).prevSong),
         Expanded(child: Container()),
         PlayPauseButton(
           elevation: 10.0,
@@ -124,16 +113,10 @@ class ButtomControls extends StatelessWidget {
         ),
         Expanded(child: Container()),
         buildAudioButton(Icons.skip_next,
-                (context) =>
-            Provider
-                .of<AudioSchedule>(context)
-                .nextSong),
+            (context) => Provider.of<AudioSchedule>(context).nextSong),
         Expanded(child: Container()),
         buildAudioButton(Icons.forward_10,
-                (context) =>
-            Provider
-                .of<AudioSchedule>(context)
-                .forward10),
+            (context) => Provider.of<AudioSchedule>(context).forward10),
         Expanded(child: Container()),
       ],
     );
@@ -150,8 +133,7 @@ class PlayPauseButton extends StatelessWidget {
     elevation = 0.0,
     highlightElevation = 0.0,
     size = 35.0,
-  })
-      : _elevation = elevation,
+  })  : _elevation = elevation,
         _highlightElevation = highlightElevation,
         _size = size,
         super(key: key);
@@ -164,7 +146,6 @@ class PlayPauseButton extends StatelessWidget {
     IconData icon;
     Function onPressed;
     Color buttonColor = lightAccentColor;
-    print("audio state changed to: $state");
     switch (state) {
       case AudioPlayerState.PLAYING:
         icon = Icons.pause;

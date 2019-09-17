@@ -9,8 +9,10 @@ import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 import 'bloc/db_offline_episode.dart';
+import 'bloc/db_podcast.dart';
 import 'episodes_page.dart';
 import 'model/offline_episode.dart';
+import 'model/podcast.dart';
 import 'offline_episode_page.dart';
 import 'resources/db.dart';
 import 'theme.dart';
@@ -209,8 +211,15 @@ Widget buildMarqueeText(BuildContext context, Text text, double height) {
       style: text.style,
       scrollAxis: Axis.horizontal,
       crossAxisAlignment: CrossAxisAlignment.center,
-      blankSpace: parentWidth/2,
+      blankSpace: parentWidth / 2,
       velocity: 100.0,
     ),
   );
+}
+
+openAlbumPage(BuildContext context, Podcast podcast) async {
+  dbPodcastBloc.feedPodcast(podcast);
+  Navigator.push(context, MaterialPageRoute(builder: (context) {
+    return EpisodesPage(podcast.image);
+  }));
 }
