@@ -1,6 +1,6 @@
 import 'dart:async';
-import 'package:async/async.dart';
 
+import 'package:async/async.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:rxdart/rxdart.dart';
 
@@ -22,7 +22,7 @@ class SeekPosition extends Duration {
 class MyAudioPlayer extends AudioPlayer {
   final StreamController<AudioPosition> _positionController =
       StreamController.broadcast();
-  final _seekPositionController = StreamController<SeekPosition>();
+  final _seekPositionController = StreamController<SeekPosition>.broadcast();
 
   MyAudioPlayer() : super();
 
