@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'bottom_bar.dart';
+import 'drawer_header.dart';
 import 'offline_episode_page.dart';
 import 'podcast_page.dart';
 import 'search_page.dart';
@@ -57,7 +58,7 @@ class _HomeState extends State<Home> {
             padding: EdgeInsets.all(0),
             children: <Widget>[
               DrawerHeader(
-                child: Text("Header"),
+                child: myDrawerHeader(),
                 decoration: BoxDecoration(color: accentColor),
               ),
               ListTile(
