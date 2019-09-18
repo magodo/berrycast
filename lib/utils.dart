@@ -217,7 +217,7 @@ Widget buildMarqueeText(BuildContext context, Text text, double height) {
   );
 }
 
-openAlbumPage(BuildContext context, Podcast podcast) async {
+openExistAlbumPage(BuildContext context, Podcast podcast) async {
   dbPodcastBloc.feedPodcast(podcast);
   Navigator.push(context, MaterialPageRoute(builder: (context) {
     return EpisodesPage(podcast.image);

@@ -39,12 +39,12 @@ class SearchResultPage extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
-                      Icon(Icons.error, size: 180.0),
+                      Icon(Icons.error, size: 100.0),
                       Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Text(
                           "No match",
-                          style: TextStyle(fontSize: 50.0),
+                          style: TextStyle(fontSize: 20.0),
                         ),
                       ),
                     ],
@@ -73,10 +73,14 @@ class SearchResultPage extends StatelessWidget {
       final podcast = await dbPodcastBloc.feedPodcastByUrl(ipodcast.feedUrl,
           imageUrl: ipodcast.artworkUrl600);
 
-      // add podcast to db if not exists
-      try {
-        await dbPodcastBloc.add(podcast);
-      } on Exception {/* ignore (already exists) */}
+      if (podcast != null) {
+        // add podcast to db if not exists
+        try {
+          await dbPodcastBloc.add(podcast);
+        } on Exception {
+          /* ignore (already exists) */
+        }
+      }
     }();
 
     Navigator.push(context, MaterialPageRoute(builder: (context) {

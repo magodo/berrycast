@@ -65,7 +65,9 @@ class _EpisodesPageState extends State<EpisodesPage> {
                         ),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: snapshot.hasData && snapshot.data != null
+                          children: snapshot.hasData &&
+                                  snapshot.data != null &&
+                                  snapshot.data != nullPodcast
                               ? <Widget>[
                                   buildPlayallButton(context, snapshot.data),
                                   SubscribeButton(podcast: snapshot.data),
@@ -93,6 +95,23 @@ class _EpisodesPageState extends State<EpisodesPage> {
         child: CircularProgressIndicator(),
       );
 
+    if (snapshot.data == nullPodcast) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Icon(Icons.error, size: 100.0),
+            Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Text(
+                "Failed to fetch podcast!",
+                style: TextStyle(fontSize: 20.0),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
     return ListView(
       children: snapshot.data.episodes
           .asMap()

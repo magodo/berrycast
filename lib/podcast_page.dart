@@ -34,7 +34,7 @@ class PodcastPage extends StatelessWidget {
             enableFeedback: true,
             child: podcasts[idx].image,
             onTap: () {
-              openAlbumPage(context, podcasts[idx]);
+              openExistAlbumPage(context, podcasts[idx]);
             },
           ),
         ),

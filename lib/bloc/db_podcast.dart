@@ -55,7 +55,14 @@ class DBPodcastBloc {
     // So we will pass in a null, which will notify the page a new event will come soon,
     // and page should be in an waiting state, showing indicator or something similar.
     _podcastSubject.add(null);
-    var podcast = await Podcast.newPodcastByUrl(feedUrl, imageUrl: imageUrl);
+    Podcast podcast;
+    try {
+      podcast = await Podcast.newPodcastByUrl(feedUrl, imageUrl: imageUrl);
+    } catch (e, traceback) {
+      print("failed to new podcast by url: $e\n$traceback");
+      _podcastSubject.add(nullPodcast);
+      return null;
+    }
     _podcastSubject.add(podcast);
     return podcast;
   }

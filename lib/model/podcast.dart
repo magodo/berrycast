@@ -1,9 +1,9 @@
 import 'dart:convert';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
-
 import 'package:webfeed/webfeed.dart';
 
 import '../resources/db.dart';
@@ -18,6 +18,8 @@ class Podcast {
   List<Episode> get episodes => _episodes;
   bool isSubscribed;
 
+  Podcast.dummy(this.feedUrl, this.imageUrl, this.feedContent, this._rssFeed);
+
   Podcast({
     @required this.feedUrl,
     @required this.imageUrl,
@@ -27,13 +29,15 @@ class Podcast {
     _episodes = [
       for (var item in _rssFeed.items)
         Episode(
-          audioUrl: item.enclosure.url,
-          audioDuration: item.itunes.duration,
-          songTitle: item.title,
-          pubDate: DateFormat("EEE, dd MMM yyyy hh:mm").parse(item.pubDate),
-          summary: item.itunes.summary ?? item.description,
+          audioUrl: item.enclosure?.url ?? "",
+          audioDuration: item.itunes?.duration ?? Duration(),
+          songTitle: item.title ?? "",
+          pubDate: item.pubDate != null
+              ? DateFormat("EEE, dd MMM yyyy hh:mm").parse(item.pubDate)
+              : DateTime(0),
+          summary: item.itunes?.summary ?? item.description ?? "",
           podcast: this,
-          size: item.enclosure.length,
+          size: item.enclosure?.length ?? 0,
           isLocal: false,
         )
     ];
@@ -56,7 +60,7 @@ class Podcast {
         "feed_url": feedUrl,
         "image_url": imageUrl,
         "feed_content": feedContent,
-        "is_subscribed": isSubscribed? 1:0,
+        "is_subscribed": isSubscribed ? 1 : 0,
       };
 
   String get author => _rssFeed.itunes?.author;
@@ -80,3 +84,5 @@ class Podcast {
         isSubscribed: isSubscribed);
   }
 }
+
+var nullPodcast = Podcast.dummy(null, null, null, null);

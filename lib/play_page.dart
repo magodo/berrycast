@@ -57,7 +57,7 @@ class PlayPage extends StatelessWidget {
                 return IconButton(
                   icon: Icon(Icons.cast),
                   color: Colors.grey,
-                  onPressed: () => openAlbumPage(context, song.podcast),
+                  onPressed: () => openExistAlbumPage(context, song.podcast),
                 );
               }
               return Container();
