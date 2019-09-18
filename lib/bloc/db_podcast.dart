@@ -27,6 +27,18 @@ class DBPodcastBloc {
     _podcastsSubject.add(await DBProvider.db.getAllPodcasts());
   }
 
+  refreshPodcast(String feedUrl) async {
+    var podcast = await DBProvider.db.getPodcast(feedUrl);
+    print("start to refresh ${podcast.feedUrl}");
+    var newPodcast = await Podcast.newPodcastByUrl(podcast.feedUrl);
+    if (podcast.feedContent == newPodcast.feedContent) {
+      print("${podcast.feedUrl} is same");
+      return;
+    }
+    await upgrade(newPodcast);
+    _podcastSubject.add(newPodcast);
+  }
+
   refreshPodcasts() async {
     var podcasts = await DBProvider.db.getAllPodcasts();
     //TODO: parallelize the refresh process below
@@ -34,8 +46,7 @@ class DBPodcastBloc {
     for (var p in podcasts) {
       futures.add(() async {
         print("start to refresh ${p.feedUrl}");
-        var podcast =
-            await Podcast.newPodcastByUrl(p.feedUrl, imageUrl: p.imageUrl);
+        var podcast = await Podcast.newPodcastByUrl(p.feedUrl);
         if (podcast.feedContent == p.feedContent) {
           print("${p.feedUrl} is same");
           return;
@@ -45,6 +56,7 @@ class DBPodcastBloc {
       }());
     }
     await Future.wait(futures);
+    await getPodcasts();
     return;
   }
 

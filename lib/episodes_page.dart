@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:path/path.dart' as path;
 import 'package:provider/provider.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 import 'audio.dart';
 import 'bloc/db_offline_episode.dart';
@@ -28,6 +29,9 @@ class EpisodesPage extends StatefulWidget {
 }
 
 class _EpisodesPageState extends State<EpisodesPage> {
+  final RefreshController _refreshController =
+      RefreshController(initialRefresh: false);
+
   @override
   Widget build(BuildContext context) {
     return StreamBuilder(
@@ -112,13 +116,22 @@ class _EpisodesPageState extends State<EpisodesPage> {
         ),
       );
     }
-    return ListView(
-      children: snapshot.data.episodes
-          .asMap()
-          .map((idx, episode) =>
-              MapEntry(idx, EpisodeItem(index: idx, episode: episode)))
-          .values
-          .toList(),
+    return SmartRefresher(
+      enablePullDown: true,
+      header: MaterialClassicHeader(),
+      controller: _refreshController,
+      onRefresh: () async {
+        await dbPodcastBloc.refreshPodcast(snapshot.data.feedUrl);
+        _refreshController.refreshCompleted();
+      },
+      child: ListView(
+        children: snapshot.data.episodes
+            .asMap()
+            .map((idx, episode) =>
+                MapEntry(idx, EpisodeItem(index: idx, episode: episode)))
+            .values
+            .toList(),
+      ),
     );
   }
 

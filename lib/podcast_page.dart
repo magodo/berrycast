@@ -1,21 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:pull_to_refresh/pull_to_refresh.dart';
 
-import 'bloc/db_podcast.dart';
 import 'model/podcast.dart';
 import 'theme.dart';
 import 'utils.dart';
 
 class PodcastPage extends StatelessWidget {
-  final RefreshController _refreshController =
-      RefreshController(initialRefresh: false);
-
-  void _onRefresh() async {
-    await dbPodcastBloc.refreshPodcasts();
-    _refreshController.refreshCompleted();
-  }
-
   List<Widget> _buildAlbumThumb(BuildContext context) {
     final podcasts = Provider.of<List<Podcast>>(context);
     if (podcasts == null) return [];
@@ -51,18 +41,13 @@ class PodcastPage extends StatelessWidget {
 //          tooltip: "",
 //          icon: Icons.add,
 //        ),
-    return SmartRefresher(
-      enablePullDown: true,
-      header: MaterialClassicHeader(),
-      controller: _refreshController,
-      onRefresh: _onRefresh,
-      child: GridView.count(
-          crossAxisCount: 2,
-          mainAxisSpacing: 4.0,
-          crossAxisSpacing: 4.0,
-          padding: const EdgeInsets.all(4.0),
-          childAspectRatio: 1.0,
-          children: _buildAlbumThumb(context)),
+    return GridView.count(
+      crossAxisCount: 2,
+      mainAxisSpacing: 4.0,
+      crossAxisSpacing: 4.0,
+      padding: const EdgeInsets.all(4.0),
+      childAspectRatio: 1.0,
+      children: _buildAlbumThumb(context),
     );
   }
 }
