@@ -342,8 +342,8 @@ class SubscribeButton extends StatefulWidget {
 enum _SubscribeState {
   unsubscribed,
   subscribing,
-  subscribed,
   unsubscribing,
+  subscribed,
 }
 
 class _SubscribeButtonState extends State<SubscribeButton> {
@@ -370,14 +370,19 @@ class _SubscribeButtonState extends State<SubscribeButton> {
           setState(() {
             _subscribeState = _SubscribeState.subscribing;
           });
-          // explicitly delay
-          await Future.delayed(const Duration(seconds: 1), () {});
+
+          // explicitly delay to make animation smoothly
+          await Future.delayed(const Duration(milliseconds: 500), () {});
+
           try {
             await dbPodcastBloc.subscribe(podcast.feedUrl);
           } on Exception catch (e) {
             FlushbarHelper.createError(message: e.toString()).show(context);
             return;
           }
+          // explicitly delay to make animation smoothly
+          await Future.delayed(const Duration(milliseconds: 500), () {});
+
           setState(() {
             _subscribeState = _SubscribeState.subscribed;
           });
@@ -393,7 +398,15 @@ class _SubscribeButtonState extends State<SubscribeButton> {
           setState(() {
             _subscribeState = _SubscribeState.unsubscribing;
           });
+
+          // explicitly delay to make animation smoothly
+          await Future.delayed(const Duration(milliseconds: 500), () {});
+
           await dbPodcastBloc.unsubscribe(podcast.feedUrl);
+
+          // explicitly delay to make animation smoothly
+          await Future.delayed(const Duration(milliseconds: 500), () {});
+
           setState(() {
             _subscribeState = _SubscribeState.unsubscribed;
           });
@@ -412,10 +425,11 @@ class _SubscribeButtonState extends State<SubscribeButton> {
         );
         color = lightAccentColor;
         break;
+
       case _SubscribeState.unsubscribing:
         callback = null;
         child = Text(
-          "UBSUBSCRIBING...",
+          "UNSUBSCRIBING...",
           style: TextStyle(color: Colors.white),
         );
         color = lightAccentColor;
@@ -427,8 +441,7 @@ class _SubscribeButtonState extends State<SubscribeButton> {
         color: color,
         borderRadius: BorderRadius.circular(8),
       ),
-      duration: Duration(seconds: 1),
-      //color: color,
+      duration: Duration(milliseconds: 400),
       child: FlatButton(onPressed: callback, child: child),
     );
   }
