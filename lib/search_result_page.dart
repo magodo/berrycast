@@ -69,8 +69,16 @@ class SearchResultPage extends StatelessWidget {
   }
 
   _openAlbumPage(BuildContext context, ItunesPodcast ipodcast) {
-    dbPodcastBloc.feedPodcastByUrl(ipodcast.feedUrl,
-        imageUrl: ipodcast.artworkUrl600);
+    () async {
+      final podcast = await dbPodcastBloc.feedPodcastByUrl(ipodcast.feedUrl,
+          imageUrl: ipodcast.artworkUrl600);
+
+      // add podcast to db if not exists
+      try {
+        await dbPodcastBloc.add(podcast);
+      } on Exception {/* ignore (already exists) */}
+    }();
+
     Navigator.push(context, MaterialPageRoute(builder: (context) {
       return EpisodesPage(ipodcast.image);
     }));

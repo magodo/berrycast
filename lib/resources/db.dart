@@ -116,8 +116,8 @@ class DBProvider {
 
   Future<Podcast> getPodcast(String url) async {
     final db = await database;
-    var res = await db.query("Podcasts",
-        where: "feed_url = ?", whereArgs: [url]);
+    var res =
+        await db.query("Podcasts", where: "feed_url = ?", whereArgs: [url]);
     return res.isNotEmpty ? Podcast.fromMap(res.first) : null;
   }
 
@@ -138,7 +138,14 @@ class DBProvider {
     return res;
   }
 
-  deletePodcast(String url) async {
+  subscribePodcast(String url) async {
+    final db = await database;
+    var res = await db.update("Podcasts", {"is_subscribed": 1},
+        where: "feed_url = ?", whereArgs: [url]);
+    return res;
+  }
+
+  unsubscribePodcast(String url) async {
     final db = await database;
     var res = await db.update("Podcasts", {"is_subscribed": 0},
         where: "feed_url = ?", whereArgs: [url]);

@@ -88,18 +88,19 @@ class _EpisodesPageState extends State<EpisodesPage> {
 
   Widget buildEpisodeListView(
       BuildContext context, AsyncSnapshot<Podcast> snapshot) {
-    return snapshot.hasData
-        ? ListView(
-            children: snapshot.data.episodes
-                .asMap()
-                .map((idx, episode) =>
-                    MapEntry(idx, EpisodeItem(index: idx, episode: episode)))
-                .values
-                .toList(),
-          )
-        : Center(
-            child: CircularProgressIndicator(),
-          );
+    if (!snapshot.hasData)
+      return Center(
+        child: CircularProgressIndicator(),
+      );
+
+    return ListView(
+      children: snapshot.data.episodes
+          .asMap()
+          .map((idx, episode) =>
+              MapEntry(idx, EpisodeItem(index: idx, episode: episode)))
+          .values
+          .toList(),
+    );
   }
 
   _playNewPodcast(BuildContext context, Podcast podcast) {
@@ -253,6 +254,7 @@ class _DownloadButtomState extends State<DownloadButtom> {
               if (await ensureStoragePermission()) {
                 var podcastDir = await ensurePodcastFolder();
 
+                // start download task
                 final taskId = await FlutterDownloader.enqueue(
                   url: widget.episode.audioUrl,
                   savedDir: podcastDir,
@@ -339,7 +341,7 @@ class _SubscribeButtonState extends State<SubscribeButton> {
           // explicitly delay
           await Future.delayed(const Duration(seconds: 1), () {});
           try {
-            await dbPodcastBloc.add(podcast);
+            await dbPodcastBloc.subscribe(podcast.feedUrl);
           } on Exception catch (e) {
             FlushbarHelper.createError(message: e.toString()).show(context);
             return;
@@ -359,7 +361,7 @@ class _SubscribeButtonState extends State<SubscribeButton> {
           setState(() {
             _subscribeState = _SubscribeState.unsubscribing;
           });
-          await dbPodcastBloc.delete(podcast.feedUrl);
+          await dbPodcastBloc.unsubscribe(podcast.feedUrl);
           setState(() {
             _subscribeState = _SubscribeState.unsubscribed;
           });

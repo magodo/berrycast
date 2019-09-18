@@ -1,4 +1,3 @@
-
 import 'package:rxdart/rxdart.dart';
 
 import '../model/podcast.dart';
@@ -35,8 +34,9 @@ class DBPodcastBloc {
     for (var p in podcasts) {
       futures.add(() async {
         print("start to refresh ${p.feedUrl}");
-        var podcast =  await Podcast.newPodcastByUrl(p.feedUrl, imageUrl: p.imageUrl);
-        if (podcast.feedContent == p.feedContent)  {
+        var podcast =
+            await Podcast.newPodcastByUrl(p.feedUrl, imageUrl: p.imageUrl);
+        if (podcast.feedContent == p.feedContent) {
           print("${p.feedUrl} is same");
           return;
         }
@@ -48,7 +48,7 @@ class DBPodcastBloc {
     return;
   }
 
-  feedPodcastByUrl(String feedUrl, {String imageUrl}) async {
+  Future<Podcast> feedPodcastByUrl(String feedUrl, {String imageUrl}) async {
     // Since we are using BehaviorSubscribe, if the `add()` takes time, and the page
     // which subscribe it is built first. Then it will show the last emitted event.
     // This is not what we want, which causes confusion.
@@ -57,10 +57,11 @@ class DBPodcastBloc {
     _podcastSubject.add(null);
     var podcast = await Podcast.newPodcastByUrl(feedUrl, imageUrl: imageUrl);
     _podcastSubject.add(podcast);
+    return podcast;
   }
 
   feedPodcast(Podcast podcast) async {
-      _podcastSubject.add(podcast);
+    _podcastSubject.add(podcast);
   }
 
   get podcasts => _podcastsSubject.stream;
@@ -71,18 +72,9 @@ class DBPodcastBloc {
 //    add(podcast);
 //  }
 
-  add(Podcast podcast) async {
-    podcast.isSubscribed = true;
-    try {
-      await DBProvider.db.addPodcast(podcast);
-    } on Exception {
-      await DBProvider.db.updatePodcast(podcast);
-    }
-    getPodcasts();
-  }
-
-  delete(String url) async {
-    await DBProvider.db.deletePodcast(url);
+  add(Podcast podcast, {bool subscribed = false}) async {
+    podcast.isSubscribed = subscribed;
+    await DBProvider.db.addPodcast(podcast);
     getPodcasts();
   }
 
@@ -90,7 +82,16 @@ class DBPodcastBloc {
     await DBProvider.db.updatePodcast(podcast);
     getPodcasts();
   }
+
+  subscribe(String url) async {
+    await DBProvider.db.subscribePodcast(url);
+    getPodcasts();
+  }
+
+  unsubscribe(String url) async {
+    await DBProvider.db.unsubscribePodcast(url);
+    getPodcasts();
+  }
 }
 
 final DBPodcastBloc dbPodcastBloc = DBPodcastBloc();
-
