@@ -207,7 +207,7 @@ Widget buildMarqueeText(BuildContext context, Text text, double height) {
   return SizedBox(
     height: height,
     child: Marquee(
-      text: text.data,
+      text: text.data.trim(),
       style: text.style,
       scrollAxis: Axis.horizontal,
       crossAxisAlignment: CrossAxisAlignment.center,
