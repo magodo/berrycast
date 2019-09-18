@@ -5,6 +5,7 @@ import 'bloc/db_podcast.dart';
 import 'bloc/itunes_bloc.dart';
 import 'episodes_page.dart';
 import 'model/itunes.dart';
+import 'resources/db.dart';
 
 class SearchResultPage extends StatelessWidget {
   @override
@@ -75,10 +76,12 @@ class SearchResultPage extends StatelessWidget {
 
       if (podcast != null) {
         // add podcast to db if not exists
-        try {
+        var existsPodcast = await DBProvider.db.getPodcast(podcast.feedUrl);
+        if (existsPodcast == null) {
           await dbPodcastBloc.add(podcast);
-        } on Exception {
-          /* ignore (already exists) */
+        } else {
+          podcast.isSubscribed = existsPodcast.isSubscribed;
+          await dbPodcastBloc.upgrade(podcast);
         }
       }
     }();
