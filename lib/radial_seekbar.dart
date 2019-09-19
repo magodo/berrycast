@@ -42,12 +42,14 @@ class _RadialSeekBarState extends State<RadialSeekBar> {
         SeekPosition(schedule.song.audioDuration * _currentDragPercent));
   }
 
-  void _onDragEnd(BuildContext context) {
+  _onDragEnd(BuildContext context) async {
     final schedule = Provider.of<AudioSchedule>(context);
     _startDragPercent = null;
     _startDragCoord = null;
-    schedule.seek(_currentDragPercent);
-    schedule.player.setSeekPosition(SeekPosition(schedule.song.audioDuration * _currentDragPercent, isEnd: true));
+    await schedule.seek(_currentDragPercent);
+    schedule.player.setSeekPosition(SeekPosition(
+        schedule.song.audioDuration * _currentDragPercent,
+        isEnd: true));
     _currentDragPercent = null;
   }
 
@@ -76,14 +78,14 @@ class _RadialSeekBarState extends State<RadialSeekBar> {
               trackColor: Color(0xFFDDDDDD),
               progressPercent: _progressPercent,
               progressColor: accentColor,
-              thumbPosition:
-                  seekPosition.inSeconds / schedule.song.audioDuration.inSeconds,
+              thumbPosition: seekPosition.inSeconds /
+                  schedule.song.audioDuration.inSeconds,
               thumbColor: lightAccentColor,
               innerPadding: EdgeInsets.all(10.0),
               outerPadding: EdgeInsets.all(10.0),
               child: ClipOval(
                 clipper: CircleClipper(),
-                child:  schedule.song.albumArt,
+                child: schedule.song.albumArt,
               ),
             ),
           ),

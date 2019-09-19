@@ -7,19 +7,16 @@ import 'resources/db.dart';
 class AudioSchedule with ChangeNotifier {
   final MyAudioPlayer player;
   List<Song> _playlist;
-  int _playIdx;
   Song _song;
 
   AudioSchedule()
       : player = MyAudioPlayer(),
-        _playlist = null,
-        _playIdx = null {
+        _playlist = <Song>[] {
     // Remember play history whenever audio focus is disabled.
     // Explicitly use the deprecated [focusHanlder] here because it's more fit then using stream.
     player.focusHandler = (focused) async {
       if (song != null) {
-        DBProvider.db.addPlayHistory(song.audioUrl,
-            Duration(milliseconds: await player.getCurrentPosition()));
+        await _recordPlayHistory();
       }
     };
   }
@@ -27,44 +24,45 @@ class AudioSchedule with ChangeNotifier {
   List<Song> get playlist => _playlist;
   set playlist(List<Song> playlist) {
     _playlist = playlist;
-    _playIdx = null;
   }
 
-  bool get isEmpty => _playlist == null;
+  bool get isEmpty => playlist.length == 0;
 
   Song get song => _song;
-  set song (Song song) {
-    _song = song;
+
+  void pushSong(Song song) {
+    playlist.removeWhere((e) => song.audioUrl == e.audioUrl);
+    playlist.insert(0, song);
     notifyListeners();
+    return;
   }
 
   bool isSongIdxActive(int idx) {
-    return idx == _playIdx;
+    return playlist[idx].audioUrl == song.audioUrl;
   }
 
   void reorderPlaylist(int oldIdx, int newIdx) {
     // These two lines are workarounds for ReorderableListView problems
     if (newIdx > _playlist.length) newIdx = _playlist.length;
     if (oldIdx < newIdx) newIdx--;
-
-    print("oldIdx: $oldIdx, newIdx: $newIdx");
-    if (oldIdx < _playIdx && newIdx >= _playIdx) {
-      _playIdx--;
-    } else if (oldIdx > _playIdx && newIdx <= _playIdx) {
-      _playIdx++;
-    } else if (oldIdx == _playIdx) {
-      _playIdx = newIdx;
-    }
     _playlist.insert(newIdx, _playlist.removeAt(oldIdx));
     notifyListeners();
   }
 
   void nextSong() {
-    playNthSong((_playIdx + 1) % _playlist.length);
+    final playIdx = playlist.indexWhere((e) => e.audioUrl == song.audioUrl);
+    if (playIdx == -1 && playlist.length > 0) {
+      playNthSong(0);
+    }
+    playNthSong((playIdx + 1) % _playlist.length);
   }
 
   void prevSong() {
-    playNthSong((_playIdx - 1) % _playlist.length);
+    final playIdx = playlist.indexWhere((e) => e.audioUrl == song.audioUrl);
+    if (playIdx == -1 && playlist.length > 0) {
+      playNthSong(0);
+    }
+    playNthSong((playIdx - 1) % _playlist.length);
   }
 
   void forward10() async {
@@ -79,25 +77,36 @@ class AudioSchedule with ChangeNotifier {
     notifyListeners();
   }
 
-  void seek(double percentage) {
-    player.seek(song.audioDuration * percentage);
+  seek(double percentage) async {
+    await player.seek(song.audioDuration * percentage);
     player.play(song.audioUrl, respectAudioFocus: true);
   }
 
-  void play() async {
+  playWithHistory() async {
     var duration = await DBProvider.db.getPlayHistory(song.audioUrl);
     player.play(song.audioUrl, position: duration, respectAudioFocus: true);
   }
 
-  void playNthSong(int idx) {
-    if (_playlist[idx]  == song) {
+  play() async {
+    player.play(song.audioUrl, respectAudioFocus: true);
+  }
+
+  Future<void> playNthSong(int idx) async {
+    if (song == null) {
+      _song = playlist[idx];
+      await playWithHistory();
+      notifyListeners();
       return;
     }
 
-    pause();
-    _playIdx = idx;
-    song = _playlist[idx];
-    play();
+    if (song.audioUrl == playlist[idx].audioUrl) {
+      await play();
+      return;
+    }
+
+    await pause();
+    _song = playlist[idx];
+    await playWithHistory();
     notifyListeners();
   }
 
@@ -105,12 +114,24 @@ class AudioSchedule with ChangeNotifier {
     player.resume();
   }
 
-  void pause() async {
+  Future<void> pause() async {
     if (song != null) {
-      player.pause();
-      DBProvider.db.addPlayHistory(song.audioUrl,
-          Duration(milliseconds: await player.getCurrentPosition()));
+      await player.pause();
+      await _recordPlayHistory();
     }
+  }
+
+  Future<void> stop() async {
+    if (song != null) {
+      await player.stop();
+      await _recordPlayHistory();
+    }
+  }
+
+  Future<void> _recordPlayHistory() async {
+    final duration = Duration(milliseconds: await player.getCurrentPosition());
+    DBProvider.db.addPlayHistory(song.audioUrl, duration);
+    print("history recorded for ${song.songTitle} @${duration.toString()}");
   }
 
   @override

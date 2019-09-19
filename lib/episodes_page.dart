@@ -410,13 +410,9 @@ playNewEpisode(BuildContext context, Episode episode) async {
     }
   }
 
+  // insert into playlist
   final schedule = Provider.of<AudioSchedule>(context);
-  if (schedule.playlist == null) {
-    schedule.playlist = <Episode>[episode];
-  } else {
-    schedule.playlist.remove(episode);
-    schedule.playlist.insert(0, episode);
-  }
+  schedule.pushSong(episode);
   schedule.playNthSong(0);
   Navigator.push(context, MaterialPageRoute(builder: (context) {
     return PlayPage();
