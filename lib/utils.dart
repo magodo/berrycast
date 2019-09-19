@@ -11,6 +11,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'bloc/db_offline_episode.dart';
 import 'bloc/db_podcast.dart';
 import 'episodes_page.dart';
+import 'model/episode.dart';
 import 'model/offline_episode.dart';
 import 'model/podcast.dart';
 import 'offline_episode_page.dart';
@@ -222,4 +223,63 @@ openExistAlbumPage(BuildContext context, Podcast podcast) async {
   Navigator.push(context, MaterialPageRoute(builder: (context) {
     return EpisodesPage(podcast.image);
   }));
+}
+
+void buildBottomSheet(BuildContext context, Episode episode) {
+  showModalBottomSheet(
+    shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.all(Radius.circular(10))),
+    elevation: 5,
+    isScrollControlled: true,
+    context: context,
+    builder: (BuildContext context) {
+      return ConstrainedBox(
+        constraints: BoxConstraints(maxHeight: 500),
+        child: ListView(
+          shrinkWrap: true,
+          children: <Widget>[
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: ListTile(
+                contentPadding: EdgeInsets.all(0),
+                leading: episode.albumArt,
+                title: Text(
+                  episode.songTitle,
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(8.0, 0, 8.0, 0),
+              child: DownloadButtom(
+                episode: episode,
+              ),
+            ),
+            Divider(),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(8.0, 0, 8.0, 0),
+              child: ListTile(
+                contentPadding: EdgeInsets.all(0),
+                leading: Icon(Icons.date_range),
+                title: Text("${episode.pubDate}"),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(8.0, 0, 8.0, 0),
+              child: ListTile(
+                contentPadding: EdgeInsets.all(0),
+                leading: Icon(Icons.timelapse),
+                title: Text(prettyDuration(episode.audioDuration)),
+              ),
+            ),
+            Divider(),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text(episode.summary),
+            ),
+          ],
+        ),
+      );
+    },
+  );
 }

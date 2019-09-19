@@ -185,69 +185,10 @@ class EpisodeItem extends StatelessWidget {
       trailing: IconButton(
         icon: Icon(Icons.more_vert),
         onPressed: () {
-          _buildBottomSheet(context, episode);
+          buildBottomSheet(context, episode);
         },
       ),
       onTap: () async => await playNewEpisode(context, episode),
-    );
-  }
-
-  void _buildBottomSheet(BuildContext context, Episode episode) {
-    showModalBottomSheet(
-      shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(10))),
-      elevation: 5,
-      isScrollControlled: true,
-      context: context,
-      builder: (BuildContext context) {
-        return ConstrainedBox(
-          constraints: BoxConstraints(maxHeight: 500),
-          child: ListView(
-            shrinkWrap: true,
-            children: <Widget>[
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: ListTile(
-                  contentPadding: EdgeInsets.all(0),
-                  leading: episode.albumArt,
-                  title: Text(
-                    episode.songTitle,
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(8.0, 0, 8.0, 0),
-                child: DownloadButtom(
-                  episode: episode,
-                ),
-              ),
-              Divider(),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(8.0, 0, 8.0, 0),
-                child: ListTile(
-                  contentPadding: EdgeInsets.all(0),
-                  leading: Icon(Icons.date_range),
-                  title: Text("${episode.pubDate}"),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(8.0, 0, 8.0, 0),
-                child: ListTile(
-                  contentPadding: EdgeInsets.all(0),
-                  leading: Icon(Icons.timelapse),
-                  title: Text(prettyDuration(episode.audioDuration)),
-                ),
-              ),
-              Divider(),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Text(episode.summary),
-              ),
-            ],
-          ),
-        );
-      },
     );
   }
 }
