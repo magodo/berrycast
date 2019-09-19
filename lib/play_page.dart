@@ -62,18 +62,18 @@ class PlayPage extends StatelessWidget {
               }
               return Container();
             }),
-            Builder(builder: (context) {
-              final schedule = Provider.of<AudioSchedule>(context);
-              final song = schedule.song;
-              if (song is Episode) {
-                return IconButton(
-                  icon: Icon(Icons.info_outline),
-                  color: Colors.grey,
-                  onPressed: () => buildBottomSheet(context, song),
-                );
-              }
-              return Container();
-            }),
+//            Builder(builder: (context) {
+//              final schedule = Provider.of<AudioSchedule>(context);
+//              final song = schedule.song;
+//              if (song is Episode) {
+//                return IconButton(
+//                  icon: Icon(Icons.info_outline),
+//                  color: Colors.grey,
+//                  onPressed: () => buildBottomSheet(context, song),
+//                );
+//              }
+//              return Container();
+//            }),
             Builder(builder: (context) {
               return IconButton(
                 icon: Icon(Icons.playlist_play),

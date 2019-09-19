@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 
 import 'audio.dart';
 import 'audioplayer_stream_wrapper.dart';
+import 'model/episode.dart';
 import 'utils.dart';
 
 class ButtonControls extends StatelessWidget {
@@ -37,7 +38,7 @@ class ButtonControls extends StatelessWidget {
             children: <Widget>[
               // song/artist names
               songTitle,
-              new SongInfos(),
+              new SecondaryControl(),
               // audio control
               Padding(
                 padding: const EdgeInsets.only(top: 10.0),
@@ -51,8 +52,8 @@ class ButtonControls extends StatelessWidget {
   }
 }
 
-class SongInfos extends StatelessWidget {
-  const SongInfos({
+class SecondaryControl extends StatelessWidget {
+  const SecondaryControl({
     Key key,
   }) : super(key: key);
 
@@ -62,31 +63,29 @@ class SongInfos extends StatelessWidget {
     final song = schedule.song;
     final seekPosition = Provider.of<SeekPosition>(context);
 
-    return RichText(
-      text: TextSpan(
-        children: [
-          TextSpan(
-            text: song.artist + "\n",
-            style: TextStyle(
-              color: Colors.white.withOpacity(0.75),
-              fontSize: 12.0,
-              letterSpacing: 3.0,
-              height: 1.5,
-            ),
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      children: <Widget>[
+        LoopModeButton(),
+        RichText(
+          text: TextSpan(
+            children: [
+              TextSpan(
+                text:
+                    "${prettyDuration(seekPosition)}/${prettyDuration(song.audioDuration)}",
+                style: TextStyle(
+                  color: Colors.white.withOpacity(0.75),
+                  fontSize: 20.0,
+                  letterSpacing: 1.0,
+                  height: 1.5,
+                ),
+              ),
+            ],
           ),
-          TextSpan(
-            text:
-                "${prettyDuration(seekPosition)}/${prettyDuration(song.audioDuration)}",
-            style: TextStyle(
-              color: Colors.white.withOpacity(0.75),
-              fontSize: 20.0,
-              letterSpacing: 1.0,
-              height: 1.5,
-            ),
-          ),
-        ],
-      ),
-      textAlign: TextAlign.center,
+          textAlign: TextAlign.center,
+        ),
+        SongInfoButton(),
+      ],
     );
   }
 }
@@ -120,6 +119,48 @@ class ButtomControls extends StatelessWidget {
         Expanded(child: Container()),
       ],
     );
+  }
+}
+
+class SongInfoButton extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final schedule = Provider.of<AudioSchedule>(context);
+    final song = schedule.song;
+    if (song is Episode) {
+      return buildAudioButton(
+        Icons.info_outline,
+        (context) {
+          return () => buildBottomSheet(context, song);
+        },
+      );
+    }
+  }
+}
+
+class LoopModeButton extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final schedule = Provider.of<AudioSchedule>(context);
+    final loopMode = schedule.loopMode;
+    IconData icon;
+    switch (loopMode) {
+      case LoopMode.repeat:
+        icon = Icons.repeat;
+        break;
+      case LoopMode.repeatOne:
+        icon = Icons.repeat_one;
+        break;
+      case LoopMode.shuffle:
+        icon = Icons.shuffle;
+        break;
+    }
+    final nextLoopMode =
+        loopModes[(loopModes.indexOf(loopMode) + 1) % loopModes.length];
+    return buildAudioButton(
+        icon,
+        (context) =>
+            () => Provider.of<AudioSchedule>(context).loopMode = nextLoopMode);
   }
 }
 
