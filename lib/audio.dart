@@ -172,7 +172,7 @@ class AudioSchedule with ChangeNotifier {
 
   void _nextSongShuffle() {
     var rng = Random();
-    final idx = rng.nextInt(_playlist.length - 1);
+    final idx = rng.nextInt(_playlist.length);
     playNthSong(idx);
     return;
   }
