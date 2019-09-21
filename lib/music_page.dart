@@ -20,6 +20,7 @@ class _MusicPageState extends State<MusicPage> {
 
   @override
   void initState() {
+    print("init...");
     super.initState();
     _isLoading = true;
     _isStoragePermitted = false;
@@ -27,9 +28,9 @@ class _MusicPageState extends State<MusicPage> {
   }
 
   _prepare() async {
-    print("start to update songs");
+    await Future.delayed(Duration(milliseconds: 200));
     await _updateAllSongs();
-    print("finish to update songs");
+    await Future.delayed(Duration(milliseconds: 200));
     setState(() {
       _isLoading = false;
     });
@@ -48,33 +49,35 @@ class _MusicPageState extends State<MusicPage> {
 
   @override
   Widget build(BuildContext context) {
-    return _isLoading
-        ? CircularProgressIndicator()
-        : !_isStoragePermitted
-            ?
-            // TODO: add retry button
-            Center(
-                child: Text("External storage permission needed!"),
-              )
-            : DefaultTabController(
-                initialIndex: 0,
-                length: 3,
-                child: Scaffold(
-                  appBar: AppBar(
-                    elevation: 1,
-                    backgroundColor: Colors.white,
-                    title: TabBar(tabs: [
-                      Tab(icon: Icon(Icons.music_note)),
-                      Tab(icon: Icon(Icons.album)),
-                      Tab(icon: Icon(Icons.folder)),
+    return Center(
+      child: _isLoading
+          ? CircularProgressIndicator()
+          : !_isStoragePermitted
+              ?
+              // TODO: add retry button
+              Center(
+                  child: Text("External storage permission needed!"),
+                )
+              : DefaultTabController(
+                  initialIndex: 0,
+                  length: 3,
+                  child: Scaffold(
+                    appBar: AppBar(
+                      elevation: 1,
+                      backgroundColor: Colors.white,
+                      title: TabBar(tabs: [
+                        Tab(icon: Icon(Icons.music_note)),
+                        Tab(icon: Icon(Icons.album)),
+                        Tab(icon: Icon(Icons.folder)),
+                      ]),
+                    ),
+                    body: TabBarView(children: [
+                      MusicView(musics: _musics),
+                      Container(),
+                      Container(),
                     ]),
-                  ),
-                  body: TabBarView(children: [
-                    MusicView(musics: _musics),
-                    Container(),
-                    Container(),
-                  ]),
-                ));
+                  )),
+    );
   }
 }
 
