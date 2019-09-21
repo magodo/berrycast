@@ -25,19 +25,22 @@ class _MusicPageState extends State<MusicPage> {
     _prepare();
   }
 
-  void _prepare() async {
+  _prepare() async {
+    await _updateAllSongs();
+    setState(() {
+      _isLoading = false;
+    });
+  }
+
+  _updateAllSongs() async {
     _isStoragePermitted = await ensureStoragePermission();
     if (_isStoragePermitted) {
-      await ensurePodcastFolder();
-      await ensureMusicFolder();
       var songs = await MusicFinder.allSongs();
+      _musics.clear();
       songs.forEach((song) {
         _musics.add(Music.fromSong(song));
       });
     }
-    setState(() {
-      _isLoading = false;
-    });
   }
 
   @override
