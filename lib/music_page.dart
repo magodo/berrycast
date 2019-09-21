@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'audio.dart';
 import 'model/music.dart';
 import 'play_page.dart';
+import 'radial_seekbar.dart';
 import 'utils.dart';
 
 class MusicPage extends StatefulWidget {
@@ -26,7 +27,9 @@ class _MusicPageState extends State<MusicPage> {
   }
 
   _prepare() async {
+    print("start to update songs");
     await _updateAllSongs();
+    print("finish to update songs");
     setState(() {
       _isLoading = false;
     });
@@ -91,7 +94,10 @@ class _MusicViewState extends State<MusicView> {
       children: widget.musics
           .map((e) => Card(
                 child: ListTile(
-                  leading: e.albumArt,
+                  leading: ClipOval(
+                    clipper: CircleClipper(),
+                    child: e.albumArt,
+                  ),
                   onTap: () => _playMusic(context, e),
                   title: Text(
                     e.songTitle,

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'audio.dart';
-import 'buttom_controls.dart';
+import 'button_controls.dart';
 import 'model/episode.dart';
 import 'radial_seekbar.dart';
 import 'utils.dart';

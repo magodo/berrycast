@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'audio.dart';
-import 'buttom_controls.dart';
+import 'button_controls.dart';
 import 'play_page.dart';
 import 'radial_seekbar.dart';
 import 'theme.dart';
@@ -24,10 +24,7 @@ class BottomBar extends StatelessWidget {
               child: ClipOval(
                 clipper: CircleClipper(),
                 child: InkWell(
-                  child: ClipOval(
-                    clipper: CircleClipper(),
-                    child: schedule.song.albumArt,
-                  ),
+                  child: schedule.song.albumArt,
                   onTap: () {
                     Navigator.push(context,
                         MaterialPageRoute(builder: (context) {

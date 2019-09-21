@@ -112,8 +112,12 @@ class AudioSchedule with ChangeNotifier {
     player.play(song.audioUrl, position: duration, respectAudioFocus: true);
   }
 
-  play() async {
+  playFromStart() async {
     player.play(song.audioUrl, position: Duration(), respectAudioFocus: true);
+  }
+
+  play() async {
+    player.play(song.audioUrl, respectAudioFocus: true);
   }
 
   Future<void> playNthSong(int idx) async {
@@ -171,7 +175,7 @@ class AudioSchedule with ChangeNotifier {
   }
 
   void _nextSongRepeatOne() {
-    play();
+    playFromStart();
     return;
   }
 
