@@ -77,6 +77,18 @@ Future<String> getPodcastFolder() async {
   return p.join(await _findLocalPath(), 'Podcasts');
 }
 
+Future<String> ensureMusicFolder() async {
+  final musicDirPath = await getMusicFolder();
+
+  if (!await Directory(musicDirPath).exists())
+    await Directory(musicDirPath).create();
+  return musicDirPath;
+}
+
+Future<String> getMusicFolder() async {
+  return p.join(await _findLocalPath(), 'Musics');
+}
+
 // Return two Widgets: [progressbar, control button]
 List<Widget> buildDownloadControls(BuildContext context, OfflineEpisode p) {
   Widget progressWidget, controlWidget;

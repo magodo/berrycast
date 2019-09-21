@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'bottom_bar.dart';
 import 'drawer_header.dart';
+import 'music_page.dart';
 import 'offline_episode_page.dart';
 import 'podcast_page.dart';
 import 'search_page.dart';
@@ -80,7 +81,7 @@ class _HomeState extends State<Home> {
               : TabBarView(
                   children: [
                     PodcastPage(),
-                    Container(),
+                    MusicPage(),
                     SearchPage(),
                   ],
                 ),
@@ -93,6 +94,7 @@ class _HomeState extends State<Home> {
   Future<void> _prepare() async {
     if (await ensureStoragePermission()) {
       await ensurePodcastFolder();
+      await ensureMusicFolder();
     }
     setState(() {
       _isLoading = false;

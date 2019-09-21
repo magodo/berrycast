@@ -225,7 +225,7 @@ class _DownloadButtomState extends State<DownloadButtom> {
                 Text("Download Episode (${prettySize(widget.episode.size)})"),
             onTap: () async {
               if (await ensureStoragePermission()) {
-                var podcastDir = await ensurePodcastFolder();
+                final podcastDir = await ensurePodcastFolder();
 
                 // start download task
                 final taskId = await FlutterDownloader.enqueue(

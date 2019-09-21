@@ -50,6 +50,11 @@ dependencies:
   percent_indicator: "^2.1.1"
   marquee: 1.2.0
 
+  #flute_music_player: ^0.0.6
+  flute_music_player:
+    path:
+      /home/magodo/github/Flute-Music-Player
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

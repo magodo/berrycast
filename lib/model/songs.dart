@@ -1,12 +1,11 @@
-import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/material.dart';
 
 abstract class Song {
   String get audioUrl;
   Duration get audioDuration;
   String get songTitle;
-  CachedNetworkImage get albumArt;
+  Widget get albumArt;
   String get artist;
   String get albumTitle;
   bool get isLocal;
 }
-

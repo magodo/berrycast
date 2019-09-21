@@ -1,4 +1,3 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
 import 'podcast.dart';
@@ -14,7 +13,7 @@ class Episode implements Song {
   final int size;
   final bool isLocal;
   Duration lastPlayPosition;
-  CachedNetworkImage get albumArt => podcast.image;
+  Widget get albumArt => podcast.image;
 
   String get artist => podcast.author;
   String get albumTitle => podcast.title;

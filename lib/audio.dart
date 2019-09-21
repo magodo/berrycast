@@ -4,6 +4,7 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 
 import 'audioplayer_stream_wrapper.dart';
+import 'model/episode.dart';
 import 'model/songs.dart';
 import 'resources/db.dart';
 
@@ -154,9 +155,13 @@ class AudioSchedule with ChangeNotifier {
 
   Future<void> _recordPlayHistory() async {
     Duration duration;
-    duration = Duration(milliseconds: await player.getCurrentPosition());
-    DBProvider.db.addPlayHistory(song.audioUrl, duration);
-    print("history recorded for ${song.songTitle} @${duration.toString()}");
+
+    // episode should record playhistory, while music should not
+    if (song is Episode) {
+      duration = Duration(milliseconds: await player.getCurrentPosition());
+      DBProvider.db.addPlayHistory(song.audioUrl, duration);
+      print("history recorded for ${song.songTitle} @${duration.toString()}");
+    }
   }
 
   void _nextSongRepeat() {

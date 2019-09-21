@@ -135,6 +135,7 @@ class SongInfoButton extends StatelessWidget {
         },
       );
     }
+    return Container();
   }
 }
 
