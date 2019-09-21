@@ -6,6 +6,7 @@ import 'audio.dart';
 import 'model/music.dart';
 import 'play_page.dart';
 import 'radial_seekbar.dart';
+import 'theme.dart';
 import 'utils.dart';
 
 class MusicPage extends StatefulWidget {
@@ -65,11 +66,15 @@ class _MusicPageState extends State<MusicPage> {
                     appBar: AppBar(
                       elevation: 1,
                       backgroundColor: Colors.white,
-                      title: TabBar(tabs: [
-                        Tab(icon: Icon(Icons.music_note)),
-                        Tab(icon: Icon(Icons.album)),
-                        Tab(icon: Icon(Icons.folder)),
-                      ]),
+                      title: TabBar(
+                        labelColor: accentColor,
+                        unselectedLabelColor: Colors.grey,
+                        tabs: [
+                          Tab(icon: Icon(Icons.music_note)),
+                          Tab(icon: Icon(Icons.album)),
+                          Tab(icon: Icon(Icons.folder)),
+                        ],
+                      ),
                     ),
                     body: TabBarView(children: [
                       MusicView(musics: _musics),
