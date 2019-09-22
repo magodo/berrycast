@@ -27,9 +27,10 @@ class _AlbumGalleryPageState extends State<AlbumGalleryPage> {
 
   List<Widget> _buildAlbumThumb(BuildContext context) {
     final albumTitles = widget.musicAlbumMap.keys.toList();
-    return List.generate(
-      albumTitles.length,
-      (idx) => RawMaterialButton(
+    return List.generate(albumTitles.length, (idx) {
+      var albumMusics = widget.musicAlbumMap[albumTitles[idx]];
+      var firstMusic = albumMusics[0];
+      return RawMaterialButton(
         shape: CircleBorder(),
         splashColor: lightAccentColor,
         highlightColor: lightAccentColor.withOpacity(0.5),
@@ -37,18 +38,29 @@ class _AlbumGalleryPageState extends State<AlbumGalleryPage> {
         highlightElevation: 5.0,
         onPressed: () {},
         child: GridTile(
+          footer: GridTileBar(
+            backgroundColor: Colors.black45,
+            title: Text(firstMusic.albumTitle),
+            subtitle: Text(firstMusic.artist),
+          ),
           child: InkResponse(
             enableFeedback: true,
-            child: widget.musicAlbumMap[albumTitles[idx]][0].albumArt,
+            child: firstMusic.albumArt,
             onTap: () {
-              Navigator.push(context, MaterialPageRoute(builder: (context) {
-                return AlbumPage(
-                    albumMusics: widget.musicAlbumMap[albumTitles[idx]]);
-              }));
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) {
+                    return AlbumPage(
+                      albumMusics: albumMusics,
+                    );
+                  },
+                ),
+              );
             },
           ),
         ),
-      ),
-    );
+      );
+    });
   }
 }

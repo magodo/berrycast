@@ -26,9 +26,9 @@ class Music implements Song {
                     width: 256,
                     child: DecoratedBox(
                       decoration: BoxDecoration(
-                        color: Colors.grey,
+                        color: Colors.grey[200],
                         image: DecorationImage(
-                          image: AssetImage('images/unknown_artist.png'),
+                          image: AssetImage('images/logo.png'),
                         ),
                       ),
                     )))
