@@ -1,34 +1,47 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
 
-import 'model/music.dart';
 import 'music_album_page.dart';
+import 'musics_provider.dart';
 import 'theme.dart';
 
 class AlbumGalleryPage extends StatefulWidget {
-  final Map<String, List<Music>> musicAlbumMap;
-
-  const AlbumGalleryPage({Key key, this.musicAlbumMap}) : super(key: key);
   @override
   _AlbumGalleryPageState createState() => _AlbumGalleryPageState();
 }
 
 class _AlbumGalleryPageState extends State<AlbumGalleryPage> {
+  final RefreshController _refreshController =
+      RefreshController(initialRefresh: false);
+
   @override
   Widget build(BuildContext context) {
-    return GridView.count(
-      crossAxisCount: 2,
-      mainAxisSpacing: 4.0,
-      crossAxisSpacing: 4.0,
-      padding: const EdgeInsets.all(4.0),
-      childAspectRatio: 1.0,
-      children: _buildAlbumThumb(context),
+    final mp = Provider.of<MusicProvider>(context);
+    return SmartRefresher(
+      enablePullDown: true,
+      header: MaterialClassicHeader(),
+      controller: _refreshController,
+      onRefresh: () async {
+        await mp.updateAllSongs();
+        _refreshController.refreshCompleted();
+      },
+      child: GridView.count(
+        crossAxisCount: 2,
+        mainAxisSpacing: 4.0,
+        crossAxisSpacing: 4.0,
+        padding: const EdgeInsets.all(4.0),
+        childAspectRatio: 1.0,
+        children: _buildAlbumThumb(context),
+      ),
     );
   }
 
   List<Widget> _buildAlbumThumb(BuildContext context) {
-    final albumTitles = widget.musicAlbumMap.keys.toList();
+    final mp = Provider.of<MusicProvider>(context);
+    final albumTitles = mp.musicAlbumMap.keys.toList();
     return List.generate(albumTitles.length, (idx) {
-      var albumMusics = widget.musicAlbumMap[albumTitles[idx]];
+      var albumMusics = mp.musicAlbumMap[albumTitles[idx]];
       var firstMusic = albumMusics[0];
       return RawMaterialButton(
         shape: CircleBorder(),

@@ -2,29 +2,31 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:path/path.dart' as p;
+import 'package:provider/provider.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
 
-import 'model/music.dart';
+import 'musics_provider.dart';
 import 'sliver_appbar_delegate.dart';
 import 'utils.dart';
 
 class MusicFolderPage extends StatefulWidget {
-  final Map<String, Music> musicPathMap;
-  final String path;
-
-  const MusicFolderPage({Key key, this.path, this.musicPathMap})
-      : super(key: key);
+  const MusicFolderPage({Key key}) : super(key: key);
 
   @override
-  _MusicFolderPageState createState() => _MusicFolderPageState(path);
+  _MusicFolderPageState createState() =>
+      _MusicFolderPageState(musicProvider.musicCommonAncientDir);
 }
 
 class _MusicFolderPageState extends State<MusicFolderPage> {
   String path;
+  final RefreshController _refreshController =
+      RefreshController(initialRefresh: false);
 
   _MusicFolderPageState(this.path);
 
   @override
   Widget build(BuildContext context) {
+    final mp = Provider.of<MusicProvider>(context);
     if (path == null) {
       return Center(child: Text("no music available"));
     }
@@ -42,7 +44,8 @@ class _MusicFolderPageState extends State<MusicFolderPage> {
                 ),
                 child: Row(
                   children: <Widget>[
-                    path == widget.path
+                    // first directory level
+                    path == mp.musicCommonAncientDir
                         ? Container()
                         : IconButton(
                             icon: Icon(Icons.arrow_back),
@@ -66,7 +69,21 @@ class _MusicFolderPageState extends State<MusicFolderPage> {
           ),
         ];
       },
-      body: ListView(
+      body: buildListView(context),
+    );
+  }
+
+  Widget buildListView(BuildContext context) {
+    final mp = Provider.of<MusicProvider>(context);
+    return SmartRefresher(
+      enablePullDown: true,
+      header: MaterialClassicHeader(),
+      controller: _refreshController,
+      onRefresh: () async {
+        await mp.updateAllSongs();
+        _refreshController.refreshCompleted();
+      },
+      child: ListView(
         children: Directory(path)
             .listSync()
             .map((e) => _buildEntry(context, e))
@@ -76,13 +93,14 @@ class _MusicFolderPageState extends State<MusicFolderPage> {
   }
 
   Widget _buildEntry(BuildContext context, FileSystemEntity e) {
+    final mp = Provider.of<MusicProvider>(context);
     if (e is File) {
       return ListTile(
         leading: Icon(Icons.music_note),
         title: Text(
           p.basename(e.path),
         ),
-        onTap: () => playSong(context, widget.musicPathMap[e.path]),
+        onTap: () => playSong(context, mp.musicPathMap[e.path]),
       );
     }
 

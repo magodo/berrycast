@@ -37,6 +37,7 @@ class _HomeState extends State<Home> {
       child: SafeArea(
         child: Scaffold(
           appBar: AppBar(
+            centerTitle: true,
             title: Text(
               "Berrycast",
               style: TextStyle(color: Colors.white),

@@ -1,22 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 import 'model/music.dart';
+import 'musics_provider.dart';
 import 'radial_seekbar.dart';
 import 'sliver_appbar_delegate.dart';
 import 'utils.dart';
 
 class AllMusicPage extends StatefulWidget {
-  final List<Music> musics;
-
-  const AllMusicPage({Key key, this.musics}) : super(key: key);
-
   @override
   _AllMusicPageState createState() => _AllMusicPageState();
 }
 
 class _AllMusicPageState extends State<AllMusicPage> {
+  final RefreshController _refreshController =
+      RefreshController(initialRefresh: false);
+
   @override
   Widget build(BuildContext context) {
+    final mp = Provider.of<MusicProvider>(context);
     return NestedScrollView(
       headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
         return <Widget>[
@@ -32,7 +35,7 @@ class _AllMusicPageState extends State<AllMusicPage> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
-                    buildPlayallButton(context, widget.musics),
+                    buildPlayallButton(context, mp.musics),
                   ],
                 ),
               ),
@@ -45,8 +48,18 @@ class _AllMusicPageState extends State<AllMusicPage> {
   }
 
   Widget _buildMusicListView(context) {
-    return ListView(
-      children: widget.musics.map((e) => _buildMusicItem(context, e)).toList(),
+    final mp = Provider.of<MusicProvider>(context);
+    return SmartRefresher(
+      enablePullDown: true,
+      header: MaterialClassicHeader(),
+      controller: _refreshController,
+      onRefresh: () async {
+        await mp.updateAllSongs();
+        _refreshController.refreshCompleted();
+      },
+      child: ListView(
+        children: mp.musics.map((e) => _buildMusicItem(context, e)).toList(),
+      ),
     );
   }
 

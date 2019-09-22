@@ -9,6 +9,7 @@ import 'bloc/db_offline_episode.dart';
 import 'bloc/db_podcast.dart';
 import 'home.dart';
 import 'model/podcast.dart';
+import 'musics_provider.dart';
 import 'theme.dart';
 
 void main() => runApp(MyApp());
@@ -26,14 +27,14 @@ class _MyAppState extends State<MyApp> {
     super.initState();
     dbOfflineEpisodeBloc.init();
     FlutterDownloader.registerCallback(
-            (String id, DownloadTaskStatus status, int progress) async {
-              // workaround when a task is just started but no byte is downloaded, then this task is paused.
-              // The flutter_downloader will return progress as -1 in this case.
-              if (progress < 0) {
-                progress = 0;
-              }
-              dbOfflineEpisodeBloc.upgradeTaskStatus(id, status, progress);
-            });
+        (String id, DownloadTaskStatus status, int progress) async {
+      // workaround when a task is just started but no byte is downloaded, then this task is paused.
+      // The flutter_downloader will return progress as -1 in this case.
+      if (progress < 0) {
+        progress = 0;
+      }
+      dbOfflineEpisodeBloc.upgradeTaskStatus(id, status, progress);
+    });
   }
 
   @override
@@ -47,6 +48,7 @@ class _MyAppState extends State<MyApp> {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider<AudioSchedule>.value(value: schedule),
+        ChangeNotifierProvider<MusicProvider>.value(value: musicProvider),
         StreamProvider<AudioPosition>.value(
           value: schedule.player.onAudioPositionChanged,
           initialData: AudioPosition(Duration()),
@@ -80,4 +82,3 @@ class _MyAppState extends State<MyApp> {
     );
   }
 }
-
