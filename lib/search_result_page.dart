@@ -3,8 +3,9 @@ import 'package:flutter/material.dart';
 
 import 'bloc/db_podcast.dart';
 import 'bloc/itunes_bloc.dart';
-import 'episodes_page.dart';
+import 'bottom_bar.dart';
 import 'model/itunes.dart';
+import 'podcast_page.dart';
 import 'resources/db.dart';
 
 class SearchResultPage extends StatelessWidget {
@@ -65,6 +66,7 @@ class SearchResultPage extends StatelessWidget {
                     .toList(),
               );
             }),
+        bottomNavigationBar: BottomBar(),
       ),
     );
   }
@@ -87,7 +89,7 @@ class SearchResultPage extends StatelessWidget {
     }();
 
     Navigator.push(context, MaterialPageRoute(builder: (context) {
-      return EpisodesPage(ipodcast.image);
+      return PodcastPage(ipodcast.image);
     }));
   }
 }

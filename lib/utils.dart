@@ -7,14 +7,18 @@ import 'package:marquee/marquee.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:provider/provider.dart';
 
+import 'audio.dart';
 import 'bloc/db_offline_episode.dart';
 import 'bloc/db_podcast.dart';
-import 'episodes_page.dart';
 import 'model/episode.dart';
 import 'model/offline_episode.dart';
 import 'model/podcast.dart';
+import 'model/songs.dart';
 import 'offline_episode_page.dart';
+import 'play_page.dart';
+import 'podcast_page.dart';
 import 'resources/db.dart';
 import 'theme.dart';
 
@@ -230,10 +234,10 @@ Widget buildMarqueeText(BuildContext context, Text text, double height) {
   );
 }
 
-openExistAlbumPage(BuildContext context, Podcast podcast) async {
+openPodcastPage(BuildContext context, Podcast podcast) async {
   dbPodcastBloc.feedPodcast(podcast);
   Navigator.push(context, MaterialPageRoute(builder: (context) {
-    return EpisodesPage(podcast.image);
+    return PodcastPage(podcast.image);
   }));
 }
 
@@ -293,5 +297,44 @@ void buildBottomSheet(BuildContext context, Episode episode) {
         ),
       );
     },
+  );
+}
+
+void playSong(BuildContext context, Song song) {
+  final schedule = Provider.of<AudioSchedule>(context);
+  schedule.pushSong(song);
+  schedule.playNthSong(0);
+  Navigator.push(context, MaterialPageRoute(builder: (context) {
+    return PlayPage();
+  }));
+}
+
+void playSongs(BuildContext context, List<Song> songs) {
+  final schedule = Provider.of<AudioSchedule>(context);
+  schedule.playlist = List.from(songs);
+  schedule.playNthSong(0);
+  Navigator.push(context, MaterialPageRoute(builder: (context) {
+    return PlayPage();
+  }));
+}
+
+buildPlayallButton(BuildContext context, List<Song> songs) {
+  return FlatButton(
+    child: Row(
+      children: <Widget>[
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Icon(
+            Icons.play_circle_outline,
+            color: accentColor,
+          ),
+        ),
+        Text(
+          "PLAY ALL (${songs.length})",
+          style: TextStyle(color: accentColor),
+        ),
+      ],
+    ),
+    onPressed: () => playSongs(context, songs),
   );
 }

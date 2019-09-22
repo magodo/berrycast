@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 
 import 'bloc/db_offline_episode.dart';
+import 'bottom_bar.dart';
 import 'model/offline_episode.dart';
 import 'theme.dart';
 import 'utils.dart';
@@ -20,6 +21,7 @@ class OfflineEpisodePage extends StatelessWidget {
           ),
         ),
         body: new _Body(),
+        bottomNavigationBar: BottomBar(),
       ),
     );
   }

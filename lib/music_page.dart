@@ -1,11 +1,11 @@
 import 'package:flute_music_player/flute_music_player.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:path/path.dart' as p;
 
-import 'audio.dart';
 import 'model/music.dart';
-import 'play_page.dart';
-import 'radial_seekbar.dart';
+import 'music_album_gallery_page.dart';
+import 'music_all_music_page.dart';
+import 'music_folder_page.dart';
 import 'theme.dart';
 import 'utils.dart';
 
@@ -18,23 +18,44 @@ class _MusicPageState extends State<MusicPage> {
   bool _isLoading;
   bool _isStoragePermitted;
   List<Music> _musics = [];
+  var _musicAlbumMap = Map<String, List<Music>>();
+  var _musicPathMap = Map<String, Music>();
+  String _musicCommonAncientDir;
 
   @override
   void initState() {
-    print("init...");
     super.initState();
     _isLoading = true;
     _isStoragePermitted = false;
     _prepare();
   }
 
+  String _getCommonAncientDir(String dir1, dir2) {
+    if (dir1.contains(dir2)) return dir2;
+    if (dir2.contains(dir1)) return dir1;
+    return _getCommonAncientDir(p.dirname(dir1), p.dirname(dir2));
+  }
+
   _prepare() async {
     await Future.delayed(Duration(milliseconds: 200));
     await _updateAllSongs();
     await Future.delayed(Duration(milliseconds: 200));
-    setState(() {
-      _isLoading = false;
-    });
+
+    for (var music in _musics) {
+      final musicFolder = p.dirname(music.audioUrl);
+      if (_musicCommonAncientDir == null) {
+        _musicCommonAncientDir = musicFolder;
+      } else {
+        _musicCommonAncientDir =
+            _getCommonAncientDir(_musicCommonAncientDir, musicFolder);
+      }
+    }
+
+    if (mounted) {
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
 
   _updateAllSongs() async {
@@ -42,8 +63,18 @@ class _MusicPageState extends State<MusicPage> {
     if (_isStoragePermitted) {
       var songs = await MusicFinder.allSongs();
       _musics.clear();
-      songs.forEach((song) {
-        _musics.add(Music.fromSong(song));
+      songs.forEach((Song song) {
+        final music = Music.fromSong(song);
+
+        _musics.add(music);
+
+        if (_musicAlbumMap[music.albumTitle] == null) {
+          _musicAlbumMap[music.albumTitle] = <Music>[music];
+        } else {
+          _musicAlbumMap[music.albumTitle].add(music);
+        }
+
+        _musicPathMap[music.audioUrl] = music;
       });
     }
   }
@@ -77,54 +108,13 @@ class _MusicPageState extends State<MusicPage> {
                       ),
                     ),
                     body: TabBarView(children: [
-                      MusicView(musics: _musics),
-                      Container(),
-                      Container(),
+                      AllMusicPage(musics: _musics),
+                      AlbumGalleryPage(musicAlbumMap: _musicAlbumMap),
+                      MusicFolderPage(
+                          path: _musicCommonAncientDir,
+                          musicPathMap: _musicPathMap),
                     ]),
                   )),
     );
   }
-}
-
-class MusicView extends StatefulWidget {
-  final List<Music> musics;
-
-  const MusicView({Key key, this.musics}) : super(key: key);
-
-  @override
-  _MusicViewState createState() => _MusicViewState();
-}
-
-class _MusicViewState extends State<MusicView> {
-  @override
-  Widget build(BuildContext context) {
-    return ListView(
-      children: widget.musics
-          .map((e) => Card(
-                child: ListTile(
-                  leading: ClipOval(
-                    clipper: CircleClipper(),
-                    child: e.albumArt,
-                  ),
-                  onTap: () => _playMusic(context, e),
-                  title: Text(
-                    e.songTitle,
-                  ),
-                  subtitle: Text(e.artist + " - " + e.albumTitle),
-                  trailing:
-                      IconButton(icon: Icon(Icons.more_vert), onPressed: () {}),
-                ),
-              ))
-          .toList(),
-    );
-  }
-}
-
-void _playMusic(BuildContext context, Music music) {
-  final schedule = Provider.of<AudioSchedule>(context);
-  schedule.pushSong(music);
-  schedule.playNthSong(0);
-  Navigator.push(context, MaterialPageRoute(builder: (context) {
-    return PlayPage();
-  }));
 }

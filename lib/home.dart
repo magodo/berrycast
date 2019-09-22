@@ -4,7 +4,7 @@ import 'bottom_bar.dart';
 import 'drawer_header.dart';
 import 'music_page.dart';
 import 'offline_episode_page.dart';
-import 'podcast_page.dart';
+import 'podcast_gallery_page.dart';
 import 'search_page.dart';
 import 'theme.dart';
 import 'utils.dart';
@@ -80,12 +80,12 @@ class _HomeState extends State<Home> {
                 )
               : TabBarView(
                   children: [
-                    PodcastPage(),
+                    PodcastGalleryPage(),
                     MusicPage(),
                     SearchPage(),
                   ],
                 ),
-          bottomSheet: BottomBar(),
+          bottomNavigationBar: BottomBar(),
         ),
       ),
     );
