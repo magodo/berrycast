@@ -75,7 +75,6 @@ class _AllMusicPageState extends State<AllMusicPage> {
           e.songTitle,
         ),
         subtitle: Text(e.artist + " - " + e.albumTitle),
-        trailing: IconButton(icon: Icon(Icons.more_vert), onPressed: () {}),
       ),
     );
   }
