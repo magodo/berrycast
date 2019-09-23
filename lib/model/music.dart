@@ -23,8 +23,8 @@ class Music implements Song {
             ? FittedBox(
                 fit: BoxFit.cover,
                 child: SizedBox(
-                    height: 256,
-                    width: 256,
+                    height: 60,
+                    width: 60,
                     child: DecoratedBox(
                       decoration: BoxDecoration(
                         color: Colors.grey[200],
@@ -33,7 +33,11 @@ class Music implements Song {
                         ),
                       ),
                     )))
-            : Image.file(File(song.albumArt), fit: BoxFit.cover),
+            : SizedBox(
+                height: 60,
+                width: 60,
+                child: Image.file(File(song.albumArt), fit: BoxFit.cover),
+              ),
         artist = song.artist,
         albumTitle = song.album,
         trackId = song.trackId;

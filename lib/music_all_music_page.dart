@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
+import 'clipper.dart';
 import 'model/music.dart';
 import 'musics_provider.dart';
-import 'radial_seekbar.dart';
 import 'sliver_appbar_delegate.dart';
 import 'utils.dart';
 

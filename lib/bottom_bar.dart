@@ -3,8 +3,8 @@ import 'package:provider/provider.dart';
 
 import 'audio.dart';
 import 'button_controls.dart';
+import 'clipper.dart';
 import 'play_page.dart';
-import 'radial_seekbar.dart';
 import 'theme.dart';
 import 'utils.dart';
 

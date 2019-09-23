@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 
 import 'audio.dart';
 import 'audioplayer_stream_wrapper.dart';
+import 'clipper.dart';
 import 'theme.dart';
 
 class RadialSeekBar extends StatefulWidget {
@@ -92,21 +93,6 @@ class _RadialSeekBarState extends State<RadialSeekBar> {
         ),
       ),
     );
-  }
-}
-
-class CircleClipper extends CustomClipper<Rect> {
-  @override
-  Rect getClip(Size size) {
-    return Rect.fromCircle(
-      center: Offset(size.width / 2, size.height / 2),
-      radius: min(size.width, size.height) / 2,
-    );
-  }
-
-  @override
-  bool shouldReclip(CustomClipper<Rect> oldClipper) {
-    return true;
   }
 }
 
