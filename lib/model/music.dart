@@ -13,6 +13,7 @@ class Music implements Song {
   final String artist;
   final String albumTitle;
   final bool isLocal = true;
+  final int trackId;
 
   Music.fromSong(flut.Song song)
       : audioUrl = song.uri,
@@ -34,7 +35,8 @@ class Music implements Song {
                     )))
             : Image.file(File(song.albumArt), fit: BoxFit.cover),
         artist = song.artist,
-        albumTitle = song.album;
+        albumTitle = song.album,
+        trackId = song.trackId;
 
   String toString() {
     return '''
@@ -42,7 +44,8 @@ audioUrl: $audioUrl,
 audioDuration: ${audioDuration.inSeconds},
 songTitle: $songTitle,
 artist: $artist,
-album: $albumTitle
+album: $albumTitle,
+trackId: $trackId
 ''';
   }
 }

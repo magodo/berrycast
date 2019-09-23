@@ -56,6 +56,7 @@ class MusicProvider with ChangeNotifier {
             _getCommonAncientDir(_musicCommonAncientDir, musicFolder);
       }
     });
+
     notifyListeners();
   }
 

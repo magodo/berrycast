@@ -8,7 +8,9 @@ import 'utils.dart';
 class AlbumPage extends StatefulWidget {
   final List<Music> albumMusics;
 
-  const AlbumPage({Key key, this.albumMusics}) : super(key: key);
+  AlbumPage({Key key, this.albumMusics}) : super(key: key) {
+    albumMusics.sort((m1, m2) => m1.trackId - m2.trackId);
+  }
 
   @override
   _AlbumPageState createState() => _AlbumPageState();

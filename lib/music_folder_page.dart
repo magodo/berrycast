@@ -75,6 +75,17 @@ class _MusicFolderPageState extends State<MusicFolderPage> {
 
   Widget buildListView(BuildContext context) {
     final mp = Provider.of<MusicProvider>(context);
+    final musicUnderFolder = Directory(path).listSync();
+    musicUnderFolder.sort((m1, m2) {
+      if (m1 is File && m2 is File) {
+        return p.basename(m1.path).compareTo(p.basename(m2.path));
+      }
+      if (m1 is Directory && m2 is Directory) {
+        return p.basename(m1.path).compareTo(p.basename(m2.path));
+      }
+      return (m1 is Directory) ? -1 : 1;
+    });
+
     return SmartRefresher(
       enablePullDown: true,
       header: MaterialClassicHeader(),
@@ -84,10 +95,7 @@ class _MusicFolderPageState extends State<MusicFolderPage> {
         _refreshController.refreshCompleted();
       },
       child: ListView(
-        children: Directory(path)
-            .listSync()
-            .map((e) => _buildEntry(context, e))
-            .toList(),
+        children: musicUnderFolder.map((e) => _buildEntry(context, e)).toList(),
       ),
     );
   }

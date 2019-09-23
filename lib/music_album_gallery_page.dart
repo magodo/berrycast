@@ -40,6 +40,7 @@ class _AlbumGalleryPageState extends State<AlbumGalleryPage> {
   List<Widget> _buildAlbumThumb(BuildContext context) {
     final mp = Provider.of<MusicProvider>(context);
     final albumTitles = mp.musicAlbumMap.keys.toList();
+    albumTitles.sort();
     return List.generate(albumTitles.length, (idx) {
       var albumMusics = mp.musicAlbumMap[albumTitles[idx]];
       var firstMusic = albumMusics[0];

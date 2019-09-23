@@ -8,4 +8,5 @@ abstract class Song {
   String get artist;
   String get albumTitle;
   bool get isLocal;
+  int get trackId;
 }

@@ -49,6 +49,8 @@ class _AllMusicPageState extends State<AllMusicPage> {
 
   Widget _buildMusicListView(context) {
     final mp = Provider.of<MusicProvider>(context);
+    final musics = mp.musics;
+    musics.sort((m1, m2) => m1.songTitle.compareTo(jkhh));
     return SmartRefresher(
       enablePullDown: true,
       header: MaterialClassicHeader(),
@@ -58,7 +60,7 @@ class _AllMusicPageState extends State<AllMusicPage> {
         _refreshController.refreshCompleted();
       },
       child: ListView(
-        children: mp.musics.map((e) => _buildMusicItem(context, e)).toList(),
+        children: musics.map((e) => _buildMusicItem(context, e)).toList(),
       ),
     );
   }
@@ -70,7 +72,9 @@ class _AllMusicPageState extends State<AllMusicPage> {
           clipper: CircleClipper(),
           child: e.albumArt,
         ),
-        onTap: () => playSong(context, e),
+        onTap: () {
+          playSong(context, e);
+        },
         title: Text(
           e.songTitle,
         ),

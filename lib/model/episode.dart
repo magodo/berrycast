@@ -17,6 +17,7 @@ class Episode implements Song {
 
   String get artist => podcast.author;
   String get albumTitle => podcast.title;
+  int get trackId => podcast.episodes.indexWhere((e) => e.audioUrl == audioUrl);
 
   Episode({
     @required this.audioUrl,
