@@ -50,7 +50,7 @@ class _AllMusicPageState extends State<AllMusicPage> {
   Widget _buildMusicListView(context) {
     final mp = Provider.of<MusicProvider>(context);
     final musics = mp.musics;
-    musics.sort((m1, m2) => m1.songTitle.compareTo(jkhh));
+    musics.sort((m1, m2) => m1.songTitle.compareTo(m2.songTitle));
     return SmartRefresher(
       enablePullDown: true,
       header: MaterialClassicHeader(),
