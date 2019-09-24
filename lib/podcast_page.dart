@@ -70,7 +70,8 @@ class _PodcastPageState extends State<PodcastPage> {
                                   snapshot.data != null &&
                                   snapshot.data != nullPodcast
                               ? <Widget>[
-                                  buildPlayallButton(context, snapshot.data),
+                                  buildPlayallButton(
+                                      context, snapshot.data.episodes),
                                   SubscribeButton(podcast: snapshot.data),
                                 ]
                               : [],
@@ -129,27 +130,6 @@ class _PodcastPageState extends State<PodcastPage> {
             .values
             .toList(),
       ),
-    );
-  }
-
-  buildPlayallButton(BuildContext context, Podcast podcast) {
-    return FlatButton(
-      child: Row(
-        children: <Widget>[
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Icon(
-              Icons.play_circle_outline,
-              color: accentColor,
-            ),
-          ),
-          Text(
-            "PLAY ALL (${podcast.episodes.length})",
-            style: TextStyle(color: accentColor),
-          ),
-        ],
-      ),
-      onPressed: () => playSongs(context, podcast.episodes),
     );
   }
 }
