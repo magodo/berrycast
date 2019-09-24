@@ -68,7 +68,7 @@ class PlayPage extends StatelessWidget {
               Center(
                 child: BackdropFilter(
                     filter: new ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
-                    child: RadialSeekBar()),
+                    child: RadialSeekBar(radius: 300.0)),
               ),
             ])),
             // song title, artist name and controls

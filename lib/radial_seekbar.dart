@@ -10,19 +10,24 @@ import 'clipper.dart';
 import 'theme.dart';
 
 class RadialSeekBar extends StatefulWidget {
+  final double radius;
   const RadialSeekBar({
     Key key,
+    this.radius,
   }) : super(key: key);
 
   @override
-  _RadialSeekBarState createState() => _RadialSeekBarState();
+  _RadialSeekBarState createState() => _RadialSeekBarState(radius);
 }
 
 class _RadialSeekBarState extends State<RadialSeekBar> {
+  final double radius;
   double _progressPercent;
   PolarCoord _startDragCoord;
   double _startDragPercent;
   double _currentDragPercent;
+
+  _RadialSeekBarState(this.radius);
 
   @override
   void initState() {
@@ -63,33 +68,43 @@ class _RadialSeekBarState extends State<RadialSeekBar> {
     _progressPercent =
         (audioPosition.inSeconds / schedule.song.audioDuration.inSeconds) % 1.0;
 
-    return RadialDragGestureDetector(
-      onRadialDragStart: (coord) => _onDragStart(context, coord),
-      onRadialDragUpdate: (coord) => _onDragUpdate(context, coord),
-      onRadialDragEnd: () => _onDragEnd(context),
-      child: Container(
-        width: double.infinity,
-        height: double.infinity,
-        color: Colors.transparent,
-        child: Center(
+    return Container(
+      width: double.infinity,
+      height: double.infinity,
+      color: Colors.transparent,
+      child: Center(
+        child: RadialDragGestureDetector(
+          onRadialDragStart: (coord) => _onDragStart(context, coord),
+          onRadialDragUpdate: (coord) => _onDragUpdate(context, coord),
+          onRadialDragEnd: () => _onDragEnd(context),
           child: ClipOval(
             clipper: CircleClipper(),
             child: Container(
-              width: 250.0,
-              height: 250.0,
+              width: radius,
+              height: radius,
               color: Colors.black,
-              child: RadialProgressBar(
-                trackColor: Color(0xFFDDDDDD),
-                progressPercent: _progressPercent,
-                progressColor: accentColor,
-                thumbPosition: seekPosition.inSeconds /
-                    schedule.song.audioDuration.inSeconds,
-                thumbColor: lightAccentColor,
-                innerPadding: EdgeInsets.all(5.0),
-                outerPadding: EdgeInsets.all(30.0),
-                child: ClipOval(
-                  clipper: CircleClipper(),
-                  child: Container(child: schedule.song.albumArt),
+              // disable internal radial gesture
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  image: DecorationImage(
+                    image: AssetImage("images/disc_background.png"),
+                  ),
+                ),
+                child: RadialDragGestureDetector(
+                  child: RadialProgressBar(
+                    trackColor: Color(0xFFDDDDDD),
+                    progressPercent: _progressPercent,
+                    progressColor: accentColor,
+                    thumbPosition: seekPosition.inSeconds /
+                        schedule.song.audioDuration.inSeconds,
+                    thumbColor: lightAccentColor,
+                    innerPadding: EdgeInsets.all(radius / 50),
+                    outerPadding: EdgeInsets.all(radius / 5),
+                    child: ClipOval(
+                      clipper: CircleClipper(),
+                      child: Container(child: schedule.song.albumArt),
+                    ),
+                  ),
                 ),
               ),
             ),
@@ -232,6 +247,31 @@ class RadialProgressBarPainter extends CustomPainter {
     final thumbCenter = Offset(thumbX, thumbY) + center;
     final thumbRadius = thumbSize / 2;
     canvas.drawCircle(thumbCenter, thumbRadius, thumbPaint);
+  }
+
+  @override
+  bool shouldRepaint(CustomPainter oldDelegate) {
+    return true;
+  }
+}
+
+class DrawCircleBorder extends CustomPainter {
+  final Color color;
+  final double strokeWidth;
+  final double radius;
+
+  Paint _paint;
+
+  DrawCircleBorder({this.color, this.strokeWidth, this.radius}) {
+    _paint = Paint()
+      ..color = color
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = strokeWidth;
+  }
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    canvas.drawCircle(Offset(size.width / 2, size.height / 2), radius, _paint);
   }
 
   @override
