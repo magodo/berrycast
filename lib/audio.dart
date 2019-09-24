@@ -57,6 +57,7 @@ class AudioSchedule with ChangeNotifier {
   List<Song> get playlist => _playlist;
   set playlist(List<Song> playlist) {
     _playlist = playlist;
+    notifyListeners();
   }
 
   bool get isEmpty => playlist.length == 0;
