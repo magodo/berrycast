@@ -85,7 +85,7 @@ class _RadialSeekBarState extends State<RadialSeekBar> {
                 thumbPosition: seekPosition.inSeconds /
                     schedule.song.audioDuration.inSeconds,
                 thumbColor: lightAccentColor,
-                innerPadding: EdgeInsets.all(0.0),
+                innerPadding: EdgeInsets.all(5.0),
                 outerPadding: EdgeInsets.all(30.0),
                 child: ClipOval(
                   clipper: CircleClipper(),
