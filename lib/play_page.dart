@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -11,6 +13,9 @@ import 'utils.dart';
 class PlayPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final schedule = Provider.of<AudioSchedule>(context);
+    final song = schedule.song;
+    Size size = MediaQuery.of(context).size;
     return SafeArea(
       child: Scaffold(
         endDrawer: buildPlaylist(context),
@@ -19,8 +24,6 @@ class PlayPage extends StatelessWidget {
           elevation: 0.0,
           actions: <Widget>[
             Builder(builder: (context) {
-              final schedule = Provider.of<AudioSchedule>(context);
-              final song = schedule.song;
               if (song is Episode) {
                 return IconButton(
                   icon: Icon(Icons.cast),
@@ -30,18 +33,6 @@ class PlayPage extends StatelessWidget {
               }
               return Container();
             }),
-//            Builder(builder: (context) {
-//              final schedule = Provider.of<AudioSchedule>(context);
-//              final song = schedule.song;
-//              if (song is Episode) {
-//                return IconButton(
-//                  icon: Icon(Icons.info_outline),
-//                  color: Colors.grey,
-//                  onPressed: () => buildBottomSheet(context, song),
-//                );
-//              }
-//              return Container();
-//            }),
             Builder(builder: (context) {
               return IconButton(
                 icon: Icon(Icons.playlist_play),
@@ -54,14 +45,32 @@ class PlayPage extends StatelessWidget {
         body: Column(
           children: <Widget>[
             // seek bar
-            Expanded(child: RadialSeekBar()),
+//            Expanded(
+//                child: Stack(children: <Widget>[
+//              SizedBox(
+//                  height: size.height,
+//                  width: size.width,
+//                  child: FittedBox(
+//                    child: BackdropFilter(
+//                        filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
+//                        child: song.albumArt),
+//                    fit: BoxFit.cover,
+//                  )),
+//              RadialSeekBar()
+//            ])),
 
-            // visualizer
-            Container(
-              width: double.infinity,
-              height: 125.0,
-            ),
-
+            Expanded(
+                child: Stack(children: <Widget>[
+              ConstrainedBox(
+                constraints: BoxConstraints.expand(),
+                child: song.albumArt,
+              ),
+              Center(
+                child: BackdropFilter(
+                    filter: new ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
+                    child: RadialSeekBar()),
+              ),
+            ])),
             // song title, artist name and controls
             ButtonControls(),
           ],

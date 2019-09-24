@@ -72,21 +72,25 @@ class _RadialSeekBarState extends State<RadialSeekBar> {
         height: double.infinity,
         color: Colors.transparent,
         child: Center(
-          child: Container(
-            width: 180.0,
-            height: 180.0,
-            child: RadialProgressBar(
-              trackColor: Color(0xFFDDDDDD),
-              progressPercent: _progressPercent,
-              progressColor: accentColor,
-              thumbPosition: seekPosition.inSeconds /
-                  schedule.song.audioDuration.inSeconds,
-              thumbColor: lightAccentColor,
-              innerPadding: EdgeInsets.all(10.0),
-              outerPadding: EdgeInsets.all(10.0),
-              child: ClipOval(
-                clipper: CircleClipper(),
-                child: schedule.song.albumArt,
+          child: ClipOval(
+            clipper: CircleClipper(),
+            child: Container(
+              width: 250.0,
+              height: 250.0,
+              color: Colors.black,
+              child: RadialProgressBar(
+                trackColor: Color(0xFFDDDDDD),
+                progressPercent: _progressPercent,
+                progressColor: accentColor,
+                thumbPosition: seekPosition.inSeconds /
+                    schedule.song.audioDuration.inSeconds,
+                thumbColor: lightAccentColor,
+                innerPadding: EdgeInsets.all(0.0),
+                outerPadding: EdgeInsets.all(30.0),
+                child: ClipOval(
+                  clipper: CircleClipper(),
+                  child: Container(child: schedule.song.albumArt),
+                ),
               ),
             ),
           ),
