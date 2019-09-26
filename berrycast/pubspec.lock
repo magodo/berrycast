@@ -11,9 +11,11 @@ packages:
   audioplayers:
     dependency: "direct main"
     description:
-      path: "/home/magodo/github/audioplayers"
-      relative: false
-    source: path
+      path: "."
+      ref: audio_focus
+      resolved-ref: f87d3fb6244fa3ed81079ba04617d89898d98756
+      url: "https://github.com/magodo/audioplayers.git"
+    source: git
     version: "0.13.1"
   boolean_selector:
     dependency: transitive
@@ -74,9 +76,11 @@ packages:
   flute_music_player:
     dependency: "direct main"
     description:
-      path: "/home/magodo/github/Flute-Music-Player"
-      relative: false
-    source: path
+      path: "."
+      ref: HEAD
+      resolved-ref: fe0f9bd6c60340e0dc882fa70955970c7fa23417
+      url: "https://github.com/magodo/Flute-Music-Player.git"
+    source: git
     version: "0.0.6"
   flutter:
     dependency: "direct main"
@@ -281,7 +285,7 @@ packages:
       name: sqflite
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.1.6+4"
+    version: "1.1.6+5"
   stack_trace:
     dependency: transitive
     description:
