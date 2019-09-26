@@ -153,7 +153,7 @@ class EpisodeItem extends StatelessWidget {
       trailing: IconButton(
         icon: Icon(Icons.more_vert),
         onPressed: () {
-          buildBottomSheet(context, episode);
+          buildEpisodeBottomSheet(context, episode);
         },
       ),
       onTap: () async => await playNewEpisode(context, episode),

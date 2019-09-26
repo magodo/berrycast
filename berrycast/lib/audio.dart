@@ -103,8 +103,13 @@ class AudioSchedule with ChangeNotifier {
     notifyListeners();
   }
 
-  seek(double percentage) async {
+  seekPercentage(double percentage) async {
     await player.seek(song.audioDuration * percentage);
+    player.play(song.audioUrl, respectAudioFocus: true);
+  }
+
+  seek(Duration duration) async {
+    await player.seek(duration);
     player.play(song.audioUrl, respectAudioFocus: true);
   }
 

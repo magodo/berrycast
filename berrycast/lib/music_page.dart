@@ -1,9 +1,9 @@
+import 'package:berrycast/resources/musics_provider.dart';
 import 'package:flutter/material.dart';
 
 import 'music_album_gallery_page.dart';
 import 'music_all_music_page.dart';
 import 'music_folder_page.dart';
-import 'musics_provider.dart';
 import 'theme.dart';
 import 'utils.dart';
 

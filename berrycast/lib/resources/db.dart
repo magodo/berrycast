@@ -4,6 +4,7 @@ import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
 
+import '../model/bookmark.dart';
 import '../model/offline_episode.dart';
 import '../model/podcast.dart';
 
@@ -25,6 +26,20 @@ class DBProvider {
   _upgradeDBSchema(Database db, int oldVersion, int newVersion) async {
     print("upgrade db schema... ($oldVersion -> $newVersion)");
     try {
+      await db.execute("drop table EpisodeBookmark");
+    } on Exception {}
+    await db.execute("""
+    CREATE TABLE EpisodeBookmark(
+      id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+      song TEXT NOT NULL,
+      duration INTEGER NOT NULL,
+      description TEXT NOT NULL
+    );
+    """);
+  }
+
+  _refreshSchema(Database db) async {
+    try {
       await db.execute("drop table Podcasts");
     } on Exception {}
     await db.execute("""
@@ -40,6 +55,9 @@ class DBProvider {
       await db.execute("drop table PlayHistory");
     } on Exception {}
 
+    // song: episode url for podcast episode
+    // duration: seconds played last time
+    // updated_at: update timestamp of this record, this is for keeping this table in certain amount of rows
     await db.execute("""
     CREATE TABLE PlayHistory(
       song TEXT NOT NULL PRIMARY KEY,
@@ -52,6 +70,7 @@ class DBProvider {
       await db.execute("drop table OfflineEpisodes");
     } on Exception {}
 
+    // song: episode url for podcast episode
     await db.execute("""
     CREATE TABLE OfflineEpisodes(
       song TEXT NOT NULL PRIMARY KEY,
@@ -61,6 +80,18 @@ class DBProvider {
       task_id TEXT NOT NULL
     );
     """);
+
+    try {
+      await db.execute("drop table EpisodeBookmark");
+    } on Exception {}
+    await db.execute("""
+    CREATE TABLE EpisodeBookmark(
+      id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+      song TEXT NOT NULL,
+      duration INTEGER NOT NULL,
+      description TEXT NOT NULL
+    );
+    """);
   }
 
   initDB() async {
@@ -68,38 +99,10 @@ class DBProvider {
     String path = join(documentsDirectory.path, "Podcast.db");
     return await openDatabase(
       path,
-      version: 1,
+      version: 3,
       onOpen: (db) {},
       onCreate: (Database db, int version) async {
-        await db.execute("""
-    CREATE TABLE Podcasts(
-      feed_url TEXT NOT NULL PRIMARY KEY,
-      image_url TEXT NOT NULL,
-      feed_content TEXT NOT NULL,
-      is_subscribed INTEGER NOT NULL
-    );
-    """);
-        // song: episode url for podcast episode
-        // duration: seconds played last time
-        // updated_at: update timestamp of this record, this is for keeping this table in certain amount of rows
-        await db.execute("""
-    CREATE TABLE PlayHistory(
-      song TEXT NOT NULL PRIMARY KEY,
-      duration INTEGER,
-      updated_at INTEGER
-    ); 
-    """);
-
-        // song: episode url for podcast episode
-        await db.execute("""
-    CREATE TABLE OfflineEpisodes(
-      song TEXT NOT NULL PRIMARY KEY,
-      title TEXT NOT NULL,
-      podcast_url TEXT NOT NULL,
-      image_url TEXT NOT NULL,
-      task_id TEXT NOT NULL
-    );
-    """);
+        await _refreshSchema(db);
       },
       onUpgrade: _upgradeDBSchema,
     );
@@ -216,5 +219,46 @@ class DBProvider {
     return res.isNotEmpty
         ? res.map((p) => OfflineEpisode.fromMap(p)).toList()
         : [];
+  }
+
+  addBookmark(Bookmark b) async {
+    final db = await database;
+    await db.insert("EpisodeBookmark", {
+      "song": b.episodeUrl,
+      "duration": b.duration.inSeconds,
+      "description": b.description
+    });
+  }
+
+  deleteBookmark(Bookmark bookmark) async {
+    final db = await database;
+    await db
+        .delete("EpisodeBookmark", where: "id = ?", whereArgs: [bookmark.id]);
+  }
+
+  deleteAllBookmarks(String audioUrl) async {
+    final db = await database;
+    await db
+        .delete("EpisodeBookmark", where: "song = ?", whereArgs: [audioUrl]);
+  }
+
+  updateBookmark(Bookmark bookmark) async {
+    final db = await database;
+    var res = await db.update("EpisodeBookmark", bookmark.toMap(),
+        where: "id = ?", whereArgs: [bookmark.id]);
+    return res;
+  }
+
+  Future<List<Bookmark>> getBookmarks(String song) async {
+    final db = await database;
+    var results =
+        await db.query("EpisodeBookmark", where: "song = ?", whereArgs: [song]);
+    List<Bookmark> bookmarks = [];
+    if (results.isNotEmpty) {
+      for (var res in results) {
+        bookmarks.add(Bookmark.fromMap(res));
+      }
+    }
+    return bookmarks;
   }
 }

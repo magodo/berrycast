@@ -1,11 +1,11 @@
 import 'dart:io';
 
+import 'package:berrycast/resources/musics_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:path/path.dart' as p;
 import 'package:provider/provider.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
-import 'musics_provider.dart';
 import 'sliver_appbar_delegate.dart';
 import 'utils.dart';
 

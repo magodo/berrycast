@@ -1,4 +1,5 @@
 import 'package:audioplayers/audioplayers.dart';
+import 'package:berrycast/resources/musics_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:provider/provider.dart';
@@ -9,7 +10,6 @@ import 'bloc/db_offline_episode.dart';
 import 'bloc/db_podcast.dart';
 import 'home.dart';
 import 'model/podcast.dart';
-import 'musics_provider.dart';
 import 'theme.dart';
 
 void main() => runApp(MyApp());

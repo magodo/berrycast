@@ -15,7 +15,6 @@ class PlayPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final schedule = Provider.of<AudioSchedule>(context);
     final song = schedule.song;
-    Size size = MediaQuery.of(context).size;
     return SafeArea(
       child: Scaffold(
         endDrawer: buildPlaylist(context),
@@ -23,6 +22,16 @@ class PlayPage extends StatelessWidget {
           backgroundColor: Colors.transparent,
           elevation: 0.0,
           actions: <Widget>[
+            Builder(builder: (context) {
+              if (song is Episode) {
+                return IconButton(
+                  icon: Icon(Icons.info_outline),
+                  color: Colors.grey,
+                  onPressed: () async => buildEpisodeBottomSheet(context, song),
+                );
+              }
+              return Container();
+            }),
             Builder(builder: (context) {
               if (song is Episode) {
                 return IconButton(
@@ -45,20 +54,6 @@ class PlayPage extends StatelessWidget {
         body: Column(
           children: <Widget>[
             // seek bar
-//            Expanded(
-//                child: Stack(children: <Widget>[
-//              SizedBox(
-//                  height: size.height,
-//                  width: size.width,
-//                  child: FittedBox(
-//                    child: BackdropFilter(
-//                        filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
-//                        child: song.albumArt),
-//                    fit: BoxFit.cover,
-//                  )),
-//              RadialSeekBar()
-//            ])),
-
             Expanded(
                 child: Stack(children: <Widget>[
               ConstrainedBox(

@@ -52,7 +52,7 @@ class _RadialSeekBarState extends State<RadialSeekBar> {
     final schedule = Provider.of<AudioSchedule>(context);
     _startDragPercent = null;
     _startDragCoord = null;
-    await schedule.seek(_currentDragPercent);
+    await schedule.seekPercentage(_currentDragPercent);
     schedule.player.setSeekPosition(SeekPosition(
         schedule.song.audioDuration * _currentDragPercent,
         isEnd: true));

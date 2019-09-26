@@ -12,6 +12,7 @@ import 'package:provider/provider.dart';
 import 'audio.dart';
 import 'bloc/db_offline_episode.dart';
 import 'bloc/db_podcast.dart';
+import 'episode_info.dart';
 import 'model/episode.dart';
 import 'model/offline_episode.dart';
 import 'model/podcast.dart';
@@ -19,6 +20,7 @@ import 'model/songs.dart';
 import 'offline_episode_page.dart';
 import 'play_page.dart';
 import 'podcast_page.dart';
+import 'resources/bookmark_provider.dart';
 import 'resources/db.dart';
 import 'theme.dart';
 
@@ -245,7 +247,10 @@ openPodcastPage(BuildContext context, Podcast podcast) async {
   }));
 }
 
-void buildBottomSheet(BuildContext context, Episode episode) {
+Future<void> buildEpisodeBottomSheet(
+    BuildContext context, Episode episode) async {
+  final bmp = BookmarkProvider(episode.audioUrl);
+  await bmp.load();
   showModalBottomSheet(
     shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.all(Radius.circular(10))),
@@ -253,52 +258,9 @@ void buildBottomSheet(BuildContext context, Episode episode) {
     isScrollControlled: true,
     context: context,
     builder: (BuildContext context) {
-      return ConstrainedBox(
-        constraints: BoxConstraints(maxHeight: 500),
-        child: ListView(
-          shrinkWrap: true,
-          children: <Widget>[
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: ListTile(
-                contentPadding: EdgeInsets.all(0),
-                leading: episode.albumArt,
-                title: Text(
-                  episode.songTitle,
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(8.0, 0, 8.0, 0),
-              child: DownloadButtom(
-                episode: episode,
-              ),
-            ),
-            Divider(),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(8.0, 0, 8.0, 0),
-              child: ListTile(
-                contentPadding: EdgeInsets.all(0),
-                leading: Icon(Icons.date_range),
-                title: Text("${episode.pubDate}"),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(8.0, 0, 8.0, 0),
-              child: ListTile(
-                contentPadding: EdgeInsets.all(0),
-                leading: Icon(Icons.timelapse),
-                title: Text(prettyDuration(episode.audioDuration)),
-              ),
-            ),
-            Divider(),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Text(episode.summary),
-            ),
-          ],
-        ),
+      return MultiProvider(
+        providers: [ChangeNotifierProvider<BookmarkProvider>.value(value: bmp)],
+        child: EpisodeInfoPage(episode),
       );
     },
   );

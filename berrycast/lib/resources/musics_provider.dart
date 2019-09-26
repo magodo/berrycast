@@ -2,7 +2,7 @@ import 'package:flute_music_player/flute_music_player.dart' as flut;
 import 'package:flutter/material.dart';
 import 'package:path/path.dart' as p;
 
-import 'model/music.dart';
+import '../model/music.dart';
 
 class MusicProvider with ChangeNotifier {
   bool _inited = false;

@@ -5,7 +5,9 @@ import 'package:provider/provider.dart';
 
 import 'audio.dart';
 import 'audioplayer_stream_wrapper.dart';
+import 'model/bookmark.dart';
 import 'model/episode.dart';
+import 'resources/db.dart';
 import 'utils.dart';
 
 class ButtonControls extends StatelessWidget {
@@ -84,7 +86,7 @@ class SecondaryControl extends StatelessWidget {
           ),
           textAlign: TextAlign.center,
         ),
-        SongInfoButton(),
+        EpisodeBookmarkButton(),
       ],
     );
   }
@@ -122,16 +124,25 @@ class ButtomControls extends StatelessWidget {
   }
 }
 
-class SongInfoButton extends StatelessWidget {
+class EpisodeBookmarkButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final schedule = Provider.of<AudioSchedule>(context);
-    final song = schedule.song;
+    final song = Provider.of<AudioSchedule>(context).song;
     if (song is Episode) {
+      final audioPosition = Provider.of<AudioPosition>(context);
       return buildAudioButton(
-        Icons.info_outline,
+        Icons.bookmark_border,
         (context) {
-          return () => buildBottomSheet(context, song);
+          return () {
+            DBProvider.db.addBookmark(
+              Bookmark(
+                episodeUrl: song.audioUrl,
+                duration: audioPosition,
+                // TODO
+                description: "foo",
+              ),
+            );
+          };
         },
       );
     }
