@@ -247,8 +247,8 @@ openPodcastPage(BuildContext context, Podcast podcast) async {
   }));
 }
 
-Future<void> buildEpisodeBottomSheet(
-    BuildContext context, Episode episode) async {
+Future<void> buildEpisodeBottomSheet(BuildContext context, Episode episode,
+    {double height = 500}) async {
   final bmp = BookmarkProvider(episode.audioUrl);
   await bmp.load();
   showModalBottomSheet(
@@ -260,7 +260,9 @@ Future<void> buildEpisodeBottomSheet(
     builder: (BuildContext context) {
       return MultiProvider(
         providers: [ChangeNotifierProvider<BookmarkProvider>.value(value: bmp)],
-        child: EpisodeInfoPage(episode),
+        child: ConstrainedBox(
+            constraints: BoxConstraints(maxHeight: height),
+            child: Scaffold(body: EpisodeInfoPage(episode, height))),
       );
     },
   );

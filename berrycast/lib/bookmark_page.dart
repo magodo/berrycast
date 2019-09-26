@@ -68,8 +68,10 @@ class BookmarkPage extends StatelessWidget {
                       title: Text(bm.description),
                       trailing: IconButton(
                           icon: Icon(Icons.play_arrow),
-                          onPressed: () => Provider.of<AudioSchedule>(context)
-                              .seek(bm.duration))),
+                          onPressed: () {
+                            Provider.of<AudioSchedule>(context)
+                                .seek(bm.duration);
+                          })),
                 ),
               )
               .toList(),
