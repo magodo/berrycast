@@ -355,9 +355,11 @@ packages:
   webfeed:
     dependency: "direct main"
     description:
-      path: "/home/magodo/github/webfeed"
-      relative: false
-    source: path
+      path: "."
+      ref: HEAD
+      resolved-ref: cf3bb97ade9d673ed69dcea0fc32c2e9b04f6fc8
+      url: "https://github.com/witochandra/webfeed.git"
+    source: git
     version: "0.4.2"
   xml:
     dependency: transitive

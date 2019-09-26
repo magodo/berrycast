@@ -25,15 +25,16 @@ dependencies:
   cupertino_icons: ^0.1.2
   # audioplayers: ^0.13.1
   audioplayers:
-    path: /home/magodo/github/audioplayers
+    git:
+      url: https://github.com/magodo/audioplayers.git
   fluttery: ^0.0.8
   provider: ^3.0.0+1
   rxdart: ^0.22.1
   sticky_headers: ^0.1.8
   flutter_advanced_networkimage: ^0.5.0
-  # webfeed: ^0.4.2
   webfeed:
-    path: /home/magodo/github/webfeed
+    git:
+      url: https://github.com/witochandra/webfeed.git
   http: ^0.12.0+2
   intl: ^0.15.8
   cached_network_image: ^1.1.1
@@ -45,15 +46,12 @@ dependencies:
   pull_to_refresh: ^1.5.4
   permission_handler: ^3.2.2
   flutter_downloader: ^1.2.1
-  #flutter_downloader:
-  #  path: /media/storage/github/flutter_downloader
   percent_indicator: "^2.1.1"
   marquee: 1.2.0
 
-  #flute_music_player: ^0.0.6
   flute_music_player:
-    path:
-      /home/magodo/github/Flute-Music-Player
+    git:
+      url: https://github.com/magodo/Flute-Music-Player.git
 
 dev_dependencies:
   flutter_test:
