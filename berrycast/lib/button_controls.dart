@@ -125,6 +125,8 @@ class ButtomControls extends StatelessWidget {
 }
 
 class EpisodeBookmarkButton extends StatelessWidget {
+  TextEditingController _textFieldController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     final song = Provider.of<AudioSchedule>(context).song;
@@ -133,15 +135,49 @@ class EpisodeBookmarkButton extends StatelessWidget {
       return buildAudioButton(
         Icons.bookmark_border,
         (context) {
-          return () {
-            DBProvider.db.addBookmark(
-              Bookmark(
-                episodeUrl: song.audioUrl,
-                duration: audioPosition,
-                // TODO
-                description: "foo",
-              ),
-            );
+          return () async {
+            final toAdd = await showDialog(
+                context: context,
+                builder: (context) {
+                  return AlertDialog(
+                    title: Text('Bookmark Description'),
+                    content: TextField(
+                      controller: _textFieldController,
+                      decoration: InputDecoration(hintText: "Hint..."),
+                    ),
+                    actions: <Widget>[
+                      FlatButton(
+                        child: new Text('Add'),
+                        onPressed: () {
+                          Navigator.of(context).pop(true);
+                        },
+                      ),
+                      FlatButton(
+                        child: new Text('CANCEL'),
+                        onPressed: () {
+                          Navigator.of(context).pop(false);
+                        },
+                      ),
+                    ],
+                  );
+                });
+            if (toAdd) {
+              await DBProvider.db.addBookmark(
+                Bookmark(
+                  episodeUrl: song.audioUrl,
+                  duration: audioPosition,
+                  description: _textFieldController.text,
+                ),
+              );
+              Scaffold.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(
+                    "Bookmark Succeed!",
+                    style: TextStyle(color: accentColor),
+                  ),
+                ),
+              );
+            }
           };
         },
       );

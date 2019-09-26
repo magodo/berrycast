@@ -16,6 +16,9 @@ class BookmarkPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bookmarkProvider = Provider.of<BookmarkProvider>(context);
+    final bookmarks = bookmarkProvider.bookmarks;
+    bookmarks.sort((b1, b2) => b1.duration.inSeconds - b2.duration.inSeconds);
+
     return ConstrainedBox(
       constraints: BoxConstraints(
         maxHeight: height,
@@ -23,7 +26,7 @@ class BookmarkPage extends StatelessWidget {
       child: Scaffold(
         appBar: AppBar(
           actions: <Widget>[
-            bookmarkProvider.bookmarks.length > 0
+            bookmarks.length > 0
                 ? IconButton(
                     icon: Icon(Icons.delete_outline),
                     onPressed: () async {
@@ -35,24 +38,13 @@ class BookmarkPage extends StatelessWidget {
                 : Container(),
           ],
           backgroundColor: Colors.white,
-          title: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Padding(
-                padding: const EdgeInsets.fromLTRB(0, 0, 8.0, 0),
-                child: Icon(
-                  Icons.bookmark_border,
-                ),
-              ),
-              Text(
-                "Bookmark (${bookmarkProvider.bookmarks.length})",
-              ),
-            ],
+          title: Text(
+            "Bookmark (${bookmarks.length})",
           ),
         ),
         body: ListView(
           shrinkWrap: true,
-          children: bookmarkProvider.bookmarks
+          children: bookmarks
               .map(
                 (bm) => Dismissible(
                   background: Container(
@@ -65,17 +57,20 @@ class BookmarkPage extends StatelessWidget {
                   onDismissed: (direction) {
                     bookmarkProvider.delete(bm);
                   },
-                  child: ListTile(
-                      leading: Text(prettyDuration(bm.duration)),
+                  child: Card(
+                    child: ListTile(
+                      onTap: () {
+                        playNewEpisode(context, episode, from: bm.duration);
+                        // popup two bottomsheets
+                        Navigator.pop(context);
+                        Navigator.pop(context);
+                      },
+                      leading: Icon(Icons.bookmark_border),
                       title: Text(bm.description),
-                      trailing: IconButton(
-                          icon: Icon(Icons.play_arrow),
-                          onPressed: () {
-                            playNewEpisode(context, episode, from: bm.duration);
-                            // popup two bottomsheets
-                            Navigator.pop(context);
-                            Navigator.pop(context);
-                          })),
+                      subtitle: Text(prettyDuration(bm.duration)),
+                      trailing: Icon(Icons.play_arrow),
+                    ),
+                  ),
                 ),
               )
               .toList(),
