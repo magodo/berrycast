@@ -25,9 +25,9 @@ class PlayPage extends StatelessWidget {
             Builder(builder: (context) {
               if (song is Episode) {
                 return IconButton(
-                  icon: Icon(Icons.info_outline),
+                  icon: Icon(Icons.cast),
                   color: Colors.grey,
-                  onPressed: () async => buildEpisodeBottomSheet(context, song),
+                  onPressed: () => openPodcastPage(context, song.podcast),
                 );
               }
               return Container();
@@ -35,9 +35,9 @@ class PlayPage extends StatelessWidget {
             Builder(builder: (context) {
               if (song is Episode) {
                 return IconButton(
-                  icon: Icon(Icons.cast),
+                  icon: Icon(Icons.info_outline),
                   color: Colors.grey,
-                  onPressed: () => openPodcastPage(context, song.podcast),
+                  onPressed: () async => buildEpisodeBottomSheet(context, song),
                 );
               }
               return Container();
