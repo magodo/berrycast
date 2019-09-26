@@ -5,6 +5,7 @@ import 'package:path/path.dart' as p;
 import 'package:provider/provider.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
+import 'play_page.dart';
 import 'resources/musics_provider.dart';
 import 'sliver_appbar_delegate.dart';
 import 'utils.dart';
@@ -108,7 +109,12 @@ class _MusicFolderPageState extends State<MusicFolderPage> {
         title: Text(
           p.basename(e.path),
         ),
-        onTap: () => playSong(context, mp.musicPathMap[e.path]),
+        onTap: () {
+          playSong(context, mp.musicPathMap[e.path]);
+          Navigator.push(context, MaterialPageRoute(builder: (context) {
+            return PlayPage();
+          }));
+        },
       );
     }
 

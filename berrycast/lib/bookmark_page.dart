@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import 'audio.dart';
+import 'model/episode.dart';
+import 'podcast_page.dart';
 import 'resources/bookmark_provider.dart';
 import 'theme.dart';
 import 'utils.dart';
 
 class BookmarkPage extends StatelessWidget {
   final double height;
+  final Episode episode;
 
-  const BookmarkPage({Key key, this.height}) : super(key: key);
+  const BookmarkPage({Key key, this.episode, this.height}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -69,9 +71,7 @@ class BookmarkPage extends StatelessWidget {
                       trailing: IconButton(
                           icon: Icon(Icons.play_arrow),
                           onPressed: () {
-                            Provider.of<AudioSchedule>(context)
-                                .seek(bm.duration);
-
+                            playNewEpisode(context, episode, from: bm.duration);
                             // popup two bottomsheets
                             Navigator.pop(context);
                             Navigator.pop(context);

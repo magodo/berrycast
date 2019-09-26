@@ -268,13 +268,10 @@ Future<void> buildEpisodeBottomSheet(BuildContext context, Episode episode,
   );
 }
 
-void playSong(BuildContext context, Song song) {
+void playSong(BuildContext context, Song song, {Duration from}) {
   final schedule = Provider.of<AudioSchedule>(context);
   schedule.pushSong(song);
-  schedule.playNthSong(0);
-  Navigator.push(context, MaterialPageRoute(builder: (context) {
-    return PlayPage();
-  }));
+  schedule.playNthSong(0, from: from);
 }
 
 void playSongs(BuildContext context, List<Song> songs) {

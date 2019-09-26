@@ -113,9 +113,9 @@ class AudioSchedule with ChangeNotifier {
     player.play(song.audioUrl, respectAudioFocus: true);
   }
 
-  playWithHistory() async {
-    var duration = await DBProvider.db.getPlayHistory(song.audioUrl);
-    player.play(song.audioUrl, position: duration, respectAudioFocus: true);
+  playFrom({Duration from}) async {
+    from = from ?? await DBProvider.db.getPlayHistory(song.audioUrl);
+    player.play(song.audioUrl, position: from, respectAudioFocus: true);
   }
 
   playFromStart() async {
@@ -126,22 +126,22 @@ class AudioSchedule with ChangeNotifier {
     player.play(song.audioUrl, respectAudioFocus: true);
   }
 
-  Future<void> playNthSong(int idx) async {
+  Future<void> playNthSong(int idx, {Duration from}) async {
     if (song == null) {
       _song = playlist[idx];
-      await playWithHistory();
+      await playFrom(from: from);
       notifyListeners();
       return;
     }
 
     if (song.audioUrl == playlist[idx].audioUrl) {
-      await play();
+      await playFrom(from: from);
       return;
     }
 
     await pause();
     _song = playlist[idx];
-    await playWithHistory();
+    await playFrom(from: from);
     notifyListeners();
   }
 

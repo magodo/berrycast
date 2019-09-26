@@ -4,6 +4,7 @@ import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 import 'clipper.dart';
 import 'model/music.dart';
+import 'play_page.dart';
 import 'resources/musics_provider.dart';
 import 'sliver_appbar_delegate.dart';
 import 'utils.dart';
@@ -74,6 +75,9 @@ class _AllMusicPageState extends State<AllMusicPage> {
         ),
         onTap: () {
           playSong(context, e);
+          Navigator.push(context, MaterialPageRoute(builder: (context) {
+            return PlayPage();
+          }));
         },
         title: Text(
           e.songTitle,

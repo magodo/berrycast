@@ -11,6 +11,7 @@ import 'bottom_bar.dart';
 import 'model/episode.dart';
 import 'model/offline_episode.dart';
 import 'model/podcast.dart';
+import 'play_page.dart';
 import 'resources/db.dart';
 import 'sliver_appbar_delegate.dart';
 import 'theme.dart';
@@ -143,21 +144,25 @@ class EpisodeItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      leading: Text("$index"),
-      title: Text(episode.songTitle,
-          style: TextStyle(
-            fontWeight: FontWeight.w500,
-            fontSize: 15,
-          )),
-      subtitle: Text(episode.artist),
-      trailing: IconButton(
-        icon: Icon(Icons.more_vert),
-        onPressed: () {
-          buildEpisodeBottomSheet(context, episode);
-        },
-      ),
-      onTap: () async => await playNewEpisode(context, episode),
-    );
+        leading: Text("$index"),
+        title: Text(episode.songTitle,
+            style: TextStyle(
+              fontWeight: FontWeight.w500,
+              fontSize: 15,
+            )),
+        subtitle: Text(episode.artist),
+        trailing: IconButton(
+          icon: Icon(Icons.more_vert),
+          onPressed: () {
+            buildEpisodeBottomSheet(context, episode);
+          },
+        ),
+        onTap: () async {
+          await playNewEpisode(context, episode);
+          Navigator.push(context, MaterialPageRoute(builder: (context) {
+            return PlayPage();
+          }));
+        });
   }
 }
 
@@ -356,7 +361,7 @@ class _SubscribeButtonState extends State<SubscribeButton> {
   }
 }
 
-playNewEpisode(BuildContext context, Episode episode) async {
+playNewEpisode(BuildContext context, Episode episode, {Duration from}) async {
   // if specified episode has offline version, use it
   final offlineEp = await DBProvider.db.getOfflineEpisode(episode.audioUrl);
   if (offlineEp != null) {
@@ -378,5 +383,5 @@ playNewEpisode(BuildContext context, Episode episode) async {
     }
   }
 
-  playSong(context, episode);
+  playSong(context, episode, from: from);
 }

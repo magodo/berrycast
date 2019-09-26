@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'bottom_bar.dart';
 import 'model/music.dart';
+import 'play_page.dart';
 import 'sliver_appbar_delegate.dart';
 import 'utils.dart';
 
@@ -82,14 +83,18 @@ class MusicItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      leading: Text("$index"),
-      title: Text(music.songTitle,
-          style: TextStyle(
-            fontWeight: FontWeight.w500,
-            fontSize: 15,
-          )),
-      subtitle: Text(music.artist + " - " + music.albumTitle),
-      onTap: () => playSong(context, music),
-    );
+        leading: Text("$index"),
+        title: Text(music.songTitle,
+            style: TextStyle(
+              fontWeight: FontWeight.w500,
+              fontSize: 15,
+            )),
+        subtitle: Text(music.artist + " - " + music.albumTitle),
+        onTap: () {
+          playSong(context, music);
+          Navigator.push(context, MaterialPageRoute(builder: (context) {
+            return PlayPage();
+          }));
+        });
   }
 }

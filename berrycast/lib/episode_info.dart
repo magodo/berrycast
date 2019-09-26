@@ -44,8 +44,8 @@ class EpisodeInfoPage extends StatelessWidget {
               leading: Icon(Icons.bookmark_border),
               title: Text("Bookmark (${bookmarksProvider.bookmarks.length})"),
               onTap: () {
-                Scaffold.of(context)
-                    .showBottomSheet((context) => BookmarkPage(height: height));
+                Scaffold.of(context).showBottomSheet((context) =>
+                    BookmarkPage(episode: episode, height: height));
               },
             )),
         Divider(),
