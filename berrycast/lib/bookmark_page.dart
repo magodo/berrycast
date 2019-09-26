@@ -71,6 +71,10 @@ class BookmarkPage extends StatelessWidget {
                           onPressed: () {
                             Provider.of<AudioSchedule>(context)
                                 .seek(bm.duration);
+
+                            // popup two bottomsheets
+                            Navigator.pop(context);
+                            Navigator.pop(context);
                           })),
                 ),
               )
