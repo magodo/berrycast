@@ -291,7 +291,7 @@ playNewEpisode(BuildContext context, Episode episode, {Duration from}) async {
     if (offlineEp.taskInfo?.status == DownloadTaskStatus.complete) {
       final localPath = path.join(await getPodcastFolder(), episode.songTitle);
       episode = Episode(
-        playUri: localPath,
+        localUri: localPath,
         originUri: episode.originUri,
         audioDuration: episode.audioDuration,
         songTitle: episode.songTitle,

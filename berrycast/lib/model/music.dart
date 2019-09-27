@@ -7,18 +7,17 @@ import 'songs.dart';
 
 class Music implements Song {
   final String originUri;
-  final String playUri;
+  final String localUri;
   final Duration audioDuration;
   final String songTitle;
   final Widget albumArt;
   final String artist;
   final String albumTitle;
-  final bool isLocal = true;
   final int trackId;
 
   Music.fromSong(flut.Song song)
       : originUri = song.uri,
-        playUri = song.uri,
+        localUri = song.uri,
         audioDuration = Duration(milliseconds: song.duration),
         songTitle = song.title,
         albumArt = song.albumArt == null
@@ -43,15 +42,4 @@ class Music implements Song {
         artist = song.artist,
         albumTitle = song.album,
         trackId = song.trackId;
-
-  String toString() {
-    return '''
-audioUrl: $originUri,
-audioDuration: ${audioDuration.inSeconds},
-songTitle: $songTitle,
-artist: $artist,
-album: $albumTitle,
-trackId: $trackId
-''';
-  }
 }

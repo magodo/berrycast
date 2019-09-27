@@ -105,16 +105,20 @@ class AudioSchedule with ChangeNotifier {
 
   seekPercentage(double percentage) async {
     await player.seek(song.audioDuration * percentage);
-    player.play(song.playUri, respectAudioFocus: true);
+    play();
   }
 
   playFrom({Duration from}) async {
     from = from ?? await DBProvider.db.getPlayHistory(song.originUri);
-    player.play(song.playUri, position: from, respectAudioFocus: true);
+    player.play(song.localUri ?? song.originUri,
+        respectAudioFocus: true,
+        isLocal: song.localUri != null,
+        position: from);
   }
 
   play() async {
-    player.play(song.playUri, respectAudioFocus: true);
+    player.play(song.localUri ?? song.originUri,
+        respectAudioFocus: true, isLocal: song.localUri != null);
   }
 
   Future<void> playNthSong(int idx, {Duration from}) async {

@@ -5,7 +5,7 @@ import 'songs.dart';
 
 class Episode implements Song {
   final String originUri;
-  final String playUri;
+  final String localUri;
   final Duration audioDuration;
   final String songTitle;
   final Podcast podcast;
@@ -19,11 +19,10 @@ class Episode implements Song {
   String get albumTitle => podcast.title;
   int get trackId =>
       podcast.episodes.indexWhere((e) => e.originUri == originUri);
-  bool get isLocal => originUri != playUri;
 
   Episode({
     @required this.originUri,
-    @required this.playUri,
+    @required this.localUri,
     @required this.audioDuration,
     @required this.songTitle,
     @required this.podcast,
