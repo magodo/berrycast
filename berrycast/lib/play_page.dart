@@ -22,16 +22,16 @@ class PlayPage extends StatelessWidget {
           backgroundColor: Colors.transparent,
           elevation: 0.0,
           actions: <Widget>[
-            Builder(builder: (context) {
-              if (song is Episode) {
-                return IconButton(
-                  icon: Icon(Icons.cast),
-                  color: Colors.grey,
-                  onPressed: () => openPodcastPage(context, song.podcast),
-                );
-              }
-              return Container();
-            }),
+//            Builder(builder: (context) {
+//              if (song is Episode) {
+//                return IconButton(
+//                  icon: Icon(Icons.cast),
+//                  color: Colors.grey,
+//                  onPressed: () => openPodcastPage(context, song.podcast),
+//                );
+//              }
+//              return Container();
+//            }),
             Builder(builder: (context) {
               if (song is Episode) {
                 return IconButton(
