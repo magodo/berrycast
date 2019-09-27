@@ -125,65 +125,83 @@ class ButtomControls extends StatelessWidget {
 }
 
 class EpisodeBookmarkButton extends StatelessWidget {
-  TextEditingController _textFieldController = TextEditingController();
+  TextEditingController _ectrl = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
     final song = Provider.of<AudioSchedule>(context).song;
     if (song is Episode) {
-      final audioPosition = Provider.of<AudioPosition>(context);
       return buildAudioButton(
         Icons.bookmark_border,
         (context) {
-          return () async {
-            final toAdd = await showDialog(
+          return () {
+            showDialog(
                 context: context,
-                builder: (context) {
+                builder: (_context) {
                   return AlertDialog(
                     title: Text('Add Bookmark'),
-                    content: TextField(
-                      controller: _textFieldController,
-                      decoration: InputDecoration(hintText: "description"),
+                    content: Form(
+                      key: _formKey,
+                      child: TextFormField(
+                        controller: _ectrl,
+                        decoration: InputDecoration(hintText: "description"),
+                        validator: (val) {
+                          if (val.length == 0) {
+                            return "It's empty";
+                          } else {
+                            return null;
+                          }
+                        },
+                        onFieldSubmitted: (String desc) =>
+                            _submit(context, desc),
+                      ),
                     ),
                     actions: <Widget>[
                       FlatButton(
                         child: new Text('Add'),
-                        onPressed: () {
-                          FocusScope.of(context).unfocus();
-                          Navigator.of(context).pop(true);
-                        },
+                        onPressed: () => _submit(context, _ectrl.text),
                       ),
                       FlatButton(
                         child: new Text('CANCEL'),
                         onPressed: () {
-                          Navigator.of(context).pop(false);
+                          FocusScope.of(context).unfocus();
+                          Navigator.of(context).pop();
                         },
                       ),
                     ],
                   );
                 });
-            if (toAdd) {
-              await DBProvider.db.addBookmark(
-                Bookmark(
-                  episodeUrl: song.originUri,
-                  duration: audioPosition,
-                  description: _textFieldController.text,
-                ),
-              );
-              Scaffold.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(
-                    "Bookmark Succeed!",
-                    style: TextStyle(color: accentColor),
-                  ),
-                ),
-              );
-            }
           };
         },
       );
     }
     return Container();
+  }
+
+  _submit(BuildContext context, String desc) async {
+    final song = Provider.of<AudioSchedule>(context).song;
+    final audioPosition = Provider.of<AudioPosition>(context);
+    if (!_formKey.currentState.validate()) {
+      return;
+    }
+    FocusScope.of(context).unfocus();
+    Navigator.of(context).pop();
+    await DBProvider.db.addBookmark(
+      Bookmark(
+        episodeUrl: song.originUri,
+        duration: audioPosition,
+        description: _ectrl.text,
+      ),
+    );
+    Scaffold.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          "Bookmark Succeed!",
+          style: TextStyle(color: accentColor),
+        ),
+      ),
+    );
   }
 }
 
