@@ -5,7 +5,9 @@ This is a podcast app made for strawberry 🍓
 - 100% flutter (except platform channel, of course...)
 - Online search podcast, no need to cross gfw in China 😊
 - Subscribe podcast (of course)
-- Download episode
+- Download episode for offline playing
+- Episode play history recorded
+- Episode bookmark (bookmark multiple positions of each episode with comment) 🎉
 - Local music player
 
 ## TODO
