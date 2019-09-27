@@ -28,6 +28,7 @@ class DBProvider {
     try {
       await db.execute("drop table EpisodeBookmark");
     } on Exception {}
+    // song: episode original url for podcast episode
     await db.execute("""
     CREATE TABLE EpisodeBookmark(
       id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
@@ -70,7 +71,7 @@ class DBProvider {
       await db.execute("drop table OfflineEpisodes");
     } on Exception {}
 
-    // song: episode url for podcast episode
+    // song: episode original url for podcast episode
     await db.execute("""
     CREATE TABLE OfflineEpisodes(
       song TEXT NOT NULL PRIMARY KEY,
@@ -84,6 +85,7 @@ class DBProvider {
     try {
       await db.execute("drop table EpisodeBookmark");
     } on Exception {}
+    // song: episode original url for podcast episode
     await db.execute("""
     CREATE TABLE EpisodeBookmark(
       id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
@@ -155,12 +157,12 @@ class DBProvider {
     return res;
   }
 
-  addPlayHistory(String song, Duration duration) async {
+  addPlayHistory(String originalUri, Duration duration) async {
     final db = await database;
     await db.execute(
         "insert or replace into PlayHistory(song, duration, updated_at) values (?,?,?)",
         [
-          song,
+          originalUri,
           duration.inSeconds,
           DateTime.now().millisecondsSinceEpoch / 1000
         ]);
@@ -173,10 +175,10 @@ class DBProvider {
     return;
   }
 
-  getPlayHistory(String song) async {
+  getPlayHistory(String originalUri) async {
     final db = await database;
-    var res =
-        await db.query("PlayHistory", where: "song = ?", whereArgs: [song]);
+    var res = await db
+        .query("PlayHistory", where: "song = ?", whereArgs: [originalUri]);
     if (res.isNotEmpty) {
       print("get duration: ${res.first["duration"]} seconds");
       return Duration(seconds: res.first["duration"]);

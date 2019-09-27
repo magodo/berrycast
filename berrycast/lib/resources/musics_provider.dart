@@ -46,9 +46,9 @@ class MusicProvider with ChangeNotifier {
         _musicAlbumMap[music.albumTitle].add(music);
       }
 
-      _musicPathMap[music.audioUrl] = music;
+      _musicPathMap[music.originUri] = music;
 
-      final musicFolder = p.dirname(music.audioUrl);
+      final musicFolder = p.dirname(music.originUri);
       if (_musicCommonAncientDir == null) {
         _musicCommonAncientDir = musicFolder;
       } else {

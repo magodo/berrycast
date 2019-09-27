@@ -65,14 +65,14 @@ class AudioSchedule with ChangeNotifier {
   Song get song => _song;
 
   void pushSong(Song song) {
-    playlist.removeWhere((e) => song.audioUrl == e.audioUrl);
+    playlist.removeWhere((e) => song.originUri == e.originUri);
     playlist.insert(0, song);
     notifyListeners();
     return;
   }
 
   bool isSongIdxActive(int idx) {
-    return playlist[idx].audioUrl == song.audioUrl;
+    return playlist[idx].originUri == song.originUri;
   }
 
   void reorderPlaylist(int oldIdx, int newIdx) {
@@ -84,7 +84,7 @@ class AudioSchedule with ChangeNotifier {
   }
 
   void prevSong() {
-    final playIdx = playlist.indexWhere((e) => e.audioUrl == song.audioUrl);
+    final playIdx = playlist.indexWhere((e) => e.originUri == song.originUri);
     if (playIdx == -1 && playlist.length > 0) {
       playNthSong(0);
     }
@@ -105,25 +105,16 @@ class AudioSchedule with ChangeNotifier {
 
   seekPercentage(double percentage) async {
     await player.seek(song.audioDuration * percentage);
-    player.play(song.audioUrl, respectAudioFocus: true);
-  }
-
-  seek(Duration duration) async {
-    await player.seek(duration);
-    player.play(song.audioUrl, respectAudioFocus: true);
+    player.play(song.playUri, respectAudioFocus: true);
   }
 
   playFrom({Duration from}) async {
-    from = from ?? await DBProvider.db.getPlayHistory(song.audioUrl);
-    player.play(song.audioUrl, position: from, respectAudioFocus: true);
-  }
-
-  playFromStart() async {
-    player.play(song.audioUrl, position: Duration(), respectAudioFocus: true);
+    from = from ?? await DBProvider.db.getPlayHistory(song.originUri);
+    player.play(song.playUri, position: from, respectAudioFocus: true);
   }
 
   play() async {
-    player.play(song.audioUrl, respectAudioFocus: true);
+    player.play(song.playUri, respectAudioFocus: true);
   }
 
   Future<void> playNthSong(int idx, {Duration from}) async {
@@ -134,8 +125,16 @@ class AudioSchedule with ChangeNotifier {
       return;
     }
 
-    if (song.audioUrl == playlist[idx].audioUrl) {
-      await playFrom(from: from);
+    if (song.originUri == playlist[idx].originUri) {
+      // For the same song, if specified from (e.g. because of choose one bookmark),
+      // play from there.
+      if (from != null) {
+        await playFrom(from: from);
+        return;
+      }
+
+      // Otherwise, just continue playing
+      await play();
       return;
     }
 
@@ -169,19 +168,19 @@ class AudioSchedule with ChangeNotifier {
     // episode should record playhistory, while music should not
     if (song is Episode) {
       duration = Duration(milliseconds: await player.getCurrentPosition());
-      DBProvider.db.addPlayHistory(song.audioUrl, duration);
+      DBProvider.db.addPlayHistory(song.originUri, duration);
       print("history recorded for ${song.songTitle} @${duration.toString()}");
     }
   }
 
   void _nextSongRepeat() {
-    final playIdx = playlist.indexWhere((e) => e.audioUrl == song.audioUrl);
+    final playIdx = playlist.indexWhere((e) => e.originUri == song.originUri);
     playNthSong((playIdx + 1) % _playlist.length);
     return;
   }
 
   void _nextSongRepeatOne() {
-    playFromStart();
+    playFrom(from: Duration());
     return;
   }
 

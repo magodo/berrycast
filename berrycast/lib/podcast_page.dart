@@ -189,7 +189,7 @@ class _DownloadButtomState extends State<DownloadButtom> {
 
         var offlineEpisodes = snapshot.data;
         var idx = offlineEpisodes
-            .indexWhere((e) => (e.songUrl == widget.episode.audioUrl));
+            .indexWhere((e) => (e.songUrl == widget.episode.originUri));
         if (idx == -1) {
           return ListTile(
             contentPadding: EdgeInsets.all(0),
@@ -202,7 +202,7 @@ class _DownloadButtomState extends State<DownloadButtom> {
 
                 // start download task
                 final taskId = await FlutterDownloader.enqueue(
-                  url: widget.episode.audioUrl,
+                  url: widget.episode.originUri,
                   savedDir: podcastDir,
                   fileName: widget.episode.songTitle,
                   showNotification: true,
@@ -210,7 +210,7 @@ class _DownloadButtomState extends State<DownloadButtom> {
                 );
 
                 await dbOfflineEpisodeBloc.add(OfflineEpisode(
-                  songUrl: widget.episode.audioUrl,
+                  songUrl: widget.episode.originUri,
                   title: widget.episode.songTitle,
                   podcastUrl: widget.episode.podcast.feedUrl,
                   imageUrl: widget.episode.podcast.imageUrl,
@@ -363,7 +363,7 @@ class _SubscribeButtonState extends State<SubscribeButton> {
 
 playNewEpisode(BuildContext context, Episode episode, {Duration from}) async {
   // if specified episode has offline version, use it
-  final offlineEp = await DBProvider.db.getOfflineEpisode(episode.audioUrl);
+  final offlineEp = await DBProvider.db.getOfflineEpisode(episode.originUri);
   if (offlineEp != null) {
     final tasks = await FlutterDownloader.loadTasks();
     final taskMap = {for (var task in tasks) task.taskId: task};
@@ -371,14 +371,14 @@ playNewEpisode(BuildContext context, Episode episode, {Duration from}) async {
     if (offlineEp.taskInfo?.status == DownloadTaskStatus.complete) {
       final localPath = path.join(await getPodcastFolder(), episode.songTitle);
       episode = Episode(
-        audioUrl: localPath,
+        playUri: localPath,
+        originUri: episode.originUri,
         audioDuration: episode.audioDuration,
         songTitle: episode.songTitle,
         podcast: episode.podcast,
         pubDate: episode.pubDate,
         summary: episode.summary,
         size: episode.size,
-        isLocal: true,
       );
     }
   }

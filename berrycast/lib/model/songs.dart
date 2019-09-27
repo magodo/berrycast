@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 
 abstract class Song {
-  String get audioUrl;
+  String get playUri;
+  String get originUri;
   Duration get audioDuration;
   String get songTitle;
   Widget get albumArt;

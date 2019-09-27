@@ -29,7 +29,8 @@ class Podcast {
     _episodes = [
       for (var item in _rssFeed.items)
         Episode(
-          audioUrl: item.enclosure?.url ?? "",
+          originUri: item.enclosure?.url ?? "",
+          playUri: item.enclosure?.url ?? "",
           audioDuration: item.itunes?.duration ?? Duration(),
           songTitle: item.title ?? "",
           pubDate: item.pubDate != null
@@ -38,7 +39,6 @@ class Podcast {
           summary: item.itunes?.summary ?? item.description ?? "",
           podcast: this,
           size: item.enclosure?.length ?? 0,
-          isLocal: false,
         )
     ];
     _episodes

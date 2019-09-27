@@ -140,15 +140,16 @@ class EpisodeBookmarkButton extends StatelessWidget {
                 context: context,
                 builder: (context) {
                   return AlertDialog(
-                    title: Text('Bookmark Description'),
+                    title: Text('Add Bookmark'),
                     content: TextField(
                       controller: _textFieldController,
-                      decoration: InputDecoration(hintText: "Hint..."),
+                      decoration: InputDecoration(hintText: "description"),
                     ),
                     actions: <Widget>[
                       FlatButton(
                         child: new Text('Add'),
                         onPressed: () {
+                          FocusScope.of(context).unfocus();
                           Navigator.of(context).pop(true);
                         },
                       ),
@@ -164,7 +165,7 @@ class EpisodeBookmarkButton extends StatelessWidget {
             if (toAdd) {
               await DBProvider.db.addBookmark(
                 Bookmark(
-                  episodeUrl: song.audioUrl,
+                  episodeUrl: song.originUri,
                   duration: audioPosition,
                   description: _textFieldController.text,
                 ),

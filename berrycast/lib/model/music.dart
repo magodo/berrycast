@@ -6,7 +6,8 @@ import 'package:flutter/material.dart';
 import 'songs.dart';
 
 class Music implements Song {
-  final String audioUrl;
+  final String originUri;
+  final String playUri;
   final Duration audioDuration;
   final String songTitle;
   final Widget albumArt;
@@ -16,7 +17,8 @@ class Music implements Song {
   final int trackId;
 
   Music.fromSong(flut.Song song)
-      : audioUrl = song.uri,
+      : originUri = song.uri,
+        playUri = song.uri,
         audioDuration = Duration(milliseconds: song.duration),
         songTitle = song.title,
         albumArt = song.albumArt == null
@@ -44,7 +46,7 @@ class Music implements Song {
 
   String toString() {
     return '''
-audioUrl: $audioUrl,
+audioUrl: $originUri,
 audioDuration: ${audioDuration.inSeconds},
 songTitle: $songTitle,
 artist: $artist,

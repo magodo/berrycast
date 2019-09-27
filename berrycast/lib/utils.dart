@@ -163,7 +163,8 @@ List<Widget> buildDownloadControls(BuildContext context, OfflineEpisode p) {
       ),
       onPressed: () async {
         final podcast = await DBProvider.db.getPodcast(p.podcastUrl);
-        final idx = podcast.episodes.indexWhere((e) => e.audioUrl == p.songUrl);
+        final idx =
+            podcast.episodes.indexWhere((e) => e.originUri == p.songUrl);
         if (idx == -1) {
           FlushbarHelper.createError(message: "unknown episode: ${p.title}");
           return;
@@ -249,7 +250,7 @@ openPodcastPage(BuildContext context, Podcast podcast) async {
 
 Future<void> buildEpisodeBottomSheet(BuildContext context, Episode episode,
     {double height = 500}) async {
-  final bmp = BookmarkProvider(episode.audioUrl);
+  final bmp = BookmarkProvider(episode.originUri);
   await bmp.load();
   showModalBottomSheet(
     shape: RoundedRectangleBorder(

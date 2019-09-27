@@ -11,10 +11,10 @@ class OfflineEpisode {
   DownloadTask taskInfo;
 
   CachedNetworkImage get image => CachedNetworkImage(
-    imageUrl: imageUrl,
-    placeholder: (context, url) => CircularProgressIndicator(),
-    fit: BoxFit.cover,
-  );
+        imageUrl: imageUrl,
+        placeholder: (context, url) => CircularProgressIndicator(),
+        fit: BoxFit.cover,
+      );
 
   OfflineEpisode({
     @required this.songUrl,
@@ -24,19 +24,20 @@ class OfflineEpisode {
     @required this.taskID,
   });
 
-  factory OfflineEpisode.fromMap(Map<String, dynamic> json) => new OfflineEpisode(
-    songUrl: json["song"],
-    title: json['title'],
-    podcastUrl: json['podcast_url'],
-    imageUrl: json["image_url"],
-    taskID: json["task_id"],
-  );
+  factory OfflineEpisode.fromMap(Map<String, dynamic> json) =>
+      new OfflineEpisode(
+        songUrl: json["song"],
+        title: json['title'],
+        podcastUrl: json['podcast_url'],
+        imageUrl: json["image_url"],
+        taskID: json["task_id"],
+      );
 
   Map<String, dynamic> toMap() => {
-    "song": songUrl,
-    "title": title,
-    "podcast_url": podcastUrl,
-    "image_url": imageUrl,
-    "task_id": taskID,
-  };
+        "song": songUrl,
+        "title": title,
+        "podcast_url": podcastUrl,
+        "image_url": imageUrl,
+        "task_id": taskID,
+      };
 }
