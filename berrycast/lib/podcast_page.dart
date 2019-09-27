@@ -5,11 +5,9 @@ import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:path/path.dart' as path;
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
-import 'bloc/db_offline_episode.dart';
 import 'bloc/db_podcast.dart';
 import 'bottom_bar.dart';
 import 'model/episode.dart';
-import 'model/offline_episode.dart';
 import 'model/podcast.dart';
 import 'play_page.dart';
 import 'resources/db.dart';
@@ -163,84 +161,6 @@ class EpisodeItem extends StatelessWidget {
             return PlayPage();
           }));
         });
-  }
-}
-
-class DownloadButtom extends StatefulWidget {
-  final Episode episode;
-
-  const DownloadButtom({
-    Key key,
-    @required this.episode,
-  }) : super(key: key);
-
-  @override
-  _DownloadButtomState createState() => _DownloadButtomState();
-}
-
-class _DownloadButtomState extends State<DownloadButtom> {
-  @override
-  Widget build(BuildContext context) {
-    return StreamBuilder(
-      stream: dbOfflineEpisodeBloc.offlineEpisodes,
-      builder:
-          (BuildContext context, AsyncSnapshot<List<OfflineEpisode>> snapshot) {
-        if (!snapshot.hasData) return Container();
-
-        var offlineEpisodes = snapshot.data;
-        var idx = offlineEpisodes
-            .indexWhere((e) => (e.songUrl == widget.episode.originUri));
-        if (idx == -1) {
-          return ListTile(
-            contentPadding: EdgeInsets.all(0),
-            leading: Icon(Icons.file_download),
-            title:
-                Text("Download Episode (${prettySize(widget.episode.size)})"),
-            onTap: () async {
-              if (await ensureStoragePermission()) {
-                final podcastDir = await ensurePodcastFolder();
-
-                // start download task
-                final taskId = await FlutterDownloader.enqueue(
-                  url: widget.episode.originUri,
-                  savedDir: podcastDir,
-                  fileName: widget.episode.songTitle,
-                  showNotification: true,
-                  openFileFromNotification: true,
-                );
-
-                await dbOfflineEpisodeBloc.add(OfflineEpisode(
-                  songUrl: widget.episode.originUri,
-                  title: widget.episode.songTitle,
-                  podcastUrl: widget.episode.podcast.feedUrl,
-                  imageUrl: widget.episode.podcast.imageUrl,
-                  taskID: taskId,
-                ));
-                setState(() {});
-              }
-            },
-          );
-        }
-
-        var offlineEpisode = offlineEpisodes[idx];
-        var controllers = buildDownloadControls(context, offlineEpisode);
-        var progressWidget = controllers[0];
-        var controlWidget = controllers[1];
-
-        return Card(
-          child: buildCancelDownloadDismissable(
-            context,
-            offlineEpisode,
-            ListTile(
-              contentPadding: EdgeInsets.all(0),
-              leading: Icon(Icons.file_download),
-              title: progressWidget,
-              trailing: controlWidget,
-            ),
-          ),
-        );
-      },
-    );
   }
 }
 
