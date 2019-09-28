@@ -3,10 +3,11 @@ import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:provider/provider.dart';
 
 import 'bloc/db_offline_episode.dart';
-import 'bookmark_page.dart';
 import 'model/episode.dart';
 import 'model/offline_episode.dart';
+import 'podcast_page.dart';
 import 'resources/bookmark_provider.dart';
+import 'theme.dart';
 import 'utils.dart';
 
 class EpisodeInfoPage extends StatelessWidget {
@@ -17,7 +18,6 @@ class EpisodeInfoPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bookmarksProvider = Provider.of<BookmarkProvider>(context);
     return ListView(
       shrinkWrap: true,
       children: <Widget>[
@@ -33,26 +33,14 @@ class EpisodeInfoPage extends StatelessWidget {
           ),
         ),
         Padding(
-          padding: const EdgeInsets.fromLTRB(8.0, 0, 8.0, 0),
+          padding: const EdgeInsets.fromLTRB(16.0, 0, 16.0, 0),
           child: DownloadButtom(
             episode: episode,
           ),
         ),
-        Divider(),
+        _BookmarkExpansionPanel(episode),
         Padding(
-            padding: const EdgeInsets.fromLTRB(8.0, 0, 8.0, 0),
-            child: ListTile(
-              contentPadding: EdgeInsets.all(0),
-              leading: Icon(Icons.bookmark_border),
-              title: Text("Bookmark (${bookmarksProvider.bookmarks.length})"),
-              onTap: () {
-                Scaffold.of(context).showBottomSheet((context) =>
-                    BookmarkPage(episode: episode, height: height));
-              },
-            )),
-        Divider(),
-        Padding(
-          padding: const EdgeInsets.fromLTRB(8.0, 0, 8.0, 0),
+          padding: const EdgeInsets.fromLTRB(16.0, 0, 16.0, 0),
           child: ListTile(
             contentPadding: EdgeInsets.all(0),
             leading: Icon(Icons.date_range),
@@ -60,16 +48,15 @@ class EpisodeInfoPage extends StatelessWidget {
           ),
         ),
         Padding(
-          padding: const EdgeInsets.fromLTRB(8.0, 0, 8.0, 0),
+          padding: const EdgeInsets.fromLTRB(16.0, 0, 16.0, 0),
           child: ListTile(
             contentPadding: EdgeInsets.all(0),
             leading: Icon(Icons.timelapse),
             title: Text(prettyDuration(episode.audioDuration)),
           ),
         ),
-        Divider(),
         Padding(
-          padding: const EdgeInsets.all(8.0),
+          padding: const EdgeInsets.all(16.0),
           child: Text(episode.summary),
         ),
       ],
@@ -150,5 +137,57 @@ class _DownloadButtomState extends State<DownloadButtom> {
         );
       },
     );
+  }
+}
+
+class _BookmarkExpansionPanel extends StatefulWidget {
+  final Episode episode;
+  _BookmarkExpansionPanel(this.episode);
+
+  @override
+  __BookmarkExpansionPanelState createState() =>
+      __BookmarkExpansionPanelState();
+}
+
+class __BookmarkExpansionPanelState extends State<_BookmarkExpansionPanel> {
+  @override
+  Widget build(BuildContext context) {
+    final bookmarksProvider = Provider.of<BookmarkProvider>(context);
+    final bookmarks = bookmarksProvider.bookmarks;
+    bookmarks.sort((b1, b2) => b1.duration.inSeconds - b2.duration.inSeconds);
+    return bookmarks.length == 0
+        ? ListTile(
+            leading: Icon(Icons.bookmark_border),
+            title: Text("Bookmark (${bookmarksProvider.bookmarks.length})"),
+          )
+        : ExpansionTile(
+            leading: Icon(Icons.bookmark_border),
+            title: Text("Bookmark (${bookmarksProvider.bookmarks.length})"),
+            children: bookmarks
+                .map((bm) => Dismissible(
+                      background: Container(
+                        alignment: Alignment(-0.8, 0),
+                        color: accentColor,
+                        child: Icon(Icons.cancel),
+                      ),
+                      key: ValueKey(bm.duration),
+                      direction: DismissDirection.startToEnd,
+                      onDismissed: (direction) {
+                        bookmarksProvider.delete(bm);
+                      },
+                      child: ListTile(
+                        onTap: () {
+                          playNewEpisode(context, widget.episode,
+                              from: bm.duration);
+                          Navigator.pop(context);
+                        },
+                        leading: Icon(Icons.bookmark_border),
+                        title: Text(bm.description),
+                        subtitle: Text(prettyDuration(bm.duration)),
+                        trailing: Icon(Icons.play_arrow),
+                      ),
+                    ))
+                .toList(),
+          );
   }
 }
