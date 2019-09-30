@@ -268,7 +268,7 @@ class PlayPauseButton extends StatelessWidget {
       case AudioPlayerState.STOPPED:
       case AudioPlayerState.COMPLETED:
         icon = Icons.play_arrow;
-        onPressed = schedule.playFrom;
+        onPressed = schedule.playOn;
         buttonColor = Colors.white;
         break;
     }

@@ -31,6 +31,8 @@ class MyAudioPlayer extends AudioPlayer {
         _positionController.stream,
         super.onAudioPositionChanged.map((position) => AudioPosition(position))
       ]);
+
+  @override
   void setPosition(AudioPosition pos) {
     _positionController.sink.add(pos);
   }

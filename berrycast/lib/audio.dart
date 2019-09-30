@@ -105,20 +105,31 @@ class AudioSchedule with ChangeNotifier {
 
   seekPercentage(double percentage) async {
     await player.seek(song.audioDuration * percentage);
-    play();
+    playOn();
   }
 
   playFrom({Duration from}) async {
-    from = from ?? await DBProvider.db.getPlayHistory(song.originUri);
+    if (song is Episode) {
+      from = from ?? await DBProvider.db.getPlayHistory(song.originUri);
+    }
+
+    // when switching song, set audio seek position to the history position or origin before actually
+    // set audio position. This is because setting audio position is async and will not update audio
+    // position immediately.
+    player.setPosition(AudioPosition(from ?? Duration()));
+
     player.play(song.localUri ?? song.originUri,
         respectAudioFocus: true,
         isLocal: song.localUri != null,
         position: from);
   }
 
-  play() async {
-    player.play(song.localUri ?? song.originUri,
-        respectAudioFocus: true, isLocal: song.localUri != null);
+  playOn() async {
+    player.play(
+      song.localUri ?? song.originUri,
+      respectAudioFocus: true,
+      isLocal: song.localUri != null,
+    );
   }
 
   Future<void> playNthSong(int idx, {Duration from}) async {
@@ -138,11 +149,11 @@ class AudioSchedule with ChangeNotifier {
       }
 
       // Otherwise, just continue playing
-      await play();
+      await playOn();
       return;
     }
 
-    await pause();
+    await stop();
     _song = playlist[idx];
     await playFrom(from: from);
     notifyListeners();
