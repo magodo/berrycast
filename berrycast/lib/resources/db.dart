@@ -25,18 +25,6 @@ class DBProvider {
 
   _upgradeDBSchema(Database db, int oldVersion, int newVersion) async {
     print("upgrade db schema... ($oldVersion -> $newVersion)");
-    try {
-      await db.execute("drop table EpisodeBookmark");
-    } on Exception {}
-    // song: episode original url for podcast episode
-    await db.execute("""
-    CREATE TABLE EpisodeBookmark(
-      id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-      song TEXT NOT NULL,
-      duration INTEGER NOT NULL,
-      description TEXT NOT NULL
-    );
-    """);
   }
 
   _refreshSchema(Database db) async {
@@ -101,7 +89,7 @@ class DBProvider {
     String path = join(documentsDirectory.path, "Podcast.db");
     return await openDatabase(
       path,
-      version: 3,
+      version: 1,
       onOpen: (db) {},
       onCreate: (Database db, int version) async {
         await _refreshSchema(db);
