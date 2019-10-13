@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
+import 'audio.dart';
 import 'bottom_bar.dart';
 import 'drawer_header.dart';
 import 'music_page.dart';
@@ -79,13 +81,7 @@ class _HomeState extends State<Home> {
               ? Center(
                   child: CircularProgressIndicator(),
                 )
-              : TabBarView(
-                  children: [
-                    PodcastGalleryPage(),
-                    MusicPage(),
-                    SearchPage(),
-                  ],
-                ),
+              : _Body(),
           bottomNavigationBar: BottomBar(),
         ),
       ),
@@ -100,5 +96,48 @@ class _HomeState extends State<Home> {
     setState(() {
       _isLoading = false;
     });
+  }
+}
+
+class _Body extends StatelessWidget {
+  DateTime currentBackPressTime;
+  @override
+  Widget build(BuildContext context) {
+    return WillPopScope(
+      onWillPop: buildOnWillPop(context),
+      child: TabBarView(
+        children: [
+          PodcastGalleryPage(),
+          MusicPage(),
+          SearchPage(),
+        ],
+      ),
+    );
+  }
+
+  buildOnWillPop(BuildContext context) {
+    onExit(BuildContext context) {
+      final audioSchedule = Provider.of<AudioSchedule>(context);
+      audioSchedule.stop();
+    }
+
+    Future<bool> onWillPop() {
+      DateTime now = DateTime.now();
+      if (currentBackPressTime == null ||
+          now.difference(currentBackPressTime) > Duration(seconds: 2)) {
+        currentBackPressTime = now;
+        var snackBar = SnackBar(
+          content: Text("Press back again to exit"),
+          duration: Duration(seconds: 3),
+        );
+        Scaffold.of(context).showSnackBar(snackBar);
+        return Future.value(false);
+      }
+
+      onExit(context);
+      return Future.value(true);
+    }
+
+    return onWillPop;
   }
 }
