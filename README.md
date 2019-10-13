@@ -13,7 +13,7 @@ This is a podcast app made for strawberry 🍓
 ## TODO
 
 - Episode auto-update and notification. Currently only manual drag down update available 😥
-- Audio arbitration (including audio focus change and audio sink unplugged). Currently only long-term audio focus change is honored 😶
+- Audio sink unplugged, audio not stopped 😶
 - Notification bar view
 - Music playlist management
 - Music search bar
