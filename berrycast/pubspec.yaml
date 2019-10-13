@@ -73,7 +73,6 @@ flutter:
 
   assets:
    - images/logo.png
-   - images/unknown_artist.png
    - images/disc_background.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
