@@ -13,7 +13,7 @@ packages:
     description:
       path: "."
       ref: audio_focus
-      resolved-ref: "3d62eeb971bb48f55974c44e34a55740e273f2fd"
+      resolved-ref: dc479370a2aa6de760d26db996e07be0c5ea1b07
       url: "https://github.com/magodo/audioplayers.git"
     source: git
     version: "0.13.1"
