@@ -102,7 +102,7 @@ class _DownloadButtomState extends State<DownloadButtom> {
                 final taskId = await FlutterDownloader.enqueue(
                   url: widget.episode.originUri,
                   savedDir: podcastDir,
-                  fileName: widget.episode.songTitle,
+                  fileName: base64OfString(widget.episode.songTitle),
                   showNotification: true,
                   openFileFromNotification: true,
                 );

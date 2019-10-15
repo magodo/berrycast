@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flushbar/flushbar_helper.dart';
@@ -303,4 +304,8 @@ buildPlayallButton(BuildContext context, List<Song> songs) {
     ),
     onPressed: () => playSongs(context, songs),
   );
+}
+
+String base64OfString(String s) {
+  return base64.encode(utf8.encode(s));
 }
