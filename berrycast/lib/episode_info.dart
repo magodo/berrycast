@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
+import 'package:flutter_html/flutter_html.dart';
+import 'package:html/dom.dart' as dom;
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import 'bloc/db_offline_episode.dart';
 import 'model/episode.dart';
@@ -57,10 +60,37 @@ class EpisodeInfoPage extends StatelessWidget {
         ),
         Padding(
           padding: const EdgeInsets.all(16.0),
-          child: Text(episode.summary),
+          child: buildSummary(),
         ),
       ],
     );
+  }
+
+  Widget buildSummary() {
+    try {
+      return Html(
+        data: episode.summary,
+        onLinkTap: (url) async {
+          if (await canLaunch(url)) {
+            await launch(url);
+          }
+        },
+        customTextStyle: (dom.Node node, TextStyle baseStyle) {
+          if (node is dom.Element) {
+            switch (node.localName) {
+              case "h1":
+                return baseStyle.merge(TextStyle(fontSize: 20));
+              case "h2":
+                return baseStyle.merge(TextStyle(fontSize: 15));
+            }
+          }
+          return baseStyle;
+        },
+      );
+    } catch (e) {
+      // TODO: This fallback logic actually not work... Figure out why???
+      return Text(episode.summary);
+    }
   }
 }
 
