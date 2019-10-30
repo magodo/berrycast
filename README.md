@@ -32,3 +32,7 @@ UI inspired by [this](https://github.com/matthew-carroll/flutter_ui_challenge_mu
 ![screenshot](https://github.com/magodo/berrycast/blob/master/screenshots/podcast_page.jpg)
 ![screenshot](https://github.com/magodo/berrycast/blob/master/screenshots/music_album_gallery_page.jpg)
 ![screenshot](https://github.com/magodo/berrycast/blob/master/screenshots/play_page.jpg)
+
+## Acknowledge
+
+Thanks to [Jetbrain's]( https://www.jetbrains.com/?from=berrycast) support on this project!
